@@ -259,8 +259,10 @@ public class RenderTrains implements IGui {
 			final boolean shouldRenderColor = renderColors || rail.railType.hasSavedRail;
 			final boolean shouldRenderArrow = renderColors && rail.railType == RailType.NONE;
 
+			final int railColor = rail.railType.color;
+
 			if (!ClientData.railRenderingCache.containsKey(rail)) {
-				final Map<String, QuadCache> cache = new HashMap<>();
+				final Map<String, RenderingCache> cache = new HashMap<>();
 				rail.render((h, k, r, t1, t2, y1, y2, isStraight, isEnd) -> {
 					final int yf = (int) Math.floor(Math.min(y1, y2));
 					final int yc = (int) Math.ceil(Math.max(y1, y2));
@@ -280,21 +282,20 @@ public class RenderTrains implements IGui {
 					final BlockPos lightRefPos = new BlockPos(lightRefC.x, yc, lightRefC.z);
 
 					final float textureOffset = (((int) (rc1.x + rc1.z)) % 4) * 0.25F;
-					final int color = shouldRenderColor ? rail.railType.color : ARGB_WHITE;
 
 					if (!cache.containsKey("rail")) {
-						cache.put("rail", new QuadCache(false, TEXTURE_PATH_RAIL, null));
+						cache.put("rail", new QuadCache(false, TEXTURE_PATH_RAIL));
 					}
-					final QuadCache quadCacheRail = cache.get("rail");
+					final QuadCache quadCacheRail = (QuadCache)cache.get("rail");
 
-					quadCacheRail.addFace(rc1.x, y1, rc1.z, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc3.x, y2, rc3.z, rc4.x, y2 + SMALL_OFFSET, rc4.z, 0, 0.1875F + textureOffset, 1, 0.3125F + textureOffset, Direction.UP, color, lightRefPos);
-					quadCacheRail.addFace(rc4.x, y2 + SMALL_OFFSET, rc4.z, rc3.x, y2, rc3.z, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc1.x, y1, rc1.z, 0, 0.1875F + textureOffset, 1, 0.3125F + textureOffset, Direction.UP, color, lightRefPos);
+					quadCacheRail.addFace(rc1.x, y1, rc1.z, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc3.x, y2, rc3.z, rc4.x, y2 + SMALL_OFFSET, rc4.z, 0, 0.1875F + textureOffset, 1, 0.3125F + textureOffset, Direction.UP, railColor, lightRefPos);
+					quadCacheRail.addFace(rc4.x, y2 + SMALL_OFFSET, rc4.z, rc3.x, y2, rc3.z, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc1.x, y1, rc1.z, 0, 0.1875F + textureOffset, 1, 0.3125F + textureOffset, Direction.UP, railColor, lightRefPos);
 
 					if (ballastBlockMetadata != null) {
 						if (!cache.containsKey("ballast_flat")) {
-							cache.put("ballast_flat", new QuadCache(true, "textures/" + ballastBlockMetadata.sprite.getId().getPath() + ".png", ballastBlockMetadata.sprite));
+							cache.put("ballast_flat", new QuadCache(true, ballastBlockMetadata.sprite));
 						}
-						final QuadCache quadCacheBallastFlat = cache.get("ballast_flat");
+						final QuadCache quadCacheBallastFlat = (QuadCache)cache.get("ballast_flat");
 
 						final int tint = ballastBlockMetadata.getTint(world, lightRefPos);
 						quadCacheBallastFlat.addFace(bc1.x, y1d, bc1.z, bc2.x, y1d + SMALL_OFFSET / 3, bc2.z,
@@ -302,9 +303,9 @@ public class RenderTrains implements IGui {
 								tint, lightRefPos);
 						if (rail.isStraight() && !rail.isFlat()) {
 							if (!cache.containsKey("ballast_block")) {
-								cache.put("ballast_block", new QuadCache(true, "textures/" + ballastBlockMetadata.sprite.getId().getPath() + ".png", ballastBlockMetadata.sprite));
+								cache.put("ballast_block", new BlockFaceCache(ballastBlockMetadata.sprite));
 							}
-							final QuadCache vcBallastBlock = cache.get("ballast_block");
+							final BlockFaceCache vcBallastBlock = (BlockFaceCache)cache.get("ballast_block");
 
 							final float xmin = Math.min(Math.min(bc1.x, bc2.x), bc3.x);
 							final float zmin = Math.min(Math.min(bc1.z, bc2.z), bc3.z);
@@ -333,8 +334,14 @@ public class RenderTrains implements IGui {
 				});
 				ClientData.railRenderingCache.put(rail, cache);
 			}
-			ClientData.railRenderingCache.get(rail).values().forEach(quadCache -> {
-				quadCache.apply(vertexConsumers, matrices, world);
+			ClientData.railRenderingCache.get(rail).forEach((name, cache) -> {
+				if (name.equals("rail")) {
+					if (!shouldRenderArrow) {
+						cache.apply(vertexConsumers, matrices, world, shouldRenderColor);
+					}
+				} else {
+					cache.apply(vertexConsumers, matrices, world, true);
+				}
 			});
 
 			if (shouldRenderArrow) {
@@ -352,8 +359,8 @@ public class RenderTrains implements IGui {
 					BlockPos lightRefPos = new BlockPos(lightRefC.x, yc, lightRefC.z);
 					final int lightRail = WorldRenderer.getLightmapCoordinates(world, lightRefPos);
 					final VertexConsumer vcRailArrow = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(new Identifier("mtr:textures/block/one_way_rail_arrow.png")));
-					IDrawing.drawTexture(matrices, vcRailArrow, rc1.x, y1, rc1.z, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc3.x, y2, rc3.z, rc4.x, y2 + SMALL_OFFSET, rc4.z, 0, 0.25F, 1, 0.25F + dV / 2, Direction.UP, -1, lightRail);
-					IDrawing.drawTexture(matrices, vcRailArrow, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc1.x, y1, rc1.z, rc4.x, y2 + SMALL_OFFSET, rc4.z, rc3.x, y2, rc3.z, 0, 0.25F, 1, 0.25F + dV / 2, Direction.UP, -1, lightRail);
+					IDrawing.drawTexture(matrices, vcRailArrow, rc1.x, y1, rc1.z, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc3.x, y2, rc3.z, rc4.x, y2 + SMALL_OFFSET, rc4.z, 0, 0.25F, 1, 0.25F + dV / 2, Direction.UP, railColor, lightRail);
+					IDrawing.drawTexture(matrices, vcRailArrow, rc2.x, y1 + SMALL_OFFSET, rc2.z, rc1.x, y1, rc1.z, rc4.x, y2 + SMALL_OFFSET, rc4.z, rc3.x, y2, rc3.z, 0, 0.25F, 1, 0.25F + dV / 2, Direction.UP, railColor, lightRail);
 				});
 			}
 		}));
@@ -477,7 +484,7 @@ public class RenderTrains implements IGui {
 
 	// l: less, m: more, lm: the corner of a block where x is minimum and z is maximum (i.e. southwest)
 
-	private static void drawSlopeBlock(QuadCache cacheList, BlockPos pos,
+	private static void drawSlopeBlock(BlockFaceCache cacheList, BlockPos pos,
 									   float yll, float ylm, float ymm, float yml, float dxl, float dzl, float dxm, float dzm,
 									   int alignment, boolean isEnd, int step, int color) {
 		// if (!blockState.isAir() && !(blockState.getBlock() instanceof mtr.block.BlockRail)) return;

@@ -2,6 +2,7 @@ package mtr.gui;
 
 import mtr.data.*;
 import mtr.render.QuadCache;
+import mtr.render.RenderingCache;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -33,7 +34,7 @@ public final class ClientData {
 	public static Map<Platform, List<PlatformRouteDetails>> platformToRoute = new HashMap<>();
 	public static Map<Long, Set<Route.ScheduleEntry>> schedulesForPlatform = new HashMap<>();
 
-	public static final Map<Rail, Map<String, QuadCache>> railRenderingCache = new HashMap<>();
+	public static final Map<Rail, Map<String, RenderingCache>> railRenderingCache = new HashMap<>();
 
 	private static long lastUpdatedIndex;
 

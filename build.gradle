@@ -10,8 +10,8 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-loom {
-    accessWidenerPath = file("src/main/resources/mtr.accesswidener")
+minecraft {
+    accessWidener = file("src/main/resources/mtr.accesswidener")
 }
 
 dependencies {
