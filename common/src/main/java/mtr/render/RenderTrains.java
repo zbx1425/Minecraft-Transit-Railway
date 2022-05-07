@@ -349,7 +349,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 					}
 
 					if (rail.railType != RailType.NONE) {
-						rail.render((x1, z1, x2, z2, x3, z3, x4, z4, y1, y2) -> {
+						rail.renderSplineShape((x1, z1, x2, z2, x3, z3, x4, z4, y1, y2) -> {
 							final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderType.lines());
 							final Matrix4f matrix4f = matrices.last().pose();
 							final Matrix3f matrix3f = matrices.last().normal();
@@ -423,7 +423,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 	private static void renderRailStandard(Level world, PoseStack matrices, MultiBufferSource vertexConsumers, Rail rail, float yOffset, boolean renderColors, float railWidth, String texture, float u1, float v1, float u2, float v2) {
 		final int maxRailDistance = Minecraft.getInstance().options.renderDistance * 16;
 
-		rail.render((x1, z1, x2, z2, x3, z3, x4, z4, y1, y2) -> {
+		rail.renderSplineShape((x1, z1, x2, z2, x3, z3, x4, z4, y1, y2) -> {
 			final BlockPos pos2 = new BlockPos(x1, y1, z1);
 			if (shouldNotRender(pos2, maxRailDistance, null)) {
 				return;
@@ -444,6 +444,20 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 				IDrawing.drawTexture(matrices, vertexConsumer, (float) x2, (float) y1 + yOffset + SMALL_OFFSET, (float) z2, (float) x1, (float) y1 + yOffset, (float) z1, (float) x4, (float) y2 + yOffset + SMALL_OFFSET, (float) z4, (float) x3, (float) y2 + yOffset, (float) z3, u1 < 0 ? 0 : u1, v1 < 0 ? 0.1875F + textureOffset : v1, u2 < 0 ? 1 : u2, v2 < 0 ? 0.3125F + textureOffset : v2, Direction.UP, color, light2);
 			}
 		}, -railWidth, railWidth);
+
+		final VertexConsumer ohlVertexConsumer = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(new ResourceLocation("mtr:textures/block/overhead_line.png")));
+		rail.renderOhlShape((double x1, double z1, double x2, double z2, double yTop1, double yBottom1, double yTop2, double yBottom2, double deltaT) -> {
+			final BlockPos pos2 = new BlockPos(x1, yTop1, z1);
+			if (shouldNotRender(pos2, maxRailDistance, null)) {
+				return;
+			}
+
+			if (rail.railType != RailType.NONE) {
+				final int color = -1;
+				IDrawing.drawTexture(matrices, ohlVertexConsumer, (float) x1, (float) yBottom1, (float) z1, (float) x1, (float) yTop1, (float) z1, (float) x2, (float) yTop2, (float) z2, (float) x2, (float) yBottom2, (float) z2, 0, 0, 1, (float) deltaT / 2, Direction.UP, color, 0);
+				IDrawing.drawTexture(matrices, ohlVertexConsumer, (float) x2, (float) yBottom2, (float) z2, (float) x2, (float) yTop2, (float) z2, (float) x1, (float) yTop1, (float) z1, (float) x1, (float) yBottom1, (float) z1, 0, - (float) deltaT / 2, 1, 0, Direction.UP, color, 0);
+			}
+		}, 20f, 5f, 0.3f);
 	}
 
 	private static void renderSignalsStandard(Level world, PoseStack matrices, MultiBufferSource vertexConsumers, Rail rail, BlockPos startPos, BlockPos endPos) {
@@ -459,7 +473,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 			final float u2 = u1 + width;
 
 			final int color = ARGB_BLACK | signalBlock.color.getMaterialColor().col;
-			rail.render((x1, z1, x2, z2, x3, z3, x4, z4, y1, y2) -> {
+			rail.renderSplineShape((x1, z1, x2, z2, x3, z3, x4, z4, y1, y2) -> {
 				final BlockPos pos2 = new BlockPos(x1, y1, z1);
 				if (shouldNotRender(pos2, maxRailDistance, null)) {
 					return;

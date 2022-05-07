@@ -363,9 +363,72 @@ public class Rail extends SerializedDataBase {
 		return Math.abs(tEnd2 - tStart2) + Math.abs(tEnd1 - tStart1);
 	}
 
-	public void render(RenderRail callback, float offsetRadius1, float offsetRadius2) {
-		renderSegment(h1, k1, r1, tStart1, tEnd1, 0, offsetRadius1, offsetRadius2, reverseT1, isStraight1, callback);
-		renderSegment(h2, k2, r2, tStart2, tEnd2, Math.abs(tEnd1 - tStart1), offsetRadius1, offsetRadius2, reverseT2, isStraight2, callback);
+	public void renderSplineShape(RenderSplineShape callback, float offsetRadius1, float offsetRadius2) {
+		renderSplineSegment(h1, k1, r1, tStart1, tEnd1, 0, offsetRadius1, offsetRadius2, reverseT1, isStraight1, callback);
+		renderSplineSegment(h2, k2, r2, tStart2, tEnd2, Math.abs(tEnd1 - tStart1), offsetRadius1, offsetRadius2, reverseT2, isStraight2, callback);
+	}
+
+	private void renderSplineSegment(double h, double k, double r, double tStart, double tEnd, double rawValueOffset, float offsetRadius1, float offsetRadius2, boolean reverseT, boolean isStraight, RenderSplineShape callback) {
+		final double count = Math.abs(tEnd - tStart);
+		final double increment = count / Math.round(count);
+
+		for (double i = 0; i < count - 0.1; i += increment) {
+			final double t1 = (reverseT ? -1 : 1) * i + tStart;
+			final double t2 = (reverseT ? -1 : 1) * (i + increment) + tStart;
+			final Vec3 corner1 = getPositionXZ(h, k, r, t1, offsetRadius1, isStraight);
+			final Vec3 corner2 = getPositionXZ(h, k, r, t1, offsetRadius2, isStraight);
+			final Vec3 corner3 = getPositionXZ(h, k, r, t2, offsetRadius2, isStraight);
+			final Vec3 corner4 = getPositionXZ(h, k, r, t2, offsetRadius1, isStraight);
+
+			final double y1 = getPositionY(i + rawValueOffset);
+			final double y2 = getPositionY(i + increment + rawValueOffset);
+
+			callback.renderSplineShape(corner1.x, corner1.z, corner2.x, corner2.z, corner3.x, corner3.z, corner4.x, corner4.z, y1, y2);
+		}
+	}
+
+	public void renderOhlShape(RenderOhlShape callback, float nodeSpacing, float minHeightTop, float faceHeight) {
+		renderOhlSegment(h1, k1, r1, tStart1, tEnd1, 0, nodeSpacing, minHeightTop, faceHeight, reverseT1, isStraight1, callback);
+		renderOhlSegment(h2, k2, r2, tStart2, tEnd2, Math.abs(tEnd1 - tStart1), nodeSpacing, minHeightTop, faceHeight, reverseT2, isStraight2, callback);
+	}
+
+	private void renderOhlSegment(double h, double k, double r, double tStart, double tEnd, double rawValueOffset, float nodeSpacing, float minHeightTop, float faceHeight, boolean reverseT, boolean isStraight, RenderOhlShape callback) {
+		final double segLength = Math.abs(tEnd - tStart);
+		int fullSpacingCount = (int)(segLength / nodeSpacing);
+		if (fullSpacingCount > 0 && segLength % nodeSpacing < 1.0f) fullSpacingCount--;
+		final double incrDirection = reverseT ? -1 : 1;
+		final double startOffset = (segLength - fullSpacingCount * nodeSpacing) / 2;
+
+		if (fullSpacingCount > 0) {
+			for (int i = -1; i <= fullSpacingCount; ++i) {
+				double offset1, offset2;
+				if (i == -1) {
+					offset1 = 0;
+					offset2 = startOffset;
+				} else if (i == fullSpacingCount) {
+					offset1 = segLength - startOffset;
+					offset2 = segLength;
+				} else {
+					offset1 = startOffset + nodeSpacing * i;
+					offset2 = offset1 + nodeSpacing;
+				}
+				final Vec3 corner1 = snapToBlockCenter(getPositionXZ(h, k, r, incrDirection * offset1 + tStart, 0, isStraight));
+				final Vec3 corner2 = snapToBlockCenter(getPositionXZ(h, k, r, incrDirection * offset2 + tStart, 0, isStraight));
+				final double y1 = Math.ceil(getPositionY(offset1 + rawValueOffset) + minHeightTop) - 0.5;
+				final double y2 = Math.ceil(getPositionY(offset2 + rawValueOffset) + minHeightTop) - 0.5;
+				callback.renderOhlShape(corner1.x, corner1.z, corner2.x, corner2.z, y1, y1-faceHeight, y2, y2-faceHeight, offset2 - offset1);
+			}
+		} else {
+			final Vec3 corner1 = snapToBlockCenter(getPositionXZ(h, k, r, tStart, 0, isStraight));
+			final Vec3 corner2 = snapToBlockCenter(getPositionXZ(h, k, r, tEnd, 0, isStraight));
+			final double y1 = Math.ceil(getPositionY(rawValueOffset) + minHeightTop) - 0.5;
+			final double y2 = Math.ceil(getPositionY(rawValueOffset + segLength) + minHeightTop) - 0.5;
+			callback.renderOhlShape(corner1.x, corner1.z, corner2.x, corner2.z, y1, y1-faceHeight, y2, y2-faceHeight, segLength);
+		}
+	}
+
+	private static Vec3 snapToBlockCenter(Vec3 src) {
+		return new Vec3(Math.round(src.x - 0.5) + 0.5, src.y, Math.round(src.z - 0.5) + 0.5);
 	}
 
 	public boolean goodRadius() {
@@ -416,25 +479,6 @@ public class Rail extends SerializedDataBase {
 			return new Vec3(h * t + k * ((Math.abs(h) >= 0.5 && Math.abs(k) >= 0.5 ? 0 : r) + radiusOffset) + 0.5F, 0, k * t + h * (r - radiusOffset) + 0.5F);
 		} else {
 			return new Vec3(h + (r + radiusOffset) * Math.cos(t / r) + 0.5F, 0, k + (r + radiusOffset) * Math.sin(t / r) + 0.5F);
-		}
-	}
-
-	private void renderSegment(double h, double k, double r, double tStart, double tEnd, double rawValueOffset, float offsetRadius1, float offsetRadius2, boolean reverseT, boolean isStraight, RenderRail callback) {
-		final double count = Math.abs(tEnd - tStart);
-		final double increment = count / Math.round(count);
-
-		for (double i = 0; i < count - 0.1; i += increment) {
-			final double t1 = (reverseT ? -1 : 1) * i + tStart;
-			final double t2 = (reverseT ? -1 : 1) * (i + increment) + tStart;
-			final Vec3 corner1 = getPositionXZ(h, k, r, t1, offsetRadius1, isStraight);
-			final Vec3 corner2 = getPositionXZ(h, k, r, t1, offsetRadius2, isStraight);
-			final Vec3 corner3 = getPositionXZ(h, k, r, t2, offsetRadius2, isStraight);
-			final Vec3 corner4 = getPositionXZ(h, k, r, t2, offsetRadius1, isStraight);
-
-			final double y1 = getPositionY(i + rawValueOffset);
-			final double y2 = getPositionY(i + increment + rawValueOffset);
-
-			callback.renderRail(corner1.x, corner1.z, corner2.x, corner2.z, corner3.x, corner3.z, corner4.x, corner4.z, y1, y2);
 		}
 	}
 
@@ -622,8 +666,13 @@ public class Rail extends SerializedDataBase {
 	}
 
 	@FunctionalInterface
-	public interface RenderRail {
-		void renderRail(double x1, double z1, double x2, double z2, double x3, double z3, double x4, double z4, double y1, double y2);
+	public interface RenderSplineShape {
+		void renderSplineShape(double x1, double z1, double x2, double z2, double x3, double z3, double x4, double z4, double y1, double y2);
+	}
+
+	@FunctionalInterface
+	public interface RenderOhlShape {
+		void renderOhlShape(double x1, double z1, double x2, double z2, double yTop1, double yBottom1, double yTop2, double yBottom2, double deltaT);
 	}
 
 	public enum RailActionType {
