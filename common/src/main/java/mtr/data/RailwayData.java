@@ -5,8 +5,7 @@ import mtr.MTR;
 import mtr.Registry;
 import mtr.block.BlockNode;
 import mtr.mappings.PersistentStateMapper;
-import mtr.packet.IPacket;
-import mtr.packet.PacketTrainDataGuiServer;
+import mtr.packet.*;
 import mtr.path.PathData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -43,6 +42,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 	public final RailwayDataCoolDownModule railwayDataCoolDownModule;
 	public final RailwayDataPathGenerationModule railwayDataPathGenerationModule;
 	public final RailwayDataRailActionsModule railwayDataRailActionsModule;
+	public final RailwayDataDriveTrainModule railwayDataDriveTrainModule;
 
 	private int prevPlatformCount;
 	private int prevSidingCount;
@@ -88,6 +88,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		railwayDataPathGenerationModule = new RailwayDataPathGenerationModule(this, world, rails);
 		railwayDataRailActionsModule = new RailwayDataRailActionsModule(this, world, rails);
 		railwayDataCoolDownModule = new RailwayDataCoolDownModule(this, world, rails);
+		railwayDataDriveTrainModule = new RailwayDataDriveTrainModule(this, world, rails);
 	}
 
 	@Override
@@ -196,6 +197,25 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		validateData();
 		dataCache.sync();
 		signalBlocks.writeCache();
+
+		try {
+			UpdateDynmap.updateDynmap(world, this);
+		} catch (NoClassDefFoundError | IllegalStateException ignored) {
+			System.out.println("Dynamp is not loaded");
+		} catch (Exception ignored) {
+		}
+		try {
+			UpdateBlueMap.updateBlueMap(world, this);
+		} catch (NoClassDefFoundError | IllegalStateException ignored) {
+			System.out.println("BlueMap is not loaded");
+		} catch (Exception ignored) {
+		}
+		try {
+			UpdateSquaremap.updateSquaremap(world, this);
+		} catch (NoClassDefFoundError | IllegalStateException ignored) {
+			System.out.println("Squaremap is not loaded");
+		} catch (Exception ignored) {
+		}
 	}
 
 	@Override
@@ -263,12 +283,13 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		signalBlocks.resetOccupied();
 		sidings.forEach(siding -> {
 			siding.setSidingData(world, dataCache.sidingIdToDepot.get(siding.id), rails);
-			siding.simulateTrain(dataCache, trainPositions, signalBlocks, newTrainsInPlayerRange, trainsToSync, schedulesForPlatform, trainDelays);
+			siding.simulateTrain(dataCache, railwayDataDriveTrainModule, trainPositions, signalBlocks, newTrainsInPlayerRange, trainsToSync, schedulesForPlatform, trainDelays);
 		});
 		final int hour = Depot.getHour(world);
 		depots.forEach(depot -> depot.deployTrain(this, hour));
 
 		railwayDataCoolDownModule.tick();
+		railwayDataDriveTrainModule.tick();
 		railwayDataRailActionsModule.tick();
 
 		trainsInPlayerRange.forEach((player, trains) -> {

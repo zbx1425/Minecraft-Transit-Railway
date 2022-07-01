@@ -3,44 +3,39 @@ package mtr.screen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.data.Platform;
 import mtr.data.TransportMode;
+import mtr.mappings.Text;
 import mtr.packet.PacketTrainDataGuiClient;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 public class PlatformScreen extends SavedRailScreenBase<Platform> {
 
-	private static final Component DWELL_TIME_TEXT = new TranslatableComponent("gui.mtr.dwell_time");
-	private final WidgetShorterSlider sliderDwellTime;
+	private static final Component DWELL_TIME_TEXT = Text.translatable("gui.mtr.dwell_time");
 
 	public PlatformScreen(Platform savedRailBase, TransportMode transportMode, DashboardScreen dashboardScreen) {
 		super(savedRailBase, transportMode, dashboardScreen, DWELL_TIME_TEXT);
-		sliderDwellTime = new WidgetShorterSlider(0, SLIDER_WIDTH - font.width("88.8s") - TEXT_PADDING, Platform.MAX_DWELL_TIME - 1, value -> String.format("%ss", (value + 1) / 2F), null);
 	}
 
 	@Override
 	protected void init() {
 		super.init();
-		sliderDwellTime.x = startX + textWidth;
-		sliderDwellTime.y = height / 2 + TEXT_FIELD_PADDING / 2;
-		sliderDwellTime.setHeight(SQUARE_SIZE);
-		sliderDwellTime.setValue(savedRailBase.getDwellTime() - 1);
-		if (showScheduleControls) {
-			addDrawableChild(sliderDwellTime);
-		}
+		sliderDwellTimeMin.y = SQUARE_SIZE * 2 + TEXT_FIELD_PADDING;
+		sliderDwellTimeSec.y = SQUARE_SIZE * 5 / 2 + TEXT_FIELD_PADDING;
 	}
 
 	@Override
 	public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
 		super.render(matrices, mouseX, mouseY, delta);
 		if (showScheduleControls) {
-			font.draw(matrices, DWELL_TIME_TEXT, startX, height / 2F + TEXT_FIELD_PADDING / 2F + TEXT_PADDING, ARGB_WHITE);
+			font.draw(matrices, DWELL_TIME_TEXT, startX, SQUARE_SIZE * 2 + TEXT_FIELD_PADDING + TEXT_PADDING, ARGB_WHITE);
 		}
 	}
 
 	@Override
 	public void onClose() {
-		savedRailBase.setDwellTime(sliderDwellTime.getIntValue() + 1, packet -> PacketTrainDataGuiClient.sendUpdate(PACKET_UPDATE_PLATFORM, packet));
+		final int minutes = sliderDwellTimeMin.getIntValue();
+		final float second = sliderDwellTimeSec.getIntValue() / 2F;
+		savedRailBase.setDwellTime((int) ((second + minutes * SECONDS_PER_MINUTE) * 2), packet -> PacketTrainDataGuiClient.sendUpdate(PACKET_UPDATE_PLATFORM, packet));
 		super.onClose();
 	}
 

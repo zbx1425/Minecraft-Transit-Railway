@@ -88,12 +88,19 @@ public class BlockStationNameEntrance extends BlockStationNameBase implements IB
 	public static class TileEntityStationNameEntrance extends TileEntityStationNameBase {
 
 		public TileEntityStationNameEntrance(BlockPos pos, BlockState state) {
-			super(BlockEntityTypes.STATION_NAME_ENTRANCE_TILE_ENTITY.get(), pos, state, 0, 0.00625F);
+			super(BlockEntityTypes.STATION_NAME_ENTRANCE_TILE_ENTITY.get(), pos, state, 0, 0.00625F, false);
 		}
 
 		@Override
-		public boolean shouldRender() {
-			return level != null && !(level.getBlockState(worldPosition.relative(IBlock.getStatePropertySafe(level, worldPosition, FACING).getCounterClockWise())).getBlock() instanceof BlockStationNameEntrance);
+		public int getColor(BlockState state) {
+			switch (IBlock.getStatePropertySafe(state, BlockStationNameBase.COLOR)) {
+				case 1:
+					return ARGB_LIGHT_GRAY;
+				case 2:
+					return ARGB_BLACK;
+				default:
+					return ARGB_WHITE;
+			}
 		}
 	}
 }

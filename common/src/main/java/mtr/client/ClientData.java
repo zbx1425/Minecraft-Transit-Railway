@@ -1,13 +1,20 @@
 package mtr.client;
 
+import mtr.KeyMappings;
 import mtr.data.*;
+import mtr.entity.EntityLift;
+import mtr.mappings.Text;
+import mtr.mappings.UtilitiesClient;
+import mtr.packet.PacketTrainDataGuiClient;
+import mtr.screen.LiftSelectionScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 import java.util.function.Function;
@@ -20,6 +27,10 @@ public final class ClientData {
 	public static String TRAINS_SEARCH = "";
 	public static String EXIT_PARENTS_SEARCH = "";
 	public static String EXIT_DESTINATIONS_SEARCH = "";
+
+	private static boolean pressingAccelerate = false;
+	private static boolean pressingBrake = false;
+	private static boolean pressingDoors = false;
 
 	public static final Set<Station> STATIONS = new HashSet<>();
 	public static final Set<Platform> PLATFORMS = new HashSet<>();
@@ -45,6 +56,31 @@ public final class ClientData {
 			PLAYER_RIDING_COOL_DOWN.put(uuid, coolDown - 1);
 		});
 		playersToRemove.forEach(PLAYER_RIDING_COOL_DOWN::remove);
+
+
+		final boolean tempPressingAccelerate = KeyMappings.TRAIN_ACCELERATE.isDown();
+		final boolean tempPressingBrake = KeyMappings.TRAIN_BRAKE.isDown();
+		final boolean tempPressingDoors = KeyMappings.TRAIN_TOGGLE_DOORS.isDown();
+		PacketTrainDataGuiClient.sendDriveTrainC2S(
+				tempPressingAccelerate && !pressingAccelerate,
+				tempPressingBrake && !pressingBrake,
+				tempPressingDoors && !pressingDoors
+		);
+		pressingAccelerate = tempPressingAccelerate;
+		pressingBrake = tempPressingBrake;
+		pressingDoors = tempPressingDoors;
+
+		final Minecraft minecraftClient = Minecraft.getInstance();
+		final Player player = minecraftClient.player;
+		if (player != null) {
+			final Entity vehicle = player.getVehicle();
+			if (vehicle instanceof EntityLift) {
+				if (KeyMappings.LIFT_MENU.isDown() && !(minecraftClient.screen instanceof LiftSelectionScreen)) {
+					UtilitiesClient.setScreen(minecraftClient, new LiftSelectionScreen((EntityLift) vehicle));
+				}
+				player.displayClientMessage(Text.translatable("gui.mtr.press_to_select_floor", KeyMappings.LIFT_MENU.getTranslatedKeyMessage()), true);
+			}
+		}
 	}
 
 	public static void writeRails(Minecraft client, FriendlyByteBuf packet) {
@@ -119,8 +155,8 @@ public final class ClientData {
 			final long id = packet.readLong();
 			final String player = packet.readUtf();
 			final float length = packet.readFloat();
-			final String block = new TranslatableComponent(packet.readUtf()).getString();
-			final String name = new TranslatableComponent("gui.mtr." + packet.readUtf(), player, length, block).getString();
+			final String block = Text.translatable(packet.readUtf()).getString();
+			final String name = Text.translatable("gui.mtr." + packet.readUtf(), player, length, block).getString();
 			final int color = packet.readInt();
 			railActions.add(new DataConverter(id, name, color));
 		}
