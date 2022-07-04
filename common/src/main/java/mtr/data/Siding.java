@@ -73,9 +73,7 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 		setTrainDetails(messagePackHelper.getString(KEY_TRAIN_ID), messagePackHelper.getString(KEY_BASE_TRAIN_TYPE));
 		unlimitedTrains = transportMode.continuousMovement || messagePackHelper.getBoolean(KEY_UNLIMITED_TRAINS);
 		maxTrains = messagePackHelper.getInt(KEY_MAX_TRAINS);
-		// isManual = messagePackHelper.getBoolean(KEY_IS_MANUAL);
-		// TODO ZBX
-		isManual = false;
+		isManual = messagePackHelper.getBoolean(KEY_IS_MANUAL);
 		maxManualSpeed = Math.min(messagePackHelper.getInt(KEY_MAX_MANUAL_SPEED), RailType.DIAMOND.ordinal());
 		final float tempAccelerationConstant = RailwayData.round(messagePackHelper.getFloat(KEY_ACCELERATION_CONSTANT, Train.ACCELERATION_DEFAULT), 3);
 		accelerationConstant = transportMode.continuousMovement ? Train.MAX_ACCELERATION : tempAccelerationConstant <= 0 ? Train.ACCELERATION_DEFAULT : tempAccelerationConstant;
@@ -96,9 +94,7 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 		setTrainDetails(compoundTag.getString(KEY_TRAIN_ID), compoundTag.getString(KEY_BASE_TRAIN_TYPE));
 		unlimitedTrains = transportMode.continuousMovement || compoundTag.getBoolean(KEY_UNLIMITED_TRAINS);
 		maxTrains = compoundTag.getInt(KEY_MAX_TRAINS);
-		// TODO ZBX
-		// isManual = compoundTag.getBoolean(KEY_IS_MANUAL);
-		isManual = false;
+		isManual = compoundTag.getBoolean(KEY_IS_MANUAL);
 		maxManualSpeed = Math.min(compoundTag.getInt(KEY_MAX_MANUAL_SPEED), RailType.DIAMOND.ordinal());
 		accelerationConstant = transportMode.continuousMovement ? Train.MAX_ACCELERATION : Train.ACCELERATION_DEFAULT;
 
@@ -121,10 +117,7 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 		setTrainDetails(packet.readUtf(PACKET_STRING_READ_LENGTH), packet.readUtf(PACKET_STRING_READ_LENGTH));
 		unlimitedTrains = packet.readBoolean() || transportMode.continuousMovement;
 		maxTrains = packet.readInt();
-		// isManual = packet.readBoolean();
-		packet.readBoolean();
-		// TODO ZBX
-		isManual = false;
+		isManual = packet.readBoolean();
 		maxManualSpeed = Math.min(packet.readInt(), RailType.DIAMOND.ordinal());
 		final float tempAccelerationConstant = RailwayData.round(packet.readFloat(), 3);
 		accelerationConstant = transportMode.continuousMovement ? Train.MAX_ACCELERATION : tempAccelerationConstant <= 0 ? Train.ACCELERATION_DEFAULT : tempAccelerationConstant;
@@ -188,10 +181,7 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 				dwellTime = transportMode.continuousMovement ? 1 : dwellTime;
 				unlimitedTrains = packet.readBoolean() || transportMode.continuousMovement;
 				maxTrains = packet.readInt();
-				// TODO ZBX
-				// isManual = packet.readBoolean();
-				packet.readBoolean();
-				isManual = false;
+				isManual = packet.readBoolean();
 				maxManualSpeed = Math.min(packet.readInt(), RailType.DIAMOND.ordinal());
 				final float newAccelerationConstant = RailwayData.round(packet.readFloat(), 3);
 				accelerationConstant = transportMode.continuousMovement ? Train.MAX_ACCELERATION : newAccelerationConstant;
@@ -249,8 +239,7 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 		sendPacket.accept(packet);
 		this.unlimitedTrains = transportMode.continuousMovement || unlimitedTrains;
 		this.maxTrains = maxTrains;
-		// this.isManual = isManual;
-		this.isManual = false;
+		this.isManual = isManual;
 		this.maxManualSpeed = maxManualSpeed;
 		this.accelerationConstant = transportMode.continuousMovement ? Train.MAX_ACCELERATION : tempAccelerationConstant;
 		if (clearTrains) {
