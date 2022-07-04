@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import mtr.ServerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Tuple;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -64,15 +65,31 @@ public class DataDiffLogger {
         addField("Color").addValue(String.format("#%06X", (data.color)));
 
         if (data instanceof AreaBase areaData) {
-            addField("Corner 1").addValue(String.format("BlockPos{x=%d, z=%d}", areaData.corner1.getA(), areaData.corner1.getB()));
-            addField("Corner 2").addValue(String.format("BlockPos{x=%d, z=%d}", areaData.corner2.getA(), areaData.corner2.getB()));
+            addField("Corner 1").addValue(pos2Str(areaData.corner1));
+            addField("Corner 2").addValue(pos2Str(areaData.corner2));
         } else if (data instanceof SavedRailBase railData) {
             var positions = railData.getOrderedPositions(new BlockPos(0, 0, 0), false);
-            addField("End 1").addValue(positions.get(0).toString());
-            addField("End 2").addValue(positions.get(1).toString());
+            addField("End 1").addValue(pos2Str(positions.get(0)));
+            addField("End 2").addValue(pos2Str(positions.get(1)));
         }
 
         return this;
+    }
+
+    private static String pos2Str(BlockPos pos) {
+        if (pos == null) {
+            return "NULL";
+        } else {
+            return String.format("{x=%d, y=%d, z=%d}", pos.getX(), pos.getY(), pos.getZ());
+        }
+    }
+
+    private static String pos2Str(Tuple<Integer, Integer> pos) {
+        if (pos == null) {
+            return "NULL";
+        } else {
+            return String.format("{x=%d, z=%d}", pos.getA(), pos.getB());
+        }
     }
 
     public DataDiffLogger addBasicProperties(String dataType, NameColorDataBase data, NameColorDataBase dataParent) {
@@ -89,6 +106,7 @@ public class DataDiffLogger {
     }
 
     public DataDiffLogger addValue(String value) {
+        if (value == null) value = "NULL";
         if (isAddingFinalValues) {
             finalValues.add(value);
         } else {

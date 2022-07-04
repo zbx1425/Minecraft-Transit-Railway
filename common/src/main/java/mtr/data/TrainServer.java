@@ -321,8 +321,7 @@ public class TrainServer extends Train {
 			waitTime = 0;
 		}
 
-		final int trainSpacing = baseTrainType.getSpacing();
-		final int headIndex = getIndex(0, trainSpacing, false);
+		final int headIndex = getIndex(0, spacing, false);
 		final int stopIndex = path.get(headIndex).stopIndex - 1;
 		List<Long> routeIds = depot == null ? new ArrayList<>() : depot.routeIds;
 		RailwayData.useRoutesAndStationsFromIndex(stopIndex, routeIds, dataCache, (currentStationIndex, thisRoute, nextRoute, thisStation, nextStation, lastStation) -> {

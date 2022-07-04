@@ -166,7 +166,7 @@ task setupFiles() {
 		outputs.upToDateWhen { false }
 		from "common/src/main/version-template.js"
 		into "common/src/main/resources/assets/mtr/website"
-		filter(ReplaceTokens, tokens: ["version": minecraft_version + "-" + rootProject.mod_version])
+		filter(ReplaceTokens, tokens: ["version": minecraft_version + "-" + rootProject.mod_version + rootProject.third_party_suffix])
 		rename "(.+)-template.js", "\$1.js"
 	}
 	copy {

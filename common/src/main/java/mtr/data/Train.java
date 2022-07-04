@@ -90,8 +90,11 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 		spacing = TrainType.getSpacing(baseTrainType);
 		width = TrainType.getWidth(baseTrainType);
 		this.trainCars = trainCars;
-		this.isManual = isManual;
-		isCurrentlyManual = isManual;
+		// TODO ZBX
+		// this.isManual = isManual;
+		// isCurrentlyManual = isManual;
+		this.isManual = false;
+		this.isCurrentlyManual = false;
 		this.maxManualSpeed = maxManualSpeed;
 		this.manualToAutomaticTime = manualToAutomaticTime;
 		this.path = path;
@@ -110,7 +113,7 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 		this.path = path;
 		this.distances = distances;
 
-		speed = messagePackHelper.getFloat(KEY_SPEED);
+		speed = Math.min(messagePackHelper.getFloat(KEY_SPEED), RailType.DIAMOND.ordinal());
 		final float tempAccelerationConstant = RailwayData.round(messagePackHelper.getFloat(KEY_ACCELERATION_CONSTANT, ACCELERATION_DEFAULT), 3);
 		accelerationConstant = tempAccelerationConstant <= 0 ? ACCELERATION_DEFAULT : tempAccelerationConstant;
 		railProgress = messagePackHelper.getDouble(KEY_RAIL_PROGRESS);
@@ -128,8 +131,11 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 		spacing = TrainType.getSpacing(baseTrainType);
 		width = TrainType.getWidth(baseTrainType);
 		trainCars = Math.min(transportMode.maxLength, (int) Math.floor(railLength / spacing + 0.01F));
-		isManual = messagePackHelper.getBoolean(KEY_IS_MANUAL);
-		isCurrentlyManual = messagePackHelper.getBoolean(KEY_IS_CURRENTLY_MANUAL);
+		// TODO ZBX
+		isManual = false;
+		isCurrentlyManual = false;
+		// isManual = messagePackHelper.getBoolean(KEY_IS_MANUAL);
+		// isCurrentlyManual = messagePackHelper.getBoolean(KEY_IS_CURRENTLY_MANUAL);
 		maxManualSpeed = messagePackHelper.getInt(KEY_MAX_MANUAL_SPEED);
 		manualToAutomaticTime = messagePackHelper.getInt(KEY_MANUAL_TO_AUTOMATIC_TIME);
 
@@ -174,9 +180,12 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 		spacing = TrainType.getSpacing(baseTrainType);
 		width = TrainType.getWidth(baseTrainType);
 		trainCars = Math.min(transportMode.maxLength, (int) Math.floor(railLength / spacing + 0.01F));
-		isManual = compoundTag.getBoolean(KEY_IS_MANUAL);
-		isCurrentlyManual = compoundTag.getBoolean(KEY_IS_CURRENTLY_MANUAL);
-		maxManualSpeed = compoundTag.getInt(KEY_MAX_MANUAL_SPEED);
+		// TODO ZBX
+		// isManual = compoundTag.getBoolean(KEY_IS_MANUAL);
+		// isCurrentlyManual = compoundTag.getBoolean(KEY_IS_CURRENTLY_MANUAL);
+		isManual = false;
+		isCurrentlyManual = false;
+		maxManualSpeed = Math.min(compoundTag.getInt(KEY_MAX_MANUAL_SPEED), RailType.DIAMOND.ordinal());
 		manualToAutomaticTime = compoundTag.getInt(KEY_MANUAL_TO_AUTOMATIC_TIME);
 
 		isOnRoute = compoundTag.getBoolean(KEY_IS_ON_ROUTE);
@@ -214,9 +223,14 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 		spacing = TrainType.getSpacing(baseTrainType);
 		width = TrainType.getWidth(baseTrainType);
 		trainCars = Math.min(transportMode.maxLength, (int) Math.floor(railLength / spacing + 0.01F));
-		isManual = packet.readBoolean();
-		isCurrentlyManual = packet.readBoolean();
-		maxManualSpeed = packet.readInt();
+		// isManual = packet.readBoolean();
+		// isCurrentlyManual = packet.readBoolean();
+		packet.readBoolean();
+		packet.readBoolean();
+		// TODO ZBX
+		isManual = false;
+		isCurrentlyManual = false;
+		maxManualSpeed = Math.min(packet.readInt(), RailType.DIAMOND.ordinal());
 		manualToAutomaticTime = packet.readInt();
 		isOnRoute = packet.readBoolean();
 		manualAccelerationSign = packet.readInt();
@@ -653,7 +667,8 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 	}
 
 	public static boolean isHoldingKey(Player player) {
-		return player != null && player.isHolding(Items.DRIVER_KEY.get());
+		return false;
+		// return player != null && player.isHolding(Items.DRIVER_KEY.get());
 	}
 
 	public static double getAverage(double a, double b) {
