@@ -42,6 +42,7 @@ public class ClientCache extends DataCache implements IGui {
 	private final List<Long> clearPlatformIdToRoutes = new ArrayList<>();
 
 	private final Map<String, DynamicResource> dynamicResources = new HashMap<>();
+	private final Set<String> removedResources = new HashSet<>();
 	private boolean canGenerateResource = true;
 
 	public static final float LINE_HEIGHT_MULTIPLIER = 1.25F;
@@ -94,8 +95,7 @@ public class ClientCache extends DataCache implements IGui {
 				clearPlatformIdToRoutes.add(id);
 			}
 		});
-		dynamicResources.forEach((key, dynamicResource) -> dynamicResource.remove());
-		dynamicResources.clear();
+		removedResources.addAll(dynamicResources.keySet());
 	}
 
 	public Map<Long, Platform> requestStationIdToPlatforms(long stationId) {
@@ -217,7 +217,7 @@ public class ClientCache extends DataCache implements IGui {
 		int height = 0;
 
 		for (int index = 0; index < textSplit.length; index++) {
-			final boolean isCjk = textSplit[index].codePoints().anyMatch(Character::isIdeographic);
+			final boolean isCjk = textSplit[index].codePoints().anyMatch(character -> !font.canDisplay(character));
 			final Font mainFont = font.deriveFont(Font.PLAIN, isCjk ? fontSizeCjk : fontSize);
 			final Font fallbackFont = isCjk ? fontCjk.deriveFont(Font.PLAIN, fontSizeCjk) : mainFont;
 
@@ -317,8 +317,7 @@ public class ClientCache extends DataCache implements IGui {
 			keysToRemove.forEach(dynamicResources::remove);
 		}
 
-		final boolean hasKey = dynamicResources.containsKey(key);
-		if (hasKey) {
+		if (dynamicResources.containsKey(key) && !removedResources.contains(key)) {
 			final DynamicResource dynamicResource = dynamicResources.get(key);
 			dynamicResource.age = 0;
 			return dynamicResource;
@@ -332,13 +331,23 @@ public class ClientCache extends DataCache implements IGui {
 				new Thread(() -> {
 					final DynamicTexture dynamicTexture = supplier.get();
 					minecraftClient.execute(() -> {
+						if (removedResources.contains(key) && dynamicResources.containsKey(key)) {
+							dynamicResources.get(key).remove();
+						}
 						dynamicResources.put(key, new DynamicResource(dynamicTexture == null ? defaultLocation : minecraftClient.getTextureManager().register(MTR.MOD_ID, dynamicTexture), dynamicTexture));
+						removedResources.remove(key);
 						canGenerateResource = true;
 					});
 				}).start();
 			}
 
-			return new DynamicResource(defaultLocation, null);
+			if (dynamicResources.containsKey(key)) {
+				final DynamicResource dynamicResource = dynamicResources.get(key);
+				dynamicResource.age = 0;
+				return dynamicResource;
+			} else {
+				return new DynamicResource(defaultLocation, null);
+			}
 		}
 	}
 
