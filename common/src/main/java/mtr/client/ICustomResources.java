@@ -20,6 +20,7 @@ public interface ICustomResources {
 	String CUSTOM_TRAINS_GANGWAY_CONNECTION_ID = "gangway_connection_id";
 	String CUSTOM_TRAINS_TRAIN_BARRIER_ID = "train_barrier_id";
 	String CUSTOM_TRAINS_RIDER_OFFSET = "rider_offset";
+	String CUSTOM_TRAINS_BVE_SOUND_BASE_ID = "bve_sound_base_id";
 	String CUSTOM_TRAINS_SPEED_SOUND_COUNT = "speed_sound_count";
 	String CUSTOM_TRAINS_SPEED_SOUND_BASE_ID = "speed_sound_base_id";
 	String CUSTOM_TRAINS_DOOR_SOUND_BASE_ID = "door_sound_base_id";

@@ -653,8 +653,7 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 	}
 
 	public static boolean isHoldingKey(Player player) {
-		return false;
-		// return player != null && player.isHolding(Items.DRIVER_KEY.get());
+		return player != null && player.isHolding(Items.DRIVER_KEY.get());
 	}
 
 	public static double getAverage(double a, double b) {
