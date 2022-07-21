@@ -114,8 +114,10 @@ public class TrainServer extends Train {
 		final Set<UUID> ridersToRemove = new HashSet<>();
 		ridingEntities.forEach(uuid -> {
 			final Player player = world.getPlayerByUUID(uuid);
+
 			if (player != null) {
 				final boolean remove;
+
 				if (player.isSpectator() || player.isShiftKeyDown()) {
 					remove = true;
 				} else if (doorLeftOpen || doorRightOpen) {
@@ -124,15 +126,18 @@ public class TrainServer extends Train {
 				} else {
 					remove = false;
 				}
+
 				if (remove) {
 					ridersToRemove.add(uuid);
 				}
+
 				railwayData.railwayDataCoolDownModule.updatePlayerRiding(player, routeId);
 				if (isHoldingKey(player)) {
 					manualCoolDown = 0;
 				}
 			}
 		});
+
 		if (!ridersToRemove.isEmpty()) {
 			ridersToRemove.forEach(ridingEntities::remove);
 		}
@@ -335,7 +340,7 @@ public class TrainServer extends Train {
 			if (isOnRoute) {
 				if (manualCoolDown >= manualToAutomaticTime * 10) {
 					if (isCurrentlyManual) {
-						final int dwellTicks = path.get(nextStoppingIndex).dwellTime * 10;
+						final int dwellTicks = nextStoppingIndex >= path.size() ? 0 : path.get(nextStoppingIndex).dwellTime * 10;
 						stopCounter = doorOpen ? dwellTicks / 2F : dwellTicks;
 					}
 					isCurrentlyManual = false;
