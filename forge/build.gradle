@@ -57,6 +57,7 @@ components.java {
 task moveForgeBuilds() {
 	doLast {
 		def variation = rootProject.variation == "normal" ? "MTR" : rootProject.variation == "server" ? "MTR-server" : "Modern-Elevators-Escalators"
+		String suffix = rootProject.third_party_suffix
 		delete fileTree("../build/release").matching {
 			include "**/${variation}-forge*"
 		}
@@ -69,7 +70,7 @@ task moveForgeBuilds() {
 		copy {
 			from "build/libs"
 			into "../build/release"
-			rename "(.+)", "${variation}-\$1"
+			rename "(.+)\\.jar", "${variation}-\$1${suffix}.jar"
 		}
 		copy {
 			from "../build/release"
