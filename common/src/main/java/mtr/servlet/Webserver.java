@@ -57,17 +57,7 @@ public abstract class Webserver {
 		context.addServlet(DelaysServletHandler.class, "/delays");
 	}
 
-	public static void start(Path path) {
-		int port = 8888;
-		try {
-			port = Mth.clamp(Integer.parseInt(String.join("", Files.readAllLines(path)).replaceAll("\\D", "")), 1025, 65535);
-		} catch (Exception ignored) {
-			try {
-				Files.write(path, Collections.singleton(String.valueOf(port)));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	public static void start(int port) {
 		serverConnector.setPort(port);
 		try {
 			webServer.start();

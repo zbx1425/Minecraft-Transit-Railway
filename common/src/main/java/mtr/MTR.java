@@ -417,7 +417,7 @@ public class MTR implements IPacket {
 			};
 			Webserver.getRoutes = railwayData -> railwayData == null ? new HashSet<>() : railwayData.routes;
 			Webserver.getDataCache = railwayData -> railwayData == null ? null : railwayData.dataCache;
-			Webserver.start(minecraftServer.getServerDirectory().toPath().resolve("config").resolve("mtr_webserver_port.txt"));
+			Webserver.start(ServerConfig.webServerPort);
 		});
 		Registry.registerServerStoppingEvent(minecraftServer -> Webserver.stop());
 	}
