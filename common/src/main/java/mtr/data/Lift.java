@@ -7,6 +7,7 @@ import mtr.packet.IPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
@@ -193,7 +194,7 @@ public abstract class Lift extends NameColorDataBase implements IPacket {
 	}
 
 	@Override
-	public void update(String key, FriendlyByteBuf packet) {
+	public void update(ServerPlayer initiator, String key, FriendlyByteBuf packet) {
 		if (KEY_LIFT_UPDATE.equals(key)) {
 			liftHeight = packet.readInt();
 			liftWidth = packet.readInt();
@@ -205,8 +206,13 @@ public abstract class Lift extends NameColorDataBase implements IPacket {
 			liftStyle = EnumHelper.valueOf(LiftStyle.TRANSPARENT, packet.readUtf(PACKET_STRING_READ_LENGTH));
 			facing = Direction.fromYRot(packet.readInt());
 		} else {
-			super.update(key, packet);
+			super.update(initiator, key, packet);
 		}
+	}
+
+	@Override
+	public void applyToDiffLogger(DataDiffLogger diffLogger) {
+		// TODO
 	}
 
 	@Override

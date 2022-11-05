@@ -216,7 +216,6 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 				.addField("Acceleration").addValue(accelerationConstant)
 				.addField("Is Manual Driving").addValue(isManual)
 				.addField("Manual Driving Max Speed").addValue(maxManualSpeed)
-				.addField("Manual Driving Timeout").addValue(dwellTime)
 				.finishAddingValues();
 	}
 

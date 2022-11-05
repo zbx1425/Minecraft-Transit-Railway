@@ -184,13 +184,24 @@ public final class Route extends NameColorDataBase implements IGui {
 
 	@Override
 	public void applyToDiffLogger(DataDiffLogger diffLogger) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < platformIds.size(); i++) {
+			sb.append(platformIds.get(i).platformId);
+			sb.append(platformIds.get(i).customDestination);
+			if (i < platformIds.size() - 1) {
+				sb.append(", ");
+			}
+		}
+		sb.append("]");
 		diffLogger
 				.addBasicProperties("Route", this)
 				.addField("Route Type").addValue(routeType.toString())
-				.addField("Platform IDs").addValue(platformIds)
+				.addField("Platform IDs").addValue(sb.toString())
 				.addField("Circular State").addValue(circularState.toString())
 				.addField("LR Route Number").addValue(isLightRailRoute ? lightRailRouteNumber : "")
 				.addField("Is Hidden").addValue(isHidden)
+				.addField("No Announcements").addValue(disableNextStationAnnouncements)
 				.finishAddingValues();
 	}
 

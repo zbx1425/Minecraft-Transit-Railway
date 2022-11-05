@@ -63,7 +63,7 @@ task moveFabricBuilds() {
 			from "build/libs"
 			include "*${rootProject.mod_version}.jar"
 			into "../build/release"
-			rename "(.+)", "${rootProject.variation_header}-\$1${suffix}"
+			rename "(.+)\\.jar", "${rootProject.variation_header}-\$1${suffix}.jar"
 		}
 		if (rootProject.variation == "normal") {
 			copy {

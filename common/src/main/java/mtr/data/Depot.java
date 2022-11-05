@@ -221,8 +221,11 @@ public class Depot extends AreaBase implements IReducedSaveData {
 	public void applyToDiffLogger(DataDiffLogger diffLogger) {
 		diffLogger
 				.addBasicProperties("Depot", this)
-				.addField("Frequencies").addValue(frequencies)
+				.addField("Use Real Time").addValue(useRealTime)
+				.addField("MCT Frequencies").addValue(frequencies)
+				.addValue("RTC Departures").addValue(Arrays.toString(departures.toArray()))
 				.addField("Route IDs").addValue(routeIds)
+				.addField("Loop No Return").addValue(repeatInfinitely)
 				.finishAddingValues();
 	}
 
