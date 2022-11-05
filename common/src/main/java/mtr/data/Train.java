@@ -1,6 +1,7 @@
 package mtr.data;
 
 import mtr.Items;
+import mtr.Keys;
 import mtr.block.BlockPSDAPGBase;
 import mtr.block.BlockPlatform;
 import mtr.packet.IPacket;
@@ -24,7 +25,7 @@ import org.msgpack.value.Value;
 import java.io.*;
 import java.util.*;
 
-public abstract class Train extends NameColorDataBase implements IPacket, IGui {
+public abstract class Train extends NameColorDataBase implements IPacket {
 
 	protected float speed;
 	protected double railProgress;
@@ -59,8 +60,8 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 	public static final float ACCELERATION_DEFAULT = 0.01F; // m/tick^2
 	public static final float MAX_ACCELERATION = 0.05F; // m/tick^2
 	public static final float MIN_ACCELERATION = 0.001F; // m/tick^2
+	public static final int DOOR_MOVE_TIME = 64;
 	protected static final int MAX_CHECK_DISTANCE = 32;
-	protected static final int DOOR_MOVE_TIME = 64;
 	private static final int DOOR_DELAY = 20;
 
 	private static final String KEY_SPEED = "speed";
@@ -127,9 +128,9 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 		nextStoppingIndex = messagePackHelper.getInt(KEY_NEXT_STOPPING_INDEX);
 		reversed = messagePackHelper.getBoolean(KEY_REVERSED);
 
-		final String tempTrainId = messagePackHelper.getString(KEY_TRAIN_CUSTOM_ID).toLowerCase();
+		final String tempTrainId = messagePackHelper.getString(KEY_TRAIN_CUSTOM_ID).toLowerCase(Locale.ENGLISH);
 		// TODO temporary code for backwards compatibility
-		String tempBaseTrainType = messagePackHelper.getString(KEY_TRAIN_TYPE).toLowerCase();
+		String tempBaseTrainType = messagePackHelper.getString(KEY_TRAIN_TYPE).toLowerCase(Locale.ENGLISH);
 		baseTrainType = tempBaseTrainType.startsWith("base_") ? tempBaseTrainType.replace("base_", "train_") : tempBaseTrainType;
 		// TODO temporary code end
 		trainId = tempTrainId.isEmpty() ? baseTrainType : tempTrainId;
@@ -681,15 +682,11 @@ public abstract class Train extends NameColorDataBase implements IPacket, IGui {
 	}
 
 	public static boolean isHoldingKey(Player player) {
-		return player != null && player.isHolding(Items.DRIVER_KEY.get());
+		return player != null && !Keys.LIFTS_ONLY && player.isHolding(Items.DRIVER_KEY.get());
 	}
 
 	public static double getAverage(double a, double b) {
 		return (a + b) / 2;
-	}
-
-	public static double getValueFromPercentage(double percentage, double total) {
-		return (percentage - 0.5) * total;
 	}
 
 	public static RailType convertMaxManualSpeed(int maxManualSpeed) {

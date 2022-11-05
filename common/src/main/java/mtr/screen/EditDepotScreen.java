@@ -163,12 +163,16 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 		departuresList.tick();
 		textFieldDeparture.tick();
 
+		for (int i = 0; i < Depot.HOURS_IN_DAY; i++) {
+			data.setFrequency(sliders[i].getIntValue(), i);
+		}
+
 		if (data.routeIds.isEmpty()) {
 			checkboxRepeatIndefinitely.visible = false;
 		} else {
 			final Route firstRoute = ClientData.DATA_CACHE.routeIdMap.get(data.routeIds.get(0));
 			final Route lastRoute = ClientData.DATA_CACHE.routeIdMap.get(data.routeIds.get(data.routeIds.size() - 1));
-			checkboxRepeatIndefinitely.visible = firstRoute != null && lastRoute != null && !firstRoute.platformIds.isEmpty() && !lastRoute.platformIds.isEmpty() && Objects.equals(firstRoute.platformIds.get(0), lastRoute.platformIds.get(lastRoute.platformIds.size() - 1));
+			checkboxRepeatIndefinitely.visible = firstRoute != null && lastRoute != null && !firstRoute.platformIds.isEmpty() && !lastRoute.platformIds.isEmpty() && firstRoute.getFirstPlatformId() == lastRoute.getLastPlatformId();
 		}
 	}
 
@@ -198,7 +202,8 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 			font.draw(matrices, Text.translatable("gui.mtr.sidings_in_depot", sidingsInDepot.size()), rightPanelsX + TEXT_PADDING, yStartRightPane, ARGB_WHITE);
 
 			final Component text;
-			final int nextDepartureMillis = data.getMillisUntilDeploy(minecraft == null || minecraft.level == null ? 0 : Depot.getHour(minecraft.level), 1);
+			data.generateTempDepartures(Minecraft.getInstance().level);
+			final int nextDepartureMillis = data.getMillisUntilDeploy(1);
 			if (nextDepartureMillis >= 0) {
 				final long hour = TimeUnit.MILLISECONDS.toHours(nextDepartureMillis);
 				final long minute = TimeUnit.MILLISECONDS.toMinutes(nextDepartureMillis) % 60;
@@ -237,9 +242,6 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 	@Override
 	protected void saveData() {
 		super.saveData();
-		for (int i = 0; i < Depot.HOURS_IN_DAY; i++) {
-			data.setFrequency(sliders[i].getIntValue(), i);
-		}
 		data.repeatInfinitely = checkboxRepeatIndefinitely.visible && checkboxRepeatIndefinitely.selected();
 		data.setData(packet -> PacketTrainDataGuiClient.sendUpdate(PACKET_UPDATE_DEPOT, packet));
 	}
@@ -279,6 +281,7 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 			departureData.add(new DataConverter(String.format("%2s:%2s:%2s", hour, minute, second).replace(' ', '0'), 0));
 		});
 		departuresList.setData(departureData, false, false, false, false, false, true);
+		data.generateTempDepartures(Minecraft.getInstance().level);
 	}
 
 	private boolean checkDeparture(String text, boolean addToList, boolean removeFromList) {
@@ -353,7 +356,7 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 					final Route nextRoute = i < data.routeIds.size() - 1 ? ClientData.DATA_CACHE.routeIdMap.get(data.routeIds.get(i + 1)) : null;
 					if (thisRoute != null) {
 						sum += thisRoute.platformIds.size();
-						if (!thisRoute.platformIds.isEmpty() && nextRoute != null && !nextRoute.platformIds.isEmpty() && thisRoute.platformIds.get(thisRoute.platformIds.size() - 1).equals(nextRoute.platformIds.get(0))) {
+						if (!thisRoute.platformIds.isEmpty() && nextRoute != null && !nextRoute.platformIds.isEmpty() && thisRoute.getLastPlatformId() == nextRoute.getFirstPlatformId()) {
 							sum--;
 						}
 					}

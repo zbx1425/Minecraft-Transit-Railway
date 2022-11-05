@@ -1,7 +1,5 @@
 package mtr.data;
 
-import io.netty.buffer.Unpooled;
-import mtr.Registry;
 import mtr.TrigCache;
 import mtr.block.*;
 import mtr.client.ClientData;
@@ -10,8 +8,6 @@ import mtr.path.PathData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -44,8 +40,6 @@ public class TrainServer extends Train {
 	private final List<Siding.TimeSegment> timeSegments;
 
 	private static final int TRAIN_UPDATE_DISTANCE = 128;
-	private static final float INNER_PADDING = 0.5F;
-	private static final int BOX_PADDING = 3;
 	private static final int TICKS_TO_SEND_RAIL_PROGRESS = 40;
 
 	public TrainServer(long id, long sidingId, float railLength, String trainId, String baseTrainType, int trainCars, List<PathData> path, List<Double> distances, int repeatIndex1, int repeatIndex2, float accelerationConstant, List<Siding.TimeSegment> timeSegments, boolean isManual, int maxManualSpeed, int manualToAutomaticTime) {
@@ -95,62 +89,11 @@ public class TrainServer extends Train {
 			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch,
 			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
 	) {
-		final RailwayData railwayData = RailwayData.getInstance(world);
-		if (railwayData == null) {
-			return;
-		}
-
-		final float halfSpacing = spacing / 2F;
-		final float halfWidth = width / 2F;
-
-		if (isManual || doorLeftOpen || doorRightOpen) {
-			final float margin = halfSpacing + BOX_PADDING;
-			world.getEntitiesOfClass(Player.class, new AABB(carX + margin, carY + margin, carZ + margin, carX - margin, carY - margin, carZ - margin), player -> !player.isSpectator() && !ridingEntities.contains(player.getUUID()) && railwayData.railwayDataCoolDownModule.canRide(player) && (!isManual || doorLeftOpen || doorRightOpen || Train.isHoldingKey(player))).forEach(player -> {
-				final Vec3 positionRotated = player.position().subtract(carX, carY, carZ).yRot(-carYaw).xRot(-carPitch);
-				if (Math.abs(positionRotated.x) < halfWidth + INNER_PADDING && Math.abs(positionRotated.y) < 2.5 && Math.abs(positionRotated.z) <= halfSpacing && !railwayData.railwayDataCoolDownModule.shouldDismount(player)) {
-					ridingEntities.add(player.getUUID());
-					final float percentageX = (float) (positionRotated.x / width + 0.5);
-					final float percentageZ = (float) (realSpacing == 0 ? 0 : positionRotated.z / realSpacing + 0.5) + ridingCar;
-					final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
-					packet.writeLong(id);
-					packet.writeFloat(percentageX);
-					packet.writeFloat(percentageZ);
-					packet.writeUUID(player.getUUID());
-					world.players().forEach(worldPlayer -> Registry.sendToPlayer((ServerPlayer) worldPlayer, PACKET_UPDATE_TRAIN_PASSENGERS, packet));
-				}
-			});
-		}
-
-		final Set<UUID> ridersToRemove = new HashSet<>();
-		ridingEntities.forEach(uuid -> {
-			final Player player = world.getPlayerByUUID(uuid);
-
-			if (player != null) {
-				final boolean remove;
-
-				if (player.isSpectator() || railwayData.railwayDataCoolDownModule.shouldDismount(player)) {
-					remove = true;
-				} else if (doorLeftOpen || doorRightOpen) {
-					final Vec3 positionRotated = player.position().subtract(carX, carY, carZ).yRot(-carYaw).xRot(-carPitch);
-					remove = Math.abs(positionRotated.z) <= halfSpacing && (Math.abs(positionRotated.x) > halfWidth + INNER_PADDING || Math.abs(positionRotated.y) > 2);
-				} else {
-					remove = false;
-				}
-
-				if (remove) {
-					ridersToRemove.add(uuid);
-				}
-
-				railwayData.railwayDataCoolDownModule.updatePlayerRiding(player, routeId);
-				if (isHoldingKey(player)) {
-					manualCoolDown = 0;
-				}
+		VehicleRidingServer.mountRider(world, ridingEntities, id, routeId, carX, carY, carZ, realSpacing, width, carYaw, carPitch, doorLeftOpen || doorRightOpen, isManual || doorLeftOpen || doorRightOpen, ridingCar, PACKET_UPDATE_TRAIN_PASSENGERS, player -> !isManual || doorLeftOpen || doorRightOpen || Train.isHoldingKey(player), player -> {
+			if (isHoldingKey(player)) {
+				manualCoolDown = 0;
 			}
 		});
-
-		if (!ridersToRemove.isEmpty()) {
-			ridersToRemove.forEach(ridingEntities::remove);
-		}
 	}
 
 	@Override
@@ -168,23 +111,25 @@ public class TrainServer extends Train {
 		});
 
 		final BlockPos frontPos = new BlockPos(positions[reversed ? positions.length - 1 : 0]);
-		if (world.getChunkSource().getChunkNow(frontPos.getX() / 16, frontPos.getZ() / 16) != null && world.hasChunk(frontPos.getX() / 16, frontPos.getZ() / 16)) {
+		if (RailwayData.chunkLoaded(world, frontPos)) {
 			checkBlock(frontPos, checkPos -> {
-				final BlockState state = world.getBlockState(checkPos);
-				final Block block = state.getBlock();
+				if (RailwayData.chunkLoaded(world, checkPos)) {
+					final BlockState state = world.getBlockState(checkPos);
+					final Block block = state.getBlock();
 
-				if (block instanceof BlockTrainRedstoneSensor && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
-					((BlockTrainRedstoneSensor) block).power(world, state, checkPos);
-				}
+					if (block instanceof BlockTrainRedstoneSensor && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
+						((BlockTrainRedstoneSensor) block).power(world, state, checkPos);
+					}
 
-				if ((block instanceof BlockTrainCargoLoader || block instanceof BlockTrainCargoUnloader) && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
-					for (final Direction direction : Direction.values()) {
-						final Container nearbyInventory = HopperBlockEntity.getContainerAt(world, checkPos.relative(direction));
-						if (nearbyInventory != null) {
-							if (block instanceof BlockTrainCargoLoader) {
-								transferItems(nearbyInventory, inventory);
-							} else {
-								transferItems(inventory, nearbyInventory);
+					if ((block instanceof BlockTrainCargoLoader || block instanceof BlockTrainCargoUnloader) && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
+						for (final Direction direction : Direction.values()) {
+							final Container nearbyInventory = HopperBlockEntity.getContainerAt(world, checkPos.relative(direction));
+							if (nearbyInventory != null) {
+								if (block instanceof BlockTrainCargoLoader) {
+									transferItems(nearbyInventory, inventory);
+								} else {
+									transferItems(inventory, nearbyInventory);
+								}
 							}
 						}
 					}
@@ -192,9 +137,9 @@ public class TrainServer extends Train {
 			});
 		}
 
-		if (!ridingEntities.isEmpty()) {
+		if (!ridingEntities.isEmpty() && RailwayData.chunkLoaded(world, frontPos)) {
 			checkBlock(frontPos, checkPos -> {
-				if (world.getBlockState(checkPos).getBlock() instanceof BlockTrainAnnouncer) {
+				if (RailwayData.chunkLoaded(world, checkPos) && world.getBlockState(checkPos).getBlock() instanceof BlockTrainAnnouncer) {
 					final BlockEntity entity = world.getBlockEntity(checkPos);
 					if (entity instanceof BlockTrainAnnouncer.TileEntityTrainAnnouncer && ((BlockTrainAnnouncer.TileEntityTrainAnnouncer) entity).matchesFilter(routeId, speed)) {
 						ridingEntities.forEach(uuid -> ((BlockTrainAnnouncer.TileEntityTrainAnnouncer) entity).announce(world.getPlayerByUUID(uuid)));
@@ -282,7 +227,7 @@ public class TrainServer extends Train {
 
 		simulateTrain(world, ticksElapsed, depot);
 
-		final int nextDepartureTicks = isOnRoute ? 0 : depot.getNextDepartureTicks(Depot.getHour(world)) * Depot.MILLIS_PER_TICK;
+		final int nextDepartureTicks = isOnRoute ? 0 : depot.getNextDepartureMillis();
 		final long currentMillis = System.currentTimeMillis() - (long) (stopCounter * Depot.MILLIS_PER_TICK) + (long) Math.max(0, nextDepartureTicks);
 
 		double currentTime = -1;
