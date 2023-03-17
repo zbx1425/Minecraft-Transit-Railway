@@ -78,6 +78,7 @@ public class MotorData5 extends MotorDataBase { // 5 for BVE5 and BVE6
 		}
 
 		public float getValue(int index, float key) {
+			if (index >= data.size()) return 0f;
 			TreeMap<Float, Float> spline = data.get(index);
 			if (spline.size() < 1) {
 				return 0F;
