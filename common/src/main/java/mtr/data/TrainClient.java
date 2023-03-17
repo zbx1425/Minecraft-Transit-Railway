@@ -184,16 +184,45 @@ public class TrainClient extends Train implements IGui {
 
 		final Entity camera = client.cameraEntity;
 		final Vec3 cameraPos = camera == null ? Vec3.ZERO : camera.position();
+		Vec3 nearestPoint = positions[0];
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		int nearestCar = 0;
 		for (int i = 0; i < trainCars; i++) {
-			final double checkDistance = cameraPos.distanceToSqr(positions[i]);
+			Vec3 v = positions[i + 1].subtract(positions[i]);
+			Vec3 w = cameraPos.subtract(positions[i]);
+
+			double c1 = w.dot(v);
+			if ( c1 <= 0 ) {
+				final double checkDistance = positions[i].distanceToSqr(cameraPos);
+				if (checkDistance < nearestDistance) {
+					nearestCar = i;
+					nearestDistance = checkDistance;
+					nearestPoint = positions[i];
+				}
+				continue;
+			}
+
+			double c2 = v.dot(v);
+			if ( c2 <= c1 ) {
+				final double checkDistance = positions[i + 1].distanceToSqr(cameraPos);
+				if (checkDistance < nearestDistance) {
+					nearestCar = i;
+					nearestDistance = checkDistance;
+					nearestPoint = positions[i + 1];
+				}
+				continue;
+			}
+
+			double b = c1 / c2;
+			Vec3 Pb = positions[i].add(v.scale(b));
+			final double checkDistance = Pb.distanceToSqr(cameraPos);
 			if (checkDistance < nearestDistance) {
 				nearestCar = i;
 				nearestDistance = checkDistance;
+				nearestPoint = Pb;
 			}
 		}
-		final BlockPos soundPos = RailwayData.newBlockPos(positions[nearestCar].x, positions[nearestCar].y, positions[nearestCar].z);
+		final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
 		trainSound.playNearestCar(world, soundPos, nearestCar);
 
 		return true;
