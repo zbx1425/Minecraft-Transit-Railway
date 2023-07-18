@@ -1,7 +1,8 @@
-package mtr.mappings;
+package mtr.forge.mappings;
 
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
+import mtr.mappings.DeferredRegisterHolder;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;

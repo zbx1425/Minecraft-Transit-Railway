@@ -24,6 +24,16 @@ dependencies {
 	forge "net.minecraftforge:forge:${rootProject.forge_version}"
 	modApi "${rootProject.architectury_id}:architectury-forge:${rootProject.architectury_data[0].split("\\+")[0]}"
 
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-http:9.+"
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-io:9.+"
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-security:9.+"
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-server:9.+"
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-servlet:9.+"
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-util:9.+"
+	forgeRuntimeLibrary "org.eclipse.jetty:jetty-util-ajax:9.+"
+	forgeRuntimeLibrary "javax.servlet:javax.servlet-api:+"
+	forgeRuntimeLibrary "org.msgpack:msgpack-core:+"
+
 	common(project(path: ":common", configuration: "namedElements")) { transitive false }
 	shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }
@@ -43,6 +53,7 @@ shadowJar {
 	archiveClassifier = "dev-shadow"
 	relocate "javax.servlet", "mtr.libraries.javax.servlet"
 	relocate "org.eclipse", "mtr.libraries.org.eclipse"
+	relocate "org.msgpack", "mtr.libraries.org.msgpack"
 }
 
 remapJar {

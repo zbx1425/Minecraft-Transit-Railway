@@ -1,6 +1,7 @@
 package mtr.forge;
 
 import mtr.MTRClient;
+import mtr.forge.mappings.ForgeUtilities;
 import mtr.mappings.*;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;

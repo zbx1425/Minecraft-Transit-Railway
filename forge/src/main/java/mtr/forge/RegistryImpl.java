@@ -1,6 +1,6 @@
 package mtr.forge;
 
-import mtr.mappings.ForgeUtilities;
+import mtr.forge.mappings.ForgeUtilities;
 import mtr.mappings.NetworkUtilities;
 import mtr.mappings.RegistryUtilities;
 import mtr.mixin.PlayerTeleportationStateAccessor;

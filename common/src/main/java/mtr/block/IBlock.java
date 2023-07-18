@@ -108,8 +108,8 @@ public interface IBlock {
 
 	static void onBreakCreative(Level world, Player player, BlockPos pos) {
 		if (!world.isClientSide && (player == null || player.isCreative())) {
-			world.setBlock(pos, Blocks.AIR.defaultBlockState(), 35);
 			final BlockState state = world.getBlockState(pos);
+			world.setBlock(pos, Blocks.AIR.defaultBlockState(), 35);
 			world.levelEvent(player, 2001, pos, Block.getId(state));
 		}
 	}

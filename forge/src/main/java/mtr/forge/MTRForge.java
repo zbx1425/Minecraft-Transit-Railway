@@ -1,11 +1,12 @@
-package mtr;
+package mtr.forge;
 
+import mtr.*;
 import mtr.client.CustomResources;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.DeferredRegisterHolder;
-import mtr.mappings.ForgeUtilities;
+import mtr.forge.mappings.ForgeUtilities;
 import mtr.mappings.RegistryUtilities;
 import mtr.render.RenderDrivingOverlay;
 import mtr.render.RenderLift;
@@ -14,7 +15,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
