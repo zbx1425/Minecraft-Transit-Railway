@@ -33,7 +33,6 @@ bin/
 run/
 latest.log
 Keys.java
-mappings
 BlockEntityExtension.java
 RandomSource.java
 UnknownPacketMixin.java
