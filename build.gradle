@@ -285,3 +285,30 @@ static Object getJson(String url) {
 		}
 	}
 }
+
+import org.gradle.api.internal.file.copy.CopyAction;
+import org.gradle.api.internal.file.copy.CopyActionProcessingStream;
+
+class DummyArchiveTask extends AbstractArchiveTask {
+
+	protected CopyAction createCopyAction() {
+		return new DummyCopyAction();
+	}
+
+	class DummyCopyAction implements CopyAction {
+
+		@Override
+		WorkResult execute(CopyActionProcessingStream stream) {
+			return WorkResults.didWork(true);
+		}
+	}
+}
+
+task dummyForgeOutput(type: DummyArchiveTask) {
+	// Forgix's mergeJars task doesn't extend AbstractArchiveTask.
+	// This is to make github.com/teaconmc/longjing happy.
+	destinationDirectory = file("build/release/")
+	archiveBaseName = "MTR-forge"
+	archiveVersion = minecraft_version + "-" + rootProject.mod_version
+	archiveExtension = "jar"
+}
