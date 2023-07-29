@@ -153,12 +153,22 @@ public class ForgeUtilities {
 	}
 
 	public static void registerCreativeModeTabsToDeferredRegistry(DeferredRegisterHolder<CreativeModeTab> registry) {
-		CREATIVE_TAB_ORDER.forEach(resourceLocation -> {
+		for (int i = 0; i < CREATIVE_TAB_ORDER.size(); i++) {
+			ResourceLocation resourceLocation = CREATIVE_TAB_ORDER.get(i);
 			final CreativeModeTabWrapper creativeModeTabWrapper = CREATIVE_TABS.get(resourceLocation);
-			CreativeModeTab tab = CreativeModeTab.builder().icon(creativeModeTabWrapper.iconSupplier).title(Component.translatable(creativeModeTabWrapper.translationKey)).build();
-			creativeModeTabWrapper.creativeModeTab = tab;
-			registry.register(resourceLocation.getPath(), () -> tab);
-		});
+			CreativeModeTab.Builder builder = CreativeModeTab.builder()
+					.icon(creativeModeTabWrapper.iconSupplier)
+					.title(Component.translatable(creativeModeTabWrapper.translationKey));
+			builder.withTabsBefore(CreativeModeTabs.SPAWN_EGGS);
+			if (i > 0) {
+				builder.withTabsBefore(CREATIVE_TAB_ORDER.get(i - 1));
+			}
+			if (i < CREATIVE_TAB_ORDER.size() - 1) {
+				builder.withTabsAfter(CREATIVE_TAB_ORDER.get(i + 1));
+			}
+			creativeModeTabWrapper.creativeModeTab = builder.build();
+			registry.register(resourceLocation.getPath(), () -> creativeModeTabWrapper.creativeModeTab);
+		}
 	}
 
 	private static class EntityRendererPair<T extends Entity> {
