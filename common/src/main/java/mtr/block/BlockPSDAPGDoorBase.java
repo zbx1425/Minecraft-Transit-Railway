@@ -34,7 +34,6 @@ public abstract class BlockPSDAPGDoorBase extends BlockPSDAPGBase implements Ent
 
 	public static final BooleanProperty END = BooleanProperty.create("end");
 	public static final BooleanProperty UNLOCKED = BooleanProperty.create("unlocked");
-	public static final BooleanProperty TEMP = BooleanProperty.create("temp");
 
 	@Override
 	public BlockState updateShape(BlockState state, Direction direction, BlockState newState, LevelAccessor world, BlockPos pos, BlockPos posFrom) {
@@ -94,7 +93,7 @@ public abstract class BlockPSDAPGDoorBase extends BlockPSDAPGBase implements Ent
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(END, FACING, HALF, SIDE, TEMP, UNLOCKED);
+		builder.add(END, FACING, HALF, SIDE, UNLOCKED);
 	}
 
 	private static void lockDoor(Level world, BlockPos pos, BlockState state, boolean unlocked) {

@@ -39,7 +39,7 @@ public class BlockLiftDoorOdd extends BlockPSDAPGDoorBase implements ITripleBloc
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(END, FACING, HALF, ODD, SIDE, TEMP, UNLOCKED);
+		builder.add(END, FACING, HALF, ODD, SIDE, UNLOCKED);
 	}
 
 	public static class TileEntityLiftDoorOdd extends TileEntityPSDAPGDoorBase {
