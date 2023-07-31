@@ -33,6 +33,9 @@ public class TrainServer extends Train {
 	private int updateRailProgressCounter;
 	private int manualCoolDown;
 
+	private long lastSimulateTrainMillis = 0;
+	private float realTicksElapsed = 1;
+
 	private final List<Siding.TimeSegment> timeSegments;
 
 	private static final int TRAIN_UPDATE_DISTANCE = 128;
@@ -235,6 +238,15 @@ public class TrainServer extends Train {
 	}
 
 	public boolean simulateTrain(Level world, float ticksElapsed, Depot depot, DataCache dataCache, List<Map<UUID, Long>> trainPositions, Map<Player, Set<TrainServer>> trainsInPlayerRange, Map<Long, List<ScheduleEntry>> schedulesForPlatform, Map<Long, Map<BlockPos, TrainDelay>> trainDelays) {
+		long t = System.currentTimeMillis();
+		if (lastSimulateTrainMillis == 0) {
+			realTicksElapsed = 1;
+		} else {
+			realTicksElapsed = (t - lastSimulateTrainMillis) / 50f;
+		}
+		lastSimulateTrainMillis = t;
+		ticksElapsed = realTicksElapsed;
+
 		this.trainPositions = trainPositions;
 		this.trainsInPlayerRange = trainsInPlayerRange;
 		this.trainDelays = trainDelays;
@@ -366,7 +378,7 @@ public class TrainServer extends Train {
 	}
 
 	private void checkBlock(BlockPos pos, Consumer<BlockPos> callback) {
-		final int checkRadius = (int) Math.floor(speed);
+		final int checkRadius = (int) Math.floor(speed * realTicksElapsed);
 		for (int x = -checkRadius; x <= checkRadius; x++) {
 			for (int z = -checkRadius; z <= checkRadius; z++) {
 				for (int y = 0; y <= 3; y++) {

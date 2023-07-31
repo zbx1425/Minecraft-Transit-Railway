@@ -319,7 +319,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		railwayDataCoolDownModule.tick();
 		railwayDataDriveTrainModule.tick();
 		railwayDataRailActionsModule.tick();
-		railwayDataRouteFinderModule.tick();
+		// railwayDataRouteFinderModule.tick();
 		updateNearbyTrains.tick();
 		updateNearbyLifts.tick();
 
