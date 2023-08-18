@@ -556,11 +556,6 @@ public class ClientCache extends DataCache implements IGui {
 			if (!resourceLocation.equals(DEFAULT_BLACK_RESOURCE) && !resourceLocation.equals(DEFAULT_WHITE_RESOURCE) && !resourceLocation.equals(DEFAULT_TRANSPARENT_RESOURCE)) {
 				final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
 				textureManager.release(resourceLocation);
-				final AbstractTexture abstractTexture = textureManager.getTexture(resourceLocation);
-				if (abstractTexture != null) {
-					abstractTexture.releaseId();
-					abstractTexture.close();
-				}
 			}
 		}
 	}
