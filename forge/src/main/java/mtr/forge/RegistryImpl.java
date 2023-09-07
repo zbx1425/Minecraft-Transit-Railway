@@ -25,7 +25,10 @@ public class RegistryImpl {
 	}
 
 	public static Supplier<CreativeModeTab> getCreativeModeTab(ResourceLocation id, Supplier<ItemStack> supplier) {
-		return ForgeUtilities.createCreativeModeTab(id, supplier, String.format("itemGroup.%s.%s", id.getNamespace(), id.getPath()));
+		String normalizedPath = id.getPath().startsWith(id.getNamespace() + "_")
+				? id.getPath().substring(id.getNamespace().length() + 1) : id.getPath();
+		return ForgeUtilities.createCreativeModeTab(id, supplier,
+				String.format("itemGroup.%s.%s", id.getNamespace(), normalizedPath));
 	}
 
 	public static void registerCreativeModeTab(ResourceLocation resourceLocation, Item item) {
