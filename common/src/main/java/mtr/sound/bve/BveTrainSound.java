@@ -148,7 +148,7 @@ public class BveTrainSound extends TrainSoundBase {
 			if (soundLoopMotor[i] == null) {
 				continue;
 			}
-			soundLoopMotor[i].setData(config.motorData.getVolume(i, speedKph, motorCurrentOutput) * config.soundCfg.motorVolumeMultiply, config.motorData.getPitch(i, speedKph, motorCurrentOutput), pos);
+			soundLoopMotor[i].setData(Math.min(1, config.motorData.getVolume(i, speedKph, motorCurrentOutput) * config.soundCfg.motorVolumeMultiply), config.motorData.getPitch(i, speedKph, motorCurrentOutput), pos);
 		}
 
 		// TODO Play flange sounds
