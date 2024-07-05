@@ -9,20 +9,11 @@ plugins {
 	id "com.github.johnrengelman.shadow" version "+" apply false
 }
 
-def default_minecraft_version = "1.20"
-def minecraft_version = rootProject.properties.containsKey("buildVersion") ? rootProject.getProperties().get("buildVersion").toString() : default_minecraft_version
-def minecraft_main_version = minecraft_version.split("\\.")[1] as int
+apply from: "build_dep_ver.gradle"
+
 def patreon_api_key = rootProject.properties.containsKey("patreonApiKey") ? rootProject.getProperties().get("patreonApiKey").toString() : ""
 boolean joml_math = minecraft_version == "1.19.3" || minecraft_version == "1.19.4" || minecraft_version == "1.20" || minecraft_version == "1.20.1"
-boolean parchment_not_avail = false
-String parchment_version = parchment_not_avail ? "N/A" : new XmlSlurper().parse("https://ldtteam.jfrog.io/artifactory/parchmentmc-internal/org/parchmentmc/data/parchment-${minecraft_version}/maven-metadata.xml").versioning.release
 def testServer = rootProject.properties.containsKey("testServer") ? rootProject.getProperties().get("testServer").toString() : ""
-
-rootProject.ext.fabric_loader_version = [minecraft_version, getJson("https://meta.fabricmc.net/v2/versions/loader/" + minecraft_version)[0]["loader"]["version"]]
-rootProject.ext.forge_version = minecraft_version + "-" + getJson("https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json")["promos"][minecraft_version + "-recommended"]
-rootProject.ext.fabric_api_data = getModrinthData("fabric", minecraft_version, "fabric-api")
-rootProject.ext.mod_menu_data = getModrinthData("fabric", minecraft_version, "modmenu")
-rootProject.ext.architectury_data = getModrinthData("forge", minecraft_version, "architectury-api")
 
 rootProject.ext.architectury_id = minecraft_main_version == 16 ? "me.shedaniel" : "dev.architectury"
 rootProject.ext.variation = rootProject.properties.containsKey("variation") ? rootProject.getProperties().get("variation").toString() : "normal"
@@ -40,7 +31,8 @@ subprojects {
 		silentMojangMappingsLicense()
 
 		mixin {
-			defaultRefmapName.set("mtr-refmap.json")
+			useLegacyMixinAp = true
+			defaultRefmapName = "mixins.mtr.refmap.json"
 		}
 	}
 
@@ -50,7 +42,7 @@ subprojects {
 
 	dependencies {
 		minecraft "com.mojang:minecraft:${minecraft_version}"
-		mappings parchment_not_avail ? loom.officialMojangMappings() : loom.layered() {
+		mappings loom.layered() {
 			officialMojangMappings()
 			parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
 		}
@@ -81,12 +73,6 @@ subprojects {
 }
 
 tasks.register("setupFiles") {
-	System.out.println("Fabric Loader: " + rootProject.fabric_loader_version[1])
-	System.out.println("Forge: " + rootProject.forge_version)
-	System.out.println("Fabric API: " + rootProject.fabric_api_data[0])
-	System.out.println("Mod Menu: " + rootProject.mod_menu_data[0])
-	System.out.println("Architectury: " + rootProject.architectury_data[0].split("\\+")[0])
-
 	/*
 	download.run {
 		src "https://github.com/jonafanho/Minecraft-Mappings/archive/refs/heads/1.19.4.zip"
@@ -130,7 +116,7 @@ tasks.register("setupFiles") {
 	}
 	if (rootProject.variation == "normal" || rootProject.variation == "server") {
 		download.run {
-			src "https://unpkg.com/fabric/dist/fabric.min.js"
+			src "https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"
 			dest "common/src/main/resources/assets/mtr/website/fabric.min.js"
 			overwrite true
 			retries - 1
