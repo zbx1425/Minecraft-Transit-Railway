@@ -52,3 +52,5 @@ fabric/server
 forge/server
 
 .architectury-transformer/
+
+/build.properties

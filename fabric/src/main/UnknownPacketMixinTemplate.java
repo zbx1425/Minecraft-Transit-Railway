@@ -29,7 +29,7 @@ public abstract class UnknownPacketMixin implements IPacket {
 		return channel;
 	}
 
-	@Redirect(at = @At(value = "INVOKE", target = "Lorg/@path1@/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V"), method = "handleCustomPayload")
+	@Redirect(at = @At(value = "INVOKE", target = "Lorg/@path1@/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V"), method = "handleCustomPayload", remap = false)
 	private void redirectLogger(org.@path2@.Logger instance, String s, Object o) {
 		process = true;
 	}

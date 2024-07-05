@@ -80,7 +80,7 @@ tasks.register("moveForgeBuilds") {
 		}
 		copy {
 			from "build/libs"
-			include "*${rootProject.mod_version}.jar"
+			include "*${rootProject.minecraft_version}.jar"
 			into "../build/release"
 			rename "(.+)", "${rootProject.variation_header}-\$1"
 		}
@@ -88,13 +88,13 @@ tasks.register("moveForgeBuilds") {
 			copy {
 				from "build/libs"
 				into "../build/latest"
-				rename { fileName -> "MTR-${fileName.replace(rootProject.mod_version, "latest")}" }
+				rename { fileName -> "NeoMTR-${fileName.replace(rootProject.mod_version, "latest")}" }
 			}
 			copy {
 				from "build/libs"
-				include "*${rootProject.mod_version}-dev-shadow.jar"
+				include "*${rootProject.minecraft_version}-dev-shadow.jar"
 				into "../build/libs"
-				rename "(.+)", "MTR-\$1"
+				rename "(.+)", "NeoMTR-\$1"
 			}
 		}
 	}
