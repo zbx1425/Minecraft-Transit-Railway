@@ -163,12 +163,14 @@ tasks.register("setupFiles") {
 		into "forge/src/main/resources"
 	}
 
+/*
 	download.run {
 		src "https://crowdin.com/backend/download/project/minecraft-transit-railway.zip"
 		dest "common/src/main/java/mtr/mappings/lang.zip"
 		overwrite true
 		retries - 1
 	}
+*/
 	copy {
 		outputs.upToDateWhen { false }
 		from(zipTree("common/src/main/java/mtr/mappings/lang.zip"))
