@@ -2,14 +2,12 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.apache.tools.ant.taskdefs.condition.Os
 
 loom {
-	forge {
-		mixinConfig "mtr.mixins.json"
-	}
+
 }
 
 architectury {
 	platformSetupLoomIde()
-	forge()
+	neoForge()
 }
 
 configurations {
@@ -17,12 +15,12 @@ configurations {
 	shadowCommon
 	compileClasspath.extendsFrom common
 	runtimeClasspath.extendsFrom common
-	developmentForge.extendsFrom common
+	developmentNeoForge.extendsFrom common
 }
 
 dependencies {
-	forge "net.minecraftforge:forge:${rootProject.forge_version}"
-	modApi "${rootProject.architectury_id}:architectury-forge:${rootProject.architectury_version}"
+	neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
+	// modApi "${rootProject.architectury_id}:architectury-forge:${rootProject.architectury_version}"
 
 	forgeRuntimeLibrary "org.eclipse.jetty:jetty-http:9.+"
 	forgeRuntimeLibrary "org.eclipse.jetty:jetty-io:9.+"
@@ -35,7 +33,7 @@ dependencies {
 	forgeRuntimeLibrary "org.msgpack:msgpack-core:+"
 
 	common(project(path: ":common", configuration: "namedElements")) { transitive false }
-	shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+	shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
 
 processResources {
@@ -95,53 +93,6 @@ tasks.register("moveForgeBuilds") {
 				include "*${rootProject.minecraft_version}-dev-shadow.jar"
 				into "../build/libs"
 				rename "(.+)", "NeoMTR-\$1"
-			}
-		}
-	}
-}
-
-tasks.register("testServer") {
-	doLast {
-		if (rootProject.variation == "normal") {
-			copy {
-				from "../resources/eula.txt"
-				into "server"
-			}
-			copy {
-				from "../resources/server.properties"
-				into "server"
-				filter(ReplaceTokens, tokens: ["port": String.valueOf(25500 + new Random().nextInt(500))])
-			}
-			copy {
-				from "../build/latest"
-				into "server/mods"
-				include "MTR-forge-*-latest.jar"
-				rename "(.+)", "MTR.jar"
-			}
-//			download.run {
-//				src rootProject.architectury_data[1]
-//				dest "forge/server/mods/architectury.jar"
-//				overwrite true
-//				retries - 1
-//			}
-			download.run {
-				src "https://maven.minecraftforge.net/net/minecraftforge/forge/${rootProject.forge_version}/forge-${rootProject.forge_version}-installer.jar"
-				dest "forge/server/forge-installer.jar"
-				overwrite true
-				retries - 1
-			}
-			javaexec {
-				mainClass = "-jar"
-				args = ["forge-installer.jar", "--installServer"]
-				workingDir = "server"
-			}
-			if (!rootProject.forge_version.startsWith("1.16.5")) {
-				javaexec {
-					mainClass = "@libraries/net/minecraftforge/forge/${rootProject.forge_version}/${Os.isFamily(Os.FAMILY_WINDOWS) ? "win" : "unix"}_args.txt"
-					args = ["nogui"]
-					jvmArgs = ["-Xms4G", "-Xmx4G"]
-					workingDir = "server"
-				}
 			}
 		}
 	}

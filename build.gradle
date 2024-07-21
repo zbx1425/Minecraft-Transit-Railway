@@ -220,6 +220,7 @@ allprojects {
 	group = rootProject.maven_group
 
 	repositories {
+		maven { url "https://maven.neoforged.net/releases/" }
 		maven { url = "https://jitpack.io/" }
 		maven { url = "https://maven.terraformersmc.com/" }
 		maven {
