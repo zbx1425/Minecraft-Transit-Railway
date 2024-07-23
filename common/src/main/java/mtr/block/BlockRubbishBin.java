@@ -38,7 +38,7 @@ public class BlockRubbishBin extends BlockDirectionalMapper {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		return IBlock.checkHoldingBrush(world, player, () -> world.setBlockAndUpdate(pos, state.setValue(FILLED, 0)), () -> {
 			final int currentLevel = IBlock.getStatePropertySafe(state, FILLED);
 			if (!player.getMainHandItem().isEmpty() && currentLevel < MAX_LEVEL) {

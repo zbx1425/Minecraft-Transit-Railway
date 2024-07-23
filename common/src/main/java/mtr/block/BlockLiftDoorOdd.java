@@ -22,9 +22,9 @@ public class BlockLiftDoorOdd extends BlockPSDAPGDoorBase implements ITripleBloc
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		ITripleBlock.playerWillDestroy(world, pos, state, player, IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER);
-		super.playerWillDestroy(world, pos, state, player);
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	@Override

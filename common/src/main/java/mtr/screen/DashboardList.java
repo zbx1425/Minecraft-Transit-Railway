@@ -1,7 +1,6 @@
 package mtr.screen;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
@@ -11,7 +10,6 @@ import mtr.mappings.UtilitiesClient;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -65,21 +63,21 @@ public class DashboardList implements IGui {
 		this.getSearch = getSearch;
 		this.setSearch = setSearch;
 		textFieldSearch = new WidgetBetterTextField(Text.translatable("gui.mtr.search").getString());
-		buttonPrevPage = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_left.png"), 20, 40, button -> setPage(page - 1));
-		buttonNextPage = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_right.png"), 20, 40, button -> setPage(page + 1));
-		buttonFind = new WidgetSilentImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_find.png"), 20, 40, button -> onClick(onFind), playSound);
-		buttonDrawArea = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_draw_area.png"), 20, 40, button -> onClick(onDrawArea));
-		buttonEdit = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_edit.png"), 20, 40, button -> onClick(onEdit));
-		buttonUp = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_up.png"), 20, 40, button -> {
+		buttonPrevPage = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_left.png"), 20, 40, button -> setPage(page - 1));
+		buttonNextPage = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_right.png"), 20, 40, button -> setPage(page + 1));
+		buttonFind = new WidgetSilentImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_find.png"), 20, 40, button -> onClick(onFind), playSound);
+		buttonDrawArea = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_draw_area.png"), 20, 40, button -> onClick(onDrawArea));
+		buttonEdit = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_edit.png"), 20, 40, button -> onClick(onEdit));
+		buttonUp = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_up.png"), 20, 40, button -> {
 			onUp(getList);
 			onSort.run();
 		});
-		buttonDown = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_down.png"), 20, 40, button -> {
+		buttonDown = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_down.png"), 20, 40, button -> {
 			onDown(getList);
 			onSort.run();
 		});
-		buttonAdd = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_add.png"), 20, 40, button -> onClick(onAdd));
-		buttonDelete = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_delete.png"), 20, 40, button -> onClick(onDelete));
+		buttonAdd = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_add.png"), 20, 40, button -> onClick(onAdd));
+		buttonDelete = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, ResourceLocation.parse("mtr:textures/gui/icon_delete.png"), 20, 40, button -> onClick(onDelete));
 	}
 
 	public void init(Consumer<AbstractWidget> addDrawableChild) {
@@ -113,7 +111,6 @@ public class DashboardList implements IGui {
 	}
 
 	public void tick() {
-		textFieldSearch.tick();
 		UtilitiesClient.setWidgetX(buttonPrevPage, x);
 		UtilitiesClient.setWidgetX(buttonNextPage, x + SQUARE_SIZE * 3);
 		UtilitiesClient.setWidgetX(textFieldSearch, x + SQUARE_SIZE * 4 + TEXT_FIELD_PADDING / 2);
@@ -159,10 +156,10 @@ public class DashboardList implements IGui {
 				final NameColorDataBase data = dataFiltered.get(sortedKeys.get(i + itemsToShow * page));
 
 				Tesselator tesselator = Tesselator.getInstance();
-				BufferBuilder buffer = tesselator.getBuilder();
+				BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 				UtilitiesClient.beginDrawingRectangle(buffer);
 				IDrawing.drawRectangle(buffer, x + TEXT_PADDING, y + drawY, x + TEXT_PADDING + TEXT_HEIGHT, y + drawY + TEXT_HEIGHT, ARGB_BLACK | data.color);
-				tesselator.end();
+				BufferUploader.drawWithShader(buffer.buildOrThrow());
 				UtilitiesClient.finishDrawingRectangle();
 
 				final String drawString = IGui.formatStationName(data.name);
@@ -218,7 +215,7 @@ public class DashboardList implements IGui {
 		}
 	}
 
-	public void mouseScrolled(double mouseX, double mouseY, double amount) {
+	public void mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
 		if (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height) {
 			setPage(page + (int) Math.signum(-amount));
 		}

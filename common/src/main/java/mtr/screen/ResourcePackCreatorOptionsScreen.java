@@ -133,16 +133,13 @@ public class ResourcePackCreatorOptionsScreen extends ScreenMapper implements IR
 
 	@Override
 	public void tick() {
-		textFieldId.tick();
-		textFieldName.tick();
-		textFieldGangwayConnectionId.tick();
-		textFieldTrainBarrierId.tick();
+
 	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			super.render(guiGraphics, mouseX, mouseY, delta);
 			final int yStart = (height - SQUARE_SIZE * 10 - TEXT_FIELD_PADDING * 4) / 2;
 			guiGraphics.drawString(font, FILE_MODEL_TEXT, SQUARE_SIZE, yStart + TEXT_PADDING, ARGB_WHITE);

@@ -17,7 +17,7 @@ public class LoopingSoundInstance extends SoundInstanceMapper implements Tickabl
 	private static final int MAX_DISTANCE = 32;
 
 	public LoopingSoundInstance(String soundId) {
-		super(RegistryUtilities.createSoundEvent(new ResourceLocation(MTR.MOD_ID, soundId)), SoundSource.BLOCKS);
+		super(RegistryUtilities.createSoundEvent(MTR.id(soundId)), SoundSource.BLOCKS);
 		looping = true;
 	}
 

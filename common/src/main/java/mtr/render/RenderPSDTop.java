@@ -53,7 +53,7 @@ public class RenderPSDTop extends RenderRouteBase<BlockPSDTop.TileEntityPSDTop> 
 		if (!airLeft && !airRight || persistent) {
 			return;
 		}
-		RenderTrains.scheduleRender(new ResourceLocation("mtr:textures/block/psd_top.png"), false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
+		RenderTrains.scheduleRender(ResourceLocation.parse("mtr:textures/block/psd_top.png"), false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
 			storedMatrixTransformations.transform(matrices);
 			if (airLeft) {
 				// back

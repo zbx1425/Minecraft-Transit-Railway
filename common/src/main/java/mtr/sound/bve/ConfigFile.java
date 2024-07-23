@@ -95,7 +95,7 @@ public class ConfigFile {
 					continue;
 				}
 
-				final SoundEvent valueAsSoundEvent = RegistryUtilities.createSoundEvent(new ResourceLocation(config.audioBaseName + value));
+				final SoundEvent valueAsSoundEvent = RegistryUtilities.createSoundEvent(ResourceLocation.parse(config.audioBaseName + value));
 				switch (section) {
 					case "mtr":
 						switch (key) {

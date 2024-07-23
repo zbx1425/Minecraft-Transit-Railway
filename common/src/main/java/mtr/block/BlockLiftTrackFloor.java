@@ -11,7 +11,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +26,7 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		return IBlock.checkHoldingBrush(world, player, () -> {
 			final BlockEntity entity = world.getBlockEntity(pos);
 			if (entity instanceof TileEntityLiftTrackFloor) {
@@ -40,7 +42,7 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		if (!world.isClientSide) {
 			final RailwayData railwayData = RailwayData.getInstance(world);
 			if (railwayData != null) {
@@ -48,6 +50,7 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 				PacketTrainDataGuiServer.removeLiftFloorTrackS2C(world, pos);
 			}
 		}
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	public static class TileEntityLiftTrackFloor extends BlockEntityClientSerializableMapper {

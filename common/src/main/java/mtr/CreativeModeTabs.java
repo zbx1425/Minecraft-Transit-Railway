@@ -9,10 +9,10 @@ import java.util.function.Supplier;
 
 public interface CreativeModeTabs {
 
-	Wrapper CORE = Keys.LIFTS_ONLY ? new Wrapper() : new Wrapper(new ResourceLocation(MTR.MOD_ID, "mtr_core"), () -> new ItemStack(Items.RAILWAY_DASHBOARD.get()));
-	Wrapper RAILWAY_FACILITIES = Keys.LIFTS_ONLY ? new Wrapper() : new Wrapper(new ResourceLocation(MTR.MOD_ID, "mtr_railway_facilities"), () -> new ItemStack(Blocks.TICKET_PROCESSOR.get()));
-	Wrapper STATION_BUILDING_BLOCKS = Keys.LIFTS_ONLY ? new Wrapper() : new Wrapper(new ResourceLocation(MTR.MOD_ID, "mtr_station_building_blocks"), () -> new ItemStack(Blocks.LOGO.get()));
-	Wrapper ESCALATORS_LIFTS = new Wrapper(new ResourceLocation(MTR.MOD_ID, "mtr_escalators_lifts"), () -> new ItemStack(Items.ESCALATOR.get()));
+	Wrapper CORE = Keys.LIFTS_ONLY ? new Wrapper() : new Wrapper(MTR.id("mtr_core"), () -> new ItemStack(Items.RAILWAY_DASHBOARD.get()));
+	Wrapper RAILWAY_FACILITIES = Keys.LIFTS_ONLY ? new Wrapper() : new Wrapper(MTR.id("mtr_railway_facilities"), () -> new ItemStack(Blocks.TICKET_PROCESSOR.get()));
+	Wrapper STATION_BUILDING_BLOCKS = Keys.LIFTS_ONLY ? new Wrapper() : new Wrapper(MTR.id("mtr_station_building_blocks"), () -> new ItemStack(Blocks.LOGO.get()));
+	Wrapper ESCALATORS_LIFTS = new Wrapper(MTR.id("mtr_escalators_lifts"), () -> new ItemStack(Items.ESCALATOR.get()));
 
 	class Wrapper {
 
@@ -33,7 +33,7 @@ public interface CreativeModeTabs {
 		}
 
 		public Wrapper() {
-			resourceLocation = new ResourceLocation("");
+			resourceLocation = ResourceLocation.parse("");
 			creativeModeTabSupplier = Utilities::getDefaultTab;
 		}
 	}

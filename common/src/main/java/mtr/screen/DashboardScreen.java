@@ -147,7 +147,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			widgetMap.render(guiGraphics, mouseX, mouseY, delta);
 			guiGraphics.pose().pushPose();
 			guiGraphics.pose().translate(0, 0, 500);
@@ -166,15 +166,13 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		dashboardList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		dashboardList.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
 	@Override
 	public void tick() {
-		textFieldName.tick();
-		textFieldCustomDestination.tick();
 		dashboardList.tick();
 
 		try {

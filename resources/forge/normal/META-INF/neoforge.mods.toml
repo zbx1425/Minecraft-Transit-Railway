@@ -1,26 +1,19 @@
 modLoader = "javafml"
-loaderVersion = "[36,)"
+loaderVersion = "[1,)"
 license = "MIT"
 
 [[mods]]
 modId = "mtr"
 version = "${version}"
-displayName = "Minecraft Transit Railway"
-authors = "Jonathan Ho"
+displayName = "NeoMTR"
+authors = "Jonathan Ho & Zbx1425"
 description = "A Minecraft mod that adds automated train systems into the game."
 logoFile = "icon.png"
 
 [[dependencies.mtr]]
-modId = "forge"
-mandatory = true
-versionRange = "[36,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.mtr]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.16.5,)"
+versionRange = "[1.21,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -30,3 +23,6 @@ mandatory = true
 versionRange = "[1.26.37,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[mixins]]
+config = "mtr.mixins.json"

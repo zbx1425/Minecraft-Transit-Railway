@@ -174,8 +174,7 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 		super.tick();
 		buttonGenerateRoute.active = data.clientPathGenerationSuccessfulSegments >= 0;
 		departuresList.tick();
-		textFieldDeparture.tick();
-		textFieldCruisingAltitude.tick();
+
 
 		for (int i = 0; i < Depot.HOURS_IN_DAY; i++) {
 			data.setFrequency(sliders[i].getIntValue(), i);
@@ -193,7 +192,7 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			guiGraphics.vLine(rightPanelsX - 1, -1, height, ARGB_WHITE_TRANSLUCENT);
 			renderTextFields(guiGraphics);
 
@@ -251,9 +250,9 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		departuresList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		departuresList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 
 	@Override

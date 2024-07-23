@@ -31,7 +31,7 @@ public class BlockTactileMap extends BlockDirectionalDoubleBlockBase implements 
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		if (world.isClientSide && TileEntityTactileMap.onUse != null) {
 			TileEntityTactileMap.onUse.accept(pos);
 			return InteractionResult.SUCCESS;

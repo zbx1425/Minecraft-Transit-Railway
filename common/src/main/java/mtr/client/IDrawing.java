@@ -41,7 +41,7 @@ public interface IDrawing {
 	}
 
 	static void drawStringWithFont(PoseStack matrices, Font textRenderer, MultiBufferSource.BufferSource immediate, String text, IGui.HorizontalAlignment horizontalAlignment, IGui.VerticalAlignment verticalAlignment, IGui.HorizontalAlignment xAlignment, float x, float y, float maxWidth, float maxHeight, float scale, int textColorCjk, int textColor, float fontSizeRatio, boolean shadow, int light, DrawingCallback drawingCallback) {
-		final Style style = false && Config.useMTRFont() ? Style.EMPTY.withFont(new ResourceLocation(MTR.MOD_ID, "mtr")) : Style.EMPTY;
+		final Style style = false && Config.useMTRFont() ? Style.EMPTY.withFont(MTR.id("mtr")) : Style.EMPTY;
 
 		while (text.contains("||")) {
 			text = text.replace("||", "|");
@@ -122,8 +122,8 @@ public interface IDrawing {
 	static void drawLine(PoseStack matrices, MultiBufferSource vertexConsumers, float x1, float y1, float z1, float x2, float y2, float z2, int r, int g, int b) {
 		final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderType.lines());
 		final PoseStack.Pose pose = matrices.last();
-		vertexConsumer.vertex(pose.pose(), x1, y1, z1).color(r, g, b, 0xFF).normal(pose.normal(), 0, 1, 0).endVertex();
-		vertexConsumer.vertex(pose.pose(), x2, y2, z2).color(r, g, b, 0xFF).normal(pose.normal(), 0, 1, 0).endVertex();
+		vertexConsumer.addVertex(pose.pose(), x1, y1, z1).setColor(r, g, b, 0xFF).setNormal(pose, 0, 1, 0);
+		vertexConsumer.addVertex(pose.pose(), x2, y2, z2).setColor(r, g, b, 0xFF).setNormal(pose, 0, 1, 0);
 	}
 
 	static void drawRectangle(VertexConsumer vertexConsumer, double x1, double y1, double x2, double y2, int color) {
@@ -134,10 +134,10 @@ public interface IDrawing {
 		if (a == 0) {
 			return;
 		}
-		vertexConsumer.vertex(x1, y1, 0).color(r, g, b, a).endVertex();
-		vertexConsumer.vertex(x1, y2, 0).color(r, g, b, a).endVertex();
-		vertexConsumer.vertex(x2, y2, 0).color(r, g, b, a).endVertex();
-		vertexConsumer.vertex(x2, y1, 0).color(r, g, b, a).endVertex();
+		vertexConsumer.addVertex((float)x1, (float)y1, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex((float)x1, (float)y2, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex((float)x2, (float)y2, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex((float)x2, (float)y1, 0).setColor(r, g, b, a);
 	}
 
 	static void drawTexture(PoseStack matrices, VertexConsumer vertexConsumer, float x1, float y1, float z1, float x2, float y2, float z2, Direction facing, int color, int light) {
@@ -166,10 +166,10 @@ public interface IDrawing {
 		if (a == 0) {
 			return;
 		}
-		vertexConsumer.vertex(pose.pose(), x1, y1, z1).color(r, g, b, a).uv(u1, v2).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.normal(), vec3i.getX(), vec3i.getY(), vec3i.getZ()).endVertex();
-		vertexConsumer.vertex(pose.pose(), x2, y2, z2).color(r, g, b, a).uv(u2, v2).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.normal(), vec3i.getX(), vec3i.getY(), vec3i.getZ()).endVertex();
-		vertexConsumer.vertex(pose.pose(), x3, y3, z3).color(r, g, b, a).uv(u2, v1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.normal(), vec3i.getX(), vec3i.getY(), vec3i.getZ()).endVertex();
-		vertexConsumer.vertex(pose.pose(), x4, y4, z4).color(r, g, b, a).uv(u1, v1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.normal(), vec3i.getX(), vec3i.getY(), vec3i.getZ()).endVertex();
+		vertexConsumer.addVertex(pose.pose(), x1, y1, z1).setColor(r, g, b, a).setUv(u1, v2).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, vec3i.getX(), vec3i.getY(), vec3i.getZ());
+		vertexConsumer.addVertex(pose.pose(), x2, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, vec3i.getX(), vec3i.getY(), vec3i.getZ());
+		vertexConsumer.addVertex(pose.pose(), x3, y3, z3).setColor(r, g, b, a).setUv(u2, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, vec3i.getX(), vec3i.getY(), vec3i.getZ());
+		vertexConsumer.addVertex(pose.pose(), x4, y4, z4).setColor(r, g, b, a).setUv(u1, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, vec3i.getX(), vec3i.getY(), vec3i.getZ());
 	}
 
 	static void setPositionAndWidth(AbstractWidget widget, int x, int y, int widgetWidth) {

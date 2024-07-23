@@ -13,7 +13,7 @@ import net.minecraft.world.entity.Entity;
 public class ModelBogie extends EntityModel<Entity> {
 
 	private final ModelMapper bogie;
-	private final ResourceLocation texture = new ResourceLocation("mtr:textures/entity/bogie_1.png");
+	private final ResourceLocation texture = ResourceLocation.parse("mtr:textures/entity/bogie_1.png");
 
 	public ModelBogie() {
 		final int textureWidth = 186;
@@ -41,6 +41,6 @@ public class ModelBogie extends EntityModel<Entity> {
 	}
 
 	@Override
-	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
 	}
 }

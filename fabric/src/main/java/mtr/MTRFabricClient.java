@@ -38,7 +38,7 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 
 		@Override
 		public ResourceLocation getFabricId() {
-			return new ResourceLocation(MTR.MOD_ID, CUSTOM_RESOURCES_ID);
+			return MTR.id(CUSTOM_RESOURCES_ID);
 		}
 
 		@Override

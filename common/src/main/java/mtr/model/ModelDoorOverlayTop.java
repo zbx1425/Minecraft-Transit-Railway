@@ -16,7 +16,7 @@ public class ModelDoorOverlayTop extends EntityModel<Entity> {
 	private final ModelMapper outer_roof_2_r1;
 	private final ModelMapper outer_roof_1_r1;
 
-	private static final ResourceLocation TEXTURE_ID = new ResourceLocation("mtr:textures/block/sign/door_overlay_sp1900_top.png");
+	private static final ResourceLocation TEXTURE_ID = ResourceLocation.parse("mtr:textures/block/sign/door_overlay_sp1900_top.png");
 
 	public ModelDoorOverlayTop() {
 		final int textureWidth = 24;
@@ -49,7 +49,7 @@ public class ModelDoorOverlayTop extends EntityModel<Entity> {
 	}
 
 	@Override
-	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
 	}
 
 	public void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, int position) {

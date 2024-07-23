@@ -24,7 +24,7 @@ public class FileUploaderScreen extends ScreenMapper implements IGui {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			super.render(guiGraphics, mouseX, mouseY, delta);
 			guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.drag_file_to_upload"), width / 2, (height - TEXT_HEIGHT) / 2, ARGB_WHITE);
 		} catch (Exception e) {

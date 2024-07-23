@@ -40,7 +40,7 @@ public abstract class ModelTrainBase extends EntityModel<Entity> implements IGui
 	}
 
 	@Override
-	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int packedLight, int packedOverlay, int color) {
 	}
 
 	public final void render(PoseStack matrices, MultiBufferSource vertexConsumers, NameColorDataBase data, ResourceLocation texture, int light, float doorLeftValue, float doorRightValue, boolean opening, int currentCar, int trainCars, boolean head1IsFront, boolean lightsOn, boolean isTranslucent, boolean renderDetails, boolean atPlatform) {
@@ -75,7 +75,7 @@ public abstract class ModelTrainBase extends EntityModel<Entity> implements IGui
 
 			if (renderDetails) {
 				final TrainClient train = data instanceof TrainClient ? (TrainClient) data : null;
-				final MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+				final MultiBufferSource.BufferSource immediate = Minecraft.getInstance().renderBuffers().bufferSource();
 				final Route thisRoute = train == null ? null : train.getThisRoute();
 				final Route nextRoute = train == null ? null : train.getNextRoute();
 				final Station thisStation = train == null ? null : train.getThisStation();

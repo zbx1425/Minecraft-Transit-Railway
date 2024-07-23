@@ -39,7 +39,7 @@ public class RenderBoatNode extends BlockEntityRendererMapper<BlockNode.TileEnti
 		}
 
 		matrices.pushPose();
-		final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(new ResourceLocation("textures/block/oak_log.png")));
+		final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(ResourceLocation.parse("textures/block/oak_log.png")));
 		IDrawing.drawTexture(matrices, vertexConsumer, 0.25F, 0, 0.25F, 0.25F, 0, 0.75F, 0.75F, 0, 0.75F, 0.75F, 0, 0.25F, 0.25F, 0.25F, 0.75F, 0.75F, Direction.EAST, -1, light);
 		IDrawing.drawTexture(matrices, vertexConsumer, 0.75F, 0, 0.25F, 0.75F, 0, 0.75F, 0.25F, 0, 0.75F, 0.25F, 0, 0.25F, 0.25F, 0.25F, 0.75F, 0.75F, Direction.DOWN, -1, light);
 		matrices.popPose();

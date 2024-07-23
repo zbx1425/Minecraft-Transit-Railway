@@ -50,7 +50,7 @@ public class TrainAnnouncerScreen extends TrainSensorScreenBase {
 		availableSoundsList = new DashboardList((data, color) -> {
 			final String soundIdString = data.name;
 			if (!soundIdString.isEmpty() && world != null && minecraft.player != null) {
-				world.playLocalSound(pos, RegistryUtilities.createSoundEvent(new ResourceLocation(soundIdString)), SoundSource.BLOCKS, 1000000, 1, false);
+				world.playLocalSound(pos, RegistryUtilities.createSoundEvent(ResourceLocation.parse(soundIdString)), SoundSource.BLOCKS, 1000000, 1, false);
 			}
 		}, null, null, null, (data, color) -> {
 			textFields[1].setValue(data.name);
@@ -97,9 +97,9 @@ public class TrainAnnouncerScreen extends TrainSensorScreenBase {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		availableSoundsList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		availableSoundsList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 
 	@Override

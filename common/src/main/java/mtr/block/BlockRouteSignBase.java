@@ -29,7 +29,7 @@ public abstract class BlockRouteSignBase extends BlockDirectionalDoubleBlockBase
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult hit) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 		final double y = hit.getLocation().y;
 		final boolean isUpper = IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER;
 		return IBlock.checkHoldingBrush(world, player, () -> {

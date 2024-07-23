@@ -1,15 +1,24 @@
 package mtr.mappings;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.LoomBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class BlockDirectionalMapper extends HorizontalDirectionalBlock {
 
 	public BlockDirectionalMapper(Properties properties) {
 		super(properties);
+	}
+
+	@Override
+	protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+		// Currently, its only use is when the block list report is being generated.
+		// TODO: Properly implement this
+		return LoomBlock.CODEC;
 	}
 
 	@Override

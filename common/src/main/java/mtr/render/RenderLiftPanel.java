@@ -34,7 +34,7 @@ public class RenderLiftPanel<T extends BlockLiftPanelBase.TileEntityLiftPanel1Ba
 	private final boolean isOdd;
 	private final boolean isFlat;
 
-	private static final ResourceLocation ARROW_TEXTURE = new ResourceLocation("mtr:textures/block/lift_arrow.png");
+	private static final ResourceLocation ARROW_TEXTURE = ResourceLocation.parse("mtr:textures/block/lift_arrow.png");
 	private static final float ARROW_SPEED = 0.04F;
 	private static final int SLIDE_TIME = 5;
 	private static final int SLIDE_INTERVAL = 50;
@@ -107,7 +107,7 @@ public class RenderLiftPanel<T extends BlockLiftPanelBase.TileEntityLiftPanel1Ba
 			// Floor Number
 			matrices.pushPose();
 			matrices.translate(0, 0, (isFlat ? 0.4375F : 0.25F) - SMALL_OFFSET * 2);
-			final MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+			final MultiBufferSource.BufferSource immediate = Minecraft.getInstance().renderBuffers().bufferSource();
 			IDrawing.drawStringWithFont(matrices, textRenderer, immediate, ClientData.DATA_CACHE.requestLiftFloorText(trackPosition)[0], HorizontalAlignment.CENTER, VerticalAlignment.CENTER, 0, -0.47F, 0.1875F, 0.1875F, 1, ARGB_BLACK, false, MAX_LIGHT_GLOWING, null);
 			immediate.endBatch();
 			matrices.popPose();

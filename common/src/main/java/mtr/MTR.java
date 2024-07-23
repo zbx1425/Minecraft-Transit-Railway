@@ -8,6 +8,7 @@ import mtr.mappings.BlockEntityMapper;
 import mtr.packet.IPacket;
 import mtr.packet.PacketTrainDataGuiServer;
 import mtr.servlet.Webserver;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -26,6 +27,10 @@ public class MTR implements IPacket {
 	private static int gameTick = 0;
 
 	public static final String MOD_ID = "mtr";
+
+	public static ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+	}
 
 	public static void init(
 			BiConsumer<String, RegistryObject<Item>> registerItem,
@@ -482,7 +487,7 @@ public class MTR implements IPacket {
 				};
 				Webserver.getRoutes = railwayData -> railwayData == null ? new HashSet<>() : railwayData.routes;
 				Webserver.getDataCache = railwayData -> railwayData == null ? null : railwayData.dataCache;
-				Webserver.start(minecraftServer.getServerDirectory().toPath().resolve("config").resolve("mtr_webserver_port.txt"));
+				Webserver.start(minecraftServer.getServerDirectory().resolve("config").resolve("mtr_webserver_port.txt"));
 			});
 			Registry.registerServerStoppingEvent(minecraftServer -> Webserver.stop());
 		}

@@ -8,6 +8,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.Score;
+import net.minecraft.world.scores.ScoreAccess;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
 public class TicketSystem {
@@ -31,12 +32,12 @@ public class TicketSystem {
 
 		addObjectivesIfMissing(world);
 
-		final Score balanceScore = getPlayerScore(world, player, BALANCE_OBJECTIVE);
-		final Score entryZoneScore = getPlayerScore(world, player, ENTRY_ZONE_OBJECTIVE);
+		final ScoreAccess balanceScore = getPlayerScore(world, player, BALANCE_OBJECTIVE);
+		final ScoreAccess entryZoneScore = getPlayerScore(world, player, ENTRY_ZONE_OBJECTIVE);
 
 		final boolean isEntering;
 		if (isEntrance && isExit) {
-			isEntering = entryZoneScore.getScore() == 0;
+			isEntering = entryZoneScore.get() == 0;
 		} else {
 			isEntering = isEntrance;
 		}
@@ -59,44 +60,44 @@ public class TicketSystem {
 
 	public static void addObjectivesIfMissing(Level world) {
 		try {
-			world.getScoreboard().addObjective(BALANCE_OBJECTIVE, ObjectiveCriteria.DUMMY, Text.literal("Balance"), ObjectiveCriteria.RenderType.INTEGER);
+			world.getScoreboard().addObjective(BALANCE_OBJECTIVE, ObjectiveCriteria.DUMMY, Text.literal("Balance"), ObjectiveCriteria.RenderType.INTEGER, true, null);
 		} catch (Exception ignored) {
 		}
 		try {
-			world.getScoreboard().addObjective(ENTRY_ZONE_OBJECTIVE, ObjectiveCriteria.DUMMY, Text.literal("Entry Zone"), ObjectiveCriteria.RenderType.INTEGER);
+			world.getScoreboard().addObjective(ENTRY_ZONE_OBJECTIVE, ObjectiveCriteria.DUMMY, Text.literal("Entry Zone"), ObjectiveCriteria.RenderType.INTEGER, true, null);
 		} catch (Exception ignored) {
 		}
 	}
 
-	public static Score getPlayerScore(Level world, Player player, String objectiveName) {
-		return world.getScoreboard().getOrCreatePlayerScore(player.getGameProfile().getName(), world.getScoreboard().getObjective(objectiveName));
+	public static ScoreAccess getPlayerScore(Level world, Player player, String objectiveName) {
+		return world.getScoreboard().getOrCreatePlayerScore(player, world.getScoreboard().getObjective(objectiveName));
 	}
 
-	private static boolean onEnter(Station station, Player player, Score balanceScore, Score entryZoneScore, boolean remindIfNoRecord) {
-		final int entryZone = entryZoneScore.getScore();
+	private static boolean onEnter(Station station, Player player, ScoreAccess balanceScore, ScoreAccess entryZoneScore, boolean remindIfNoRecord) {
+		final int entryZone = entryZoneScore.get();
 
 		if (entryZone != 0) {
 			if (remindIfNoRecord) {
 				player.displayClientMessage(Text.translatable("gui.mtr.already_entered"), true);
 				return false;
 			} else {
-				entryZoneScore.setScore(0);
+				entryZoneScore.set(0);
 				balanceScore.add(-EVASION_FINE);
 			}
 		}
 
-		if (balanceScore.getScore() >= 0) {
-			entryZoneScore.setScore(encodeZone(station.zone));
-			player.displayClientMessage(Text.translatable("gui.mtr.enter_barrier", String.format("%s (%s)", station.name.replace('|', ' '), station.zone), balanceScore.getScore()), true);
+		if (balanceScore.get() >= 0) {
+			entryZoneScore.set(encodeZone(station.zone));
+			player.displayClientMessage(Text.translatable("gui.mtr.enter_barrier", String.format("%s (%s)", station.name.replace('|', ' '), station.zone), balanceScore.get()), true);
 			return true;
 		} else {
-			player.displayClientMessage(Text.translatable("gui.mtr.insufficient_balance", balanceScore.getScore()), true);
+			player.displayClientMessage(Text.translatable("gui.mtr.insufficient_balance", balanceScore.get()), true);
 			return false;
 		}
 	}
 
-	private static boolean onExit(Station station, Player player, Score balanceScore, Score entryZoneScore, boolean remindIfNoRecord) {
-		final int entryZone = entryZoneScore.getScore();
+	private static boolean onExit(Station station, Player player, ScoreAccess balanceScore, ScoreAccess entryZoneScore, boolean remindIfNoRecord) {
+		final int entryZone = entryZoneScore.get();
 		final int fare = BASE_FARE + ZONE_FARE * Math.abs(station.zone - decodeZone(entryZone));
 		final int finalFare = entryZone != 0 ? isConcessionary(player) ? (int) Math.ceil(fare / 2F) : fare : EVASION_FINE;
 
@@ -104,9 +105,9 @@ public class TicketSystem {
 			player.displayClientMessage(Text.translatable("gui.mtr.already_exited"), true);
 			return false;
 		} else {
-			entryZoneScore.setScore(0);
+			entryZoneScore.set(0);
 			balanceScore.add(-finalFare);
-			player.displayClientMessage(Text.translatable("gui.mtr.exit_barrier", String.format("%s (%s)", station.name.replace('|', ' '), station.zone), finalFare, balanceScore.getScore()), true);
+			player.displayClientMessage(Text.translatable("gui.mtr.exit_barrier", String.format("%s (%s)", station.name.replace('|', ' '), station.zone), finalFare, balanceScore.get()), true);
 			return true;
 		}
 	}

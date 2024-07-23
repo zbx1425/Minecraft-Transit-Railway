@@ -38,7 +38,7 @@ public class RenderDrivingOverlay implements IGui {
 
 		guiGraphics.pose().pushPose();
 		RenderSystem.enableBlend();
-		final ResourceLocation resourceLocation = new ResourceLocation("textures/gui/widgets.png");
+		final ResourceLocation resourceLocation = ResourceLocation.parse("textures/gui/widgets.png");
 		final int startX = (window.getGuiScaledWidth() - HOT_BAR_WIDTH) / 2;
 		final int startY = window.getGuiScaledHeight() - (player.isCreative() ? 47 : 63);
 

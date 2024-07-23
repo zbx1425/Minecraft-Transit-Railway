@@ -1,6 +1,7 @@
 package mtr.mappings;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -27,8 +28,8 @@ public abstract class BlockEntityClientSerializableMapper extends BlockEntityMap
 	}
 
 	@Override
-	public final CompoundTag getUpdateTag() {
-		final CompoundTag compoundTag = super.getUpdateTag();
+	public final CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		final CompoundTag compoundTag = super.getUpdateTag(registries);
 		writeCompoundTag(compoundTag);
 		return compoundTag;
 	}

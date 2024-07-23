@@ -7,8 +7,10 @@ import mtr.mappings.EntityBlockMapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,7 +29,7 @@ public class BlockAPGGlass extends BlockPSDAPGGlassBase implements EntityBlockMa
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		final double y = blockHitResult.getLocation().y;
 		if (IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER && y - Math.floor(y) > 0.21875) {
 			return IBlock.checkHoldingBrush(world, player, () -> {
@@ -36,7 +38,7 @@ public class BlockAPGGlass extends BlockPSDAPGGlassBase implements EntityBlockMa
 				propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), ARROW_DIRECTION, 3);
 			});
 		} else {
-			return super.use(state, world, pos, player, interactionHand, blockHitResult);
+			return super.useWithoutItem(state, world, pos, player, blockHitResult);
 		}
 	}
 

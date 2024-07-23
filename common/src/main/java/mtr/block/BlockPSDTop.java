@@ -13,12 +13,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -49,7 +51,7 @@ public class BlockPSDTop extends BlockDirectionalMapper implements EntityBlockMa
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		return IBlock.checkHoldingItem(world, player, item -> {
 			if (item == Items.BRUSH.get()) {
 				world.setBlockAndUpdate(pos, state.cycle(ARROW_DIRECTION));
@@ -86,18 +88,18 @@ public class BlockPSDTop extends BlockDirectionalMapper implements EntityBlockMa
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter blockGetter, BlockPos blockPos, BlockState blockState) {
+	public ItemStack getCloneItemStack(LevelReader blockGetter, BlockPos blockPos, BlockState blockState) {
 		return new ItemStack(asItem());
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		final Block blockDown = world.getBlockState(pos.below()).getBlock();
 		if (blockDown instanceof BlockPSDAPGBase) {
 			blockDown.playerWillDestroy(world, pos.below(), world.getBlockState(pos.below()), player);
 			world.setBlockAndUpdate(pos.below(), Blocks.AIR.defaultBlockState());
 		}
-		super.playerWillDestroy(world, pos, state, player);
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	@Override

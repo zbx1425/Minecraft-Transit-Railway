@@ -1,6 +1,7 @@
 package mtr.block;
 
 import mtr.BlockEntityTypes;
+import mtr.MTR;
 import mtr.mappings.*;
 import mtr.packet.PacketTrainDataGuiServer;
 import net.minecraft.ChatFormatting;
@@ -15,6 +16,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -48,7 +50,7 @@ public class BlockRailwaySign extends BlockDirectionalMapper implements EntityBl
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult hit) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 		return IBlock.checkHoldingBrush(world, player, () -> {
 			final Direction facing = IBlock.getStatePropertySafe(state, FACING);
 			final Direction hitSide = hit.getDirection();
@@ -79,7 +81,7 @@ public class BlockRailwaySign extends BlockDirectionalMapper implements EntityBl
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		final Direction facing = IBlock.getStatePropertySafe(state, FACING);
 
 		final BlockPos checkPos = findEndWithDirection(world, pos, facing, true);
@@ -87,7 +89,7 @@ public class BlockRailwaySign extends BlockDirectionalMapper implements EntityBl
 			IBlock.onBreakCreative(world, player, checkPos);
 		}
 
-		super.playerWillDestroy(world, pos, state, player);
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	@Override
@@ -122,7 +124,7 @@ public class BlockRailwaySign extends BlockDirectionalMapper implements EntityBl
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, BlockGetter blockGetter, List<Component> tooltip, TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
 		tooltip.add(Text.translatable("tooltip.mtr.railway_sign_length", length).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 		tooltip.add(Text.translatable(isOdd ? "tooltip.mtr.railway_sign_odd" : "tooltip.mtr.railway_sign_even").setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 	}
@@ -388,7 +390,7 @@ public class BlockRailwaySign extends BlockDirectionalMapper implements EntityBl
 		public final int backgroundColor;
 
 		SignType(String texture, String translation, boolean small, boolean flipTexture, boolean flipCustomText, boolean hasCustomText, int backgroundColor) {
-			textureId = new ResourceLocation("mtr:textures/block/sign/" + texture + ".png");
+			textureId = MTR.id("textures/block/sign/" + texture + ".png");
 			customText = hasCustomText ? Text.translatable("sign.mtr." + translation + "_cjk").append("|").append(Text.translatable("sign.mtr." + translation)).getString() : "";
 			this.small = small;
 			this.flipTexture = flipTexture;

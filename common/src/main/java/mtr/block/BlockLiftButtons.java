@@ -39,7 +39,7 @@ public class BlockLiftButtons extends BlockDirectionalMapper implements EntityBl
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult hit) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 		final InteractionResult result = IBlock.checkHoldingBrush(world, player, () -> {
 			final boolean unlocked = !IBlock.getStatePropertySafe(state, UNLOCKED);
 			world.setBlockAndUpdate(pos, state.setValue(UNLOCKED, unlocked));

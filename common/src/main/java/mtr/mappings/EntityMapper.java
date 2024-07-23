@@ -12,10 +12,4 @@ public abstract class EntityMapper extends Entity {
 		super(entityType, level);
 	}
 
-	@Override
-	public Packet<ClientGamePacketListener> getAddEntityPacket() {
-		return (Packet<ClientGamePacketListener>) getAddEntityPacket2();
-	}
-
-	public abstract Packet<?> getAddEntityPacket2();
 }

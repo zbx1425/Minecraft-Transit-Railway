@@ -42,8 +42,8 @@ public class ModelDoorOverlay extends EntityModel<Entity> {
 
 	public ModelDoorOverlay(int doorMax, float angle, int pivotY, String overlayLeftTextureName, String overlayRightTextureName, boolean renderLeft, boolean renderRight) {
 		float angleRadians = (float) Math.toRadians(angle);
-		doorOverlayTextureLeft = new ResourceLocation("mtr:textures/block/sign/" + overlayLeftTextureName);
-		doorOverlayTextureRight = new ResourceLocation("mtr:textures/block/sign/" + overlayRightTextureName);
+		doorOverlayTextureLeft = ResourceLocation.parse("mtr:textures/block/sign/" + overlayLeftTextureName);
+		doorOverlayTextureRight = ResourceLocation.parse("mtr:textures/block/sign/" + overlayRightTextureName);
 		this.renderLeft = renderLeft;
 		this.renderRight = renderRight;
 
@@ -163,6 +163,6 @@ public class ModelDoorOverlay extends EntityModel<Entity> {
 	}
 
 	@Override
-	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
 	}
 }

@@ -11,8 +11,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -109,7 +111,7 @@ public abstract class BlockLiftPanelBase extends BlockDirectionalMapper implemen
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		if (isOdd) {
 			ITripleBlock.playerWillDestroy(world, pos, state, player, false);
 		} else {
@@ -117,11 +119,11 @@ public abstract class BlockLiftPanelBase extends BlockDirectionalMapper implemen
 				IBlock.onBreakCreative(world, player, pos.relative(IBlock.getSideDirection(state)));
 			}
 		}
-		super.playerWillDestroy(world, pos, state, player);
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult hit) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 		if (world.isClientSide) {
 			return InteractionResult.SUCCESS;
 		} else {
@@ -135,7 +137,7 @@ public abstract class BlockLiftPanelBase extends BlockDirectionalMapper implemen
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, BlockGetter blockGetter, List<Component> tooltip, TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
 		tooltip.add(Text.translatable("tooltip.mtr.railway_sign_" + (isOdd ? "odd" : "even")).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 	}
 

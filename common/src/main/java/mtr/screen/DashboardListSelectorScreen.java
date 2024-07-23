@@ -73,7 +73,7 @@ public class DashboardListSelectorScreen extends ScreenMapper implements IGui {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			availableList.render(guiGraphics, font);
 			selectedList.render(guiGraphics, font);
 			super.render(guiGraphics, mouseX, mouseY, delta);
@@ -91,10 +91,10 @@ public class DashboardListSelectorScreen extends ScreenMapper implements IGui {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		availableList.mouseScrolled(mouseX, mouseY, amount);
-		selectedList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		availableList.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		selectedList.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
 	@Override

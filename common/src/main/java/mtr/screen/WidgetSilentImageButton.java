@@ -1,6 +1,5 @@
 package mtr.screen;
 
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.resources.ResourceLocation;
 

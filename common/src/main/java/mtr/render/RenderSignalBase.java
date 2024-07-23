@@ -74,7 +74,7 @@ public abstract class RenderSignalBase<T extends BlockEntityMapper> extends Bloc
 			if (occupiedAspect >= 0) {
 				matrices.pushPose();
 				UtilitiesClient.rotateYDegrees(matrices, -newFacing.toYRot());
-				final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(MoreRenderLayers.getLight(new ResourceLocation("mtr:textures/block/white.png"), false));
+				final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(MoreRenderLayers.getLight(ResourceLocation.parse("mtr:textures/block/white.png"), false));
 				render(matrices, vertexConsumers, vertexConsumer, entity, tickDelta, newFacing, occupiedAspect, i == 1);
 				// TODO temporary code
 				render(matrices, vertexConsumers, vertexConsumer, entity, tickDelta, newFacing, occupiedAspect == 1, i == 1);

@@ -38,7 +38,7 @@ public class BlockTrainAnnouncer extends BlockTrainSensorBase {
 		public void readCompoundTag(CompoundTag compoundTag) {
 			message = compoundTag.getString(KEY_MESSAGE);
 			final String soundIdString = compoundTag.getString(KEY_SOUND_ID);
-			soundId = soundIdString.isEmpty() ? null : new ResourceLocation(soundIdString);
+			soundId = soundIdString.isEmpty() ? null : ResourceLocation.parse(soundIdString);
 			super.readCompoundTag(compoundTag);
 		}
 
@@ -54,7 +54,7 @@ public class BlockTrainAnnouncer extends BlockTrainSensorBase {
 			if (strings.length >= 2) {
 				message = strings[0];
 				final String soundIdString = strings[1];
-				soundId = soundIdString.isEmpty() ? null : new ResourceLocation(soundIdString);
+				soundId = soundIdString.isEmpty() ? null : ResourceLocation.parse(soundIdString);
 			}
 			setData(filterRouteIds, stoppedOnly, movingOnly);
 		}

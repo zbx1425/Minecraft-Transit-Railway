@@ -109,11 +109,6 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 			clickDelay--;
 		}
 
-		textFieldZone.tick();
-		textFieldExitParentLetter.tick();
-		textFieldExitParentNumber.tick();
-		textFieldExitDestination.tick();
-
 		exitParentList.tick();
 		exitDestinationList.tick();
 
@@ -131,7 +126,7 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			renderTextFields(guiGraphics);
 
 			guiGraphics.vLine(width / 2, EXIT_PANELS_START - SQUARE_SIZE, height, ARGB_WHITE_TRANSLUCENT);
@@ -158,10 +153,10 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		exitParentList.mouseScrolled(mouseX, mouseY, amount);
-		exitDestinationList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		exitParentList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		exitDestinationList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 
 	@Override

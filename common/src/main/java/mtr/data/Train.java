@@ -56,7 +56,6 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 	protected final int repeatIndex1;
 	protected final int repeatIndex2;
 	protected final Set<UUID> ridingEntities = new HashSet<>();
-	protected final SimpleContainer inventory;
 
 	private final float railLength;
 
@@ -103,7 +102,6 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		this.repeatIndex2 = repeatIndex2;
 		final float tempAccelerationConstant = RailwayData.round(accelerationConstant, 3);
 		this.accelerationConstant = tempAccelerationConstant <= 0 ? ACCELERATION_DEFAULT : tempAccelerationConstant;
-		inventory = new SimpleContainer(trainCars);
 	}
 
 	public Train(
@@ -155,13 +153,12 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 			try {
 				final CompoundTag compoundTag = NbtIo.read(new DataInputStream(inputStream));
 				final NonNullList<ItemStack> stacks = NonNullList.withSize(trainCars, ItemStack.EMPTY);
-				ContainerHelper.loadAllItems(compoundTag.getCompound(KEY_CARGO), stacks);
+//				ContainerHelper.loadAllItems(compoundTag.getCompound(KEY_CARGO), stacks);
 				inventory1 = new SimpleContainer(stacks.toArray(new ItemStack[0]));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		inventory = inventory1;
 	}
 
 	@Deprecated
@@ -204,8 +201,6 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		tagRidingEntities.getAllKeys().forEach(key -> ridingEntities.add(tagRidingEntities.getUUID(key)));
 
 		final NonNullList<ItemStack> stacks = NonNullList.withSize(trainCars, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compoundTag.getCompound(KEY_CARGO), stacks);
-		inventory = new SimpleContainer(stacks.toArray(new ItemStack[0]));
 	}
 
 	public Train(FriendlyByteBuf packet) {
@@ -250,7 +245,6 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 			ridingEntities.add(packet.readUUID());
 		}
 
-		inventory = null;
 	}
 
 	@Override
@@ -274,25 +268,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		}
 
 		messagePacker.packString(KEY_CARGO);
-		if (inventory != null) {
-			final NonNullList<ItemStack> stacks = NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
-			int totalCount = 0;
-			for (int i = 0; i < inventory.getContainerSize(); i++) {
-				stacks.set(i, inventory.getItem(i));
-				totalCount += inventory.getItem(i).getCount();
-			}
-			if (totalCount > 0) {
-				CompoundTag tag = ContainerHelper.saveAllItems(new CompoundTag(), stacks);
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				NbtIo.write(tag, new DataOutputStream(outputStream));
-				messagePacker.packBinaryHeader(outputStream.size());
-				messagePacker.writePayload(outputStream.toByteArray());
-			} else {
-				messagePacker.packNil();
-			}
-		} else {
-			messagePacker.packNil();
-		}
+		messagePacker.packNil();
 	}
 
 	@Override

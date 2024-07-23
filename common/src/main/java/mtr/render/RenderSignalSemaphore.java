@@ -33,7 +33,7 @@ public class RenderSignalSemaphore<T extends BlockSignalSemaphoreBase.TileEntity
 		final Level world = entity.getLevel();
 		if (world != null) {
 			final BlockPos pos = entity.getBlockPos();
-			final VertexConsumer vertexConsumer2 = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(new ResourceLocation("mtr:textures/block/semaphore.png")));
+			final VertexConsumer vertexConsumer2 = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(ResourceLocation.parse("mtr:textures/block/semaphore.png")));
 			final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, pos), world.getBrightness(LightLayer.SKY, pos));
 			IDrawing.drawTexture(matrices, vertexConsumer2, -0.705F, -0.5F, -0.19375F, 0.295F, 0.5F, -0.19375F, facing.getOpposite(), ARGB_WHITE, light);
 			IDrawing.drawTexture(matrices, vertexConsumer2, 0.295F, -0.5F, -0.19375F, -0.705F, 0.5F, -0.19375F, 1, 0, 0, 1, facing.getOpposite(), ARGB_WHITE, light);

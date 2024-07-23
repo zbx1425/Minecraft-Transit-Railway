@@ -13,7 +13,7 @@ import net.minecraft.world.entity.Entity;
 public class ModelCableCarGrip extends EntityModel<Entity> {
 
 	private final ModelMapper grip;
-	private final ResourceLocation texture = new ResourceLocation("mtr:textures/entity/cable_car_grip.png");
+	private final ResourceLocation texture = ResourceLocation.parse("mtr:textures/entity/cable_car_grip.png");
 
 	public ModelCableCarGrip() {
 		final int textureWidth = 48;
@@ -44,6 +44,6 @@ public class ModelCableCarGrip extends EntityModel<Entity> {
 	}
 
 	@Override
-	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+	public final void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
 	}
 }

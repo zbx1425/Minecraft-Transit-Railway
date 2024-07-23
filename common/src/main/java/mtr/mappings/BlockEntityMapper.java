@@ -1,6 +1,7 @@
 package mtr.mappings;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -13,14 +14,14 @@ public abstract class BlockEntityMapper extends BlockEntity {
 	}
 
 	@Override
-	public final void load(CompoundTag compoundTag) {
-		super.load(compoundTag);
+	public final void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider registries) {
+		super.loadAdditional(compoundTag, registries);
 		readCompoundTag(compoundTag);
 	}
 
 	@Override
-	public final void saveAdditional(CompoundTag compoundTag) {
-		super.saveAdditional(compoundTag);
+	public final void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider registries) {
+		super.saveAdditional(compoundTag, registries);
 		writeCompoundTag(compoundTag);
 	}
 

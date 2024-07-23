@@ -1,15 +1,14 @@
 package mtr.forge.mappings;
 
-import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
-import mtr.mappings.DeferredRegisterHolder;
+import mtr.forge.DeferredRegisterHolder;
+import mtr.forge.MTRForge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -21,14 +20,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -45,17 +44,13 @@ public class ForgeUtilities {
 	private static final List<ResourceLocation> CREATIVE_TAB_ORDER = new ArrayList<>();
 	private static final Map<ResourceLocation, CreativeModeTabWrapper> CREATIVE_TABS = new HashMap<>();
 	private static final Set<EntityRendererPair<?>> ENTITY_RENDERER_PAIRS = new HashSet<>();
-
-	public static void registerModEventBus(String modId, IEventBus eventBus) {
-		EventBuses.registerModEventBus(modId, eventBus);
-	}
+//
+//	public static void registerModEventBus(String modId, IEventBus eventBus) {
+//		EventBuses.registerModEventBus(modId, eventBus);
+//	}
 
 	public static void registerKeyBinding(KeyMapping keyMapping) {
 		KeyMappingRegistry.register(keyMapping);
-	}
-
-	public static Packet<?> createAddEntityPacket(Entity entity) {
-		return NetworkHooks.getEntitySpawningPacket(entity);
 	}
 
 	public static Supplier<CreativeModeTab> createCreativeModeTab(ResourceLocation resourceLocation, Supplier<ItemStack> iconSupplier, String translationKey) {
@@ -122,8 +117,15 @@ public class ForgeUtilities {
 		}
 
 		@SubscribeEvent
-		public static void onRenderGameOverlayEvent(RenderGuiOverlayEvent.Post event) {
+		public static void onRenderGameOverlayEvent(RenderGuiLayerEvent.Post event) {
+//			if (event.getLayer() != VanillaGuiLayers.SCOREBOARD_SIDEBAR) return;
 			renderGameOverlayAction.accept(event.getGuiGraphics());
+		}
+
+		@SubscribeEvent
+		public static void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
+			PayloadRegistrar registrar = event.registrar("1");
+			MTRForge.PACKET_REGISTRY.commit(registrar);
 		}
 	}
 
@@ -135,7 +137,7 @@ public class ForgeUtilities {
 		}
 
 		@SubscribeEvent
-		public static void onTextureStitchEvent(TextureStitchEvent event) {
+		public static void onTextureStitchEvent(TextureAtlasStitchedEvent event) {
 			textureStitchEvent.accept(event.getAtlas());
 		}
 	}
@@ -146,7 +148,7 @@ public class ForgeUtilities {
 		public static void onRegisterCreativeModeTabsEvent(BuildCreativeModeTabContentsEvent event) {
 			CREATIVE_TABS.forEach((resourceLocation, creativeModeTabWrapper) -> {
 				if (creativeModeTabWrapper.creativeModeTab.getDisplayName().equals(event.getTab().getDisplayName())) {
-					creativeModeTabWrapper.items.forEach(item -> event.getEntries().put(new ItemStack(item), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
+					creativeModeTabWrapper.items.forEach(item -> event.accept(new ItemStack(item), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
 				}
 			});
 		}

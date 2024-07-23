@@ -89,7 +89,7 @@ public class EditRouteScreen extends EditNameColorScreenBase<Route> implements I
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			renderTextFields(guiGraphics);
 
 			if (textFieldLightRailRouteNumber.visible) {

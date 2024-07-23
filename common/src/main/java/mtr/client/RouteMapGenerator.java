@@ -761,7 +761,7 @@ public class RouteMapGenerator implements IGui {
 	}
 
 	private static void drawResource(NativeImage nativeImage, String resource, int x, int y, int width, int height, boolean flipX, float v1, float v2, int color, boolean useActualColor) throws IOException {
-		final NativeImage nativeImageResource = NativeImage.read(NativeImage.Format.RGBA, Utilities.getInputStream(Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation(MTR.MOD_ID, resource))));
+		final NativeImage nativeImageResource = NativeImage.read(NativeImage.Format.RGBA, Utilities.getInputStream(Minecraft.getInstance().getResourceManager().getResource(MTR.id(resource))));
 		final int resourceWidth = nativeImageResource.getWidth();
 		final int resourceHeight = nativeImageResource.getHeight();
 		for (int drawX = 0; drawX < width; drawX++) {

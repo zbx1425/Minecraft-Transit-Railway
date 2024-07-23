@@ -1,7 +1,6 @@
 package mtr.screen;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
 import mtr.mappings.ButtonMapper;
@@ -42,8 +41,8 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-		super.render(guiGraphics, mouseX, mouseY, delta);
+	public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+		super.renderWidget(guiGraphics, mouseX, mouseY, delta);
 		if (visible) {
 			final int margin = hasMargin ? 1 : 0;
 			guiGraphics.fill(UtilitiesClient.getWidgetX(this) - margin, UtilitiesClient.getWidgetY(this) - margin, UtilitiesClient.getWidgetX(this) + width + margin, UtilitiesClient.getWidgetY(this) + height + margin, ARGB_BLACK | color);
@@ -133,7 +132,7 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 		@Override
 		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 			try {
-				renderBackground(guiGraphics);
+				renderBackground(guiGraphics, mouseX, mouseY, delta);
 				super.render(guiGraphics, mouseX, mouseY, delta);
 
 				final int mainWidth = getMainWidth();
@@ -143,7 +142,7 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 				guiGraphics.drawCenteredString(font, "RGB", SQUARE_SIZE * 4 + mainWidth + RIGHT_WIDTH / 2, SQUARE_SIZE * 3 + TEXT_FIELD_PADDING, ARGB_WHITE);
 
 				final Tesselator tesselator = Tesselator.getInstance();
-				final BufferBuilder buffer = tesselator.getBuilder();
+				final BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 				UtilitiesClient.beginDrawingRectangle(buffer);
 
 				final int selectedColor = Color.HSBtoRGB(hue, saturation, brightness);
@@ -170,7 +169,7 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 				IDrawing.drawRectangle(buffer, SQUARE_SIZE + selectedSaturationInt, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 2, SQUARE_SIZE + selectedSaturationInt + 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt + 1, ARGB_BLACK);
 				IDrawing.drawRectangle(buffer, SQUARE_SIZE + selectedSaturationInt, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 1, SQUARE_SIZE + selectedSaturationInt + 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt, ARGB_WHITE);
 
-				tesselator.end();
+				BufferUploader.drawWithShader(buffer.buildOrThrow());
 				UtilitiesClient.finishDrawingRectangle();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -179,10 +178,7 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 
 		@Override
 		public void tick() {
-			textFieldRed.tick();
-			textFieldGreen.tick();
-			textFieldBlue.tick();
-			textFieldColor.tick();
+
 		}
 
 		@Override

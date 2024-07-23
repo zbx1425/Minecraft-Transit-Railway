@@ -81,14 +81,13 @@ public class LiftTrackFloorScreen extends ScreenMapper implements IGui, IPacket 
 
 	@Override
 	public void tick() {
-		textFieldFloorNumber.tick();
-		textFieldFloorDescription.tick();
+
 	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			final int startX = (width - textWidth - TEXT_PADDING - TEXT_FIELD_WIDTH) / 2;
 			final int startY = (height - SQUARE_SIZE * 3 - TEXT_FIELD_PADDING * 2) / 2;
 			guiGraphics.drawString(font, TEXT_FLOOR_NUMBER, startX, startY + TEXT_FIELD_PADDING / 2 + TEXT_PADDING, ARGB_WHITE);

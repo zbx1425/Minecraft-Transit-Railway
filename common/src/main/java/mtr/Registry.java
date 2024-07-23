@@ -1,7 +1,9 @@
 package mtr;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.NetworkUtilities;
+import mtr.mappings.Utilities;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +14,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -20,6 +24,11 @@ public class Registry {
 
 	@ExpectPlatform
 	public static boolean isFabric() {
+		throw new AssertionError();
+	}
+
+	@ExpectPlatform
+	public static <T extends BlockEntityMapper> BlockEntityType<T> getBlockEntityType(Utilities.TileEntitySupplier<T> supplier, Block block) {
 		throw new AssertionError();
 	}
 

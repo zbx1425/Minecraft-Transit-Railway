@@ -5,7 +5,6 @@ import mtr.client.CustomResources;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.BlockEntityMapper;
-import mtr.mappings.DeferredRegisterHolder;
 import mtr.forge.mappings.ForgeUtilities;
 import mtr.mappings.RegistryUtilities;
 import mtr.render.RenderDrivingOverlay;
@@ -23,14 +22,13 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 @Mod(MTR.MOD_ID)
 public class MTRForge {
@@ -42,26 +40,26 @@ public class MTRForge {
 	private static final DeferredRegisterHolder<SoundEvent> SOUND_EVENTS = new DeferredRegisterHolder<>(MTR.MOD_ID, ForgeUtilities.registryGetSoundEvent());
 	private static final DeferredRegisterHolder<CreativeModeTab> CREATIVE_MODE_TABS = new DeferredRegisterHolder<>(MTR.MOD_ID, Registries.CREATIVE_MODE_TAB);
 
+	public static final CompatPacketRegistry PACKET_REGISTRY = new CompatPacketRegistry();
+
 	static {
 		MTR.init(MTRForge::registerItem, MTRForge::registerBlock, MTRForge::registerBlock, MTRForge::registerEnchantedBlock, MTRForge::registerBlockEntityType, MTRForge::registerEntityType, MTRForge::registerSoundEvent);
 	}
 
-	public MTRForge() {
-		final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-		ForgeUtilities.registerModEventBus(MTR.MOD_ID, eventBus);
+	public MTRForge(IEventBus eventBus) {
 
-		ITEMS.register();
-		BLOCKS.register();
-		BLOCK_ENTITY_TYPES.register();
-		ENTITY_TYPES.register();
-		SOUND_EVENTS.register();
+		ITEMS.register(eventBus);
+		BLOCKS.register(eventBus);
+		BLOCK_ENTITY_TYPES.register(eventBus);
+		ENTITY_TYPES.register(eventBus);
+		SOUND_EVENTS.register(eventBus);
 
 		ForgeUtilities.registerCreativeModeTabsToDeferredRegistry(CREATIVE_MODE_TABS);
-		CREATIVE_MODE_TABS.register();
+		CREATIVE_MODE_TABS.register(eventBus);
 
 		eventBus.register(MTRModEventBus.class);
 		eventBus.register(ForgeUtilities.RegisterCreativeTabs.class);
-		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+		if (FMLEnvironment.dist.isClient()) {
 			ForgeUtilities.renderTickAction(MTRClient::incrementGameTick);
 			ForgeUtilities.registerEntityRenderer(EntityTypes.SEAT::get, RenderTrains::new);
 			ForgeUtilities.registerEntityRenderer(EntityTypes.LiftType.SIZE_2_2.registryObject::get, RenderLift::new);
@@ -75,9 +73,9 @@ public class MTRForge {
 			ForgeUtilities.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_4.registryObject::get, RenderLift::new);
 			ForgeUtilities.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_4_DOUBLE_SIDED.registryObject::get, RenderLift::new);
 			ForgeUtilities.renderGameOverlayAction((guiGraphics) -> RenderDrivingOverlay.render((GuiGraphics) guiGraphics));
-			MinecraftForge.EVENT_BUS.register(ForgeUtilities.Events.class);
+			NeoForge.EVENT_BUS.register(ForgeUtilities.Events.class);
 			eventBus.register(ForgeUtilities.ClientsideEvents.class);
-		});
+		}
 	}
 
 	private static void registerItem(String path, RegistryObject<Item> item) {

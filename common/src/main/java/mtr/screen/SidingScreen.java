@@ -143,7 +143,6 @@ public class SidingScreen extends SavedRailScreenBase<Siding> implements Icons {
 	public void tick() {
 		super.tick();
 		availableTrainsList.tick();
-		textFieldMaxTrains.tick();
 	}
 
 	@Override
@@ -213,9 +212,9 @@ public class SidingScreen extends SavedRailScreenBase<Siding> implements Icons {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		availableTrainsList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
+		availableTrainsList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 
 	@Override

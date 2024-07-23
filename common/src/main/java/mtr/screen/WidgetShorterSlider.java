@@ -7,11 +7,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class WidgetShorterSlider extends AbstractSliderButton implements IGui {
+
+	private static final ResourceLocation WIDGETS_LOCATION
+			= ResourceLocation.fromNamespaceAndPath("mtr", "textures/gui/widgets.png");
 
 	private final int maxValue;
 	private final int markerFrequency;

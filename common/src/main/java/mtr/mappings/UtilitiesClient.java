@@ -34,7 +34,6 @@ public interface UtilitiesClient {
 
 	static void beginDrawingRectangle(BufferBuilder buffer) {
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 	}
 
 	static void finishDrawingRectangle() {

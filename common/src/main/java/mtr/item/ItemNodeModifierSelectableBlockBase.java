@@ -8,6 +8,7 @@ import mtr.mappings.Text;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -15,6 +16,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -55,8 +57,10 @@ public abstract class ItemNodeModifierSelectableBlockBase extends ItemNodeModifi
 						newState = state;
 					}
 					player.displayClientMessage(Text.translatable("tooltip.mtr.selected_material", Text.translatable(newState.getBlock().getDescriptionId())), true);
-					final CompoundTag compoundTag = context.getItemInHand().getOrCreateTag();
+					final CustomData customData = context.getItemInHand().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+					final CompoundTag compoundTag = customData.copyTag();
 					compoundTag.putInt(TAG_BLOCK_ID, Block.getId(newState));
+					context.getItemInHand().set(DataComponents.CUSTOM_DATA, CustomData.of(compoundTag));
 					return InteractionResult.SUCCESS;
 				}
 			}
@@ -66,7 +70,7 @@ public abstract class ItemNodeModifierSelectableBlockBase extends ItemNodeModifi
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
 		if (height > 0) {
 			tooltip.add(Text.translatable("tooltip.mtr.rail_action_height", height).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 		}
@@ -81,7 +85,7 @@ public abstract class ItemNodeModifierSelectableBlockBase extends ItemNodeModifi
 			tooltip.add(Text.translatable("tooltip.mtr.selected_material", Text.translatable(state.getBlock().getDescriptionId())).setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 		}
 
-		super.appendHoverText(stack, level, tooltip, tooltipFlag);
+		super.appendHoverText(stack, context, tooltip, tooltipFlag);
 	}
 
 	@Override
@@ -96,7 +100,8 @@ public abstract class ItemNodeModifierSelectableBlockBase extends ItemNodeModifi
 	}
 
 	protected BlockState getSavedState(ItemStack stack) {
-		final CompoundTag tag = stack.getOrCreateTag();
+		final CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+		final CompoundTag tag = customData.copyTag();
 		if (tag.contains(TAG_BLOCK_ID)) {
 			return Block.stateById(tag.getInt(TAG_BLOCK_ID));
 		} else {

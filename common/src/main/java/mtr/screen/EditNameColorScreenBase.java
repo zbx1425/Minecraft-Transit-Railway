@@ -38,7 +38,7 @@ public abstract class EditNameColorScreenBase<T extends NameColorDataBase> exten
 
 	@Override
 	public void tick() {
-		textFieldName.tick();
+
 	}
 
 	@Override

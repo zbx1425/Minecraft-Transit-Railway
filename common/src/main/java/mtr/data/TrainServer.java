@@ -141,19 +141,6 @@ public class TrainServer extends Train {
 					if (block instanceof BlockTrainRedstoneSensor && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
 						((BlockTrainRedstoneSensor) block).power(world, state, checkPos);
 					}
-
-					if ((block instanceof BlockTrainCargoLoader || block instanceof BlockTrainCargoUnloader) && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
-						for (final Direction direction : Direction.values()) {
-							final Container nearbyInventory = HopperBlockEntity.getContainerAt(world, checkPos.relative(direction));
-							if (nearbyInventory != null) {
-								if (block instanceof BlockTrainCargoLoader) {
-									transferItems(nearbyInventory, inventory);
-								} else {
-									transferItems(inventory, nearbyInventory);
-								}
-							}
-						}
-					}
 				}
 			});
 		}
@@ -383,21 +370,6 @@ public class TrainServer extends Train {
 			for (int z = -checkRadius; z <= checkRadius; z++) {
 				for (int y = 0; y <= 3; y++) {
 					callback.accept(pos.offset(x, -y, z));
-				}
-			}
-		}
-	}
-
-	private static void transferItems(Container inventoryFrom, Container inventoryTo) {
-		for (int i = 0; i < inventoryFrom.getContainerSize(); i++) {
-			if (!inventoryFrom.getItem(i).isEmpty()) {
-				final ItemStack insertItem = new ItemStack(inventoryFrom.getItem(i).getItem(), 1);
-				insertItem.setTag(inventoryFrom.getItem(i).getOrCreateTag());
-
-				final ItemStack remainingStack = HopperBlockEntity.addItem(null, inventoryTo, insertItem, null);
-				if (remainingStack.isEmpty()) {
-					inventoryFrom.removeItem(i, 1);
-					return;
 				}
 			}
 		}

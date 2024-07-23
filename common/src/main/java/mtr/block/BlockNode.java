@@ -15,6 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -57,7 +58,7 @@ public class BlockNode extends BlockDirectionalMapper {
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		if (!world.isClientSide) {
 			final RailwayData railwayData = RailwayData.getInstance(world);
 			if (railwayData != null) {
@@ -65,6 +66,7 @@ public class BlockNode extends BlockDirectionalMapper {
 				PacketTrainDataGuiServer.removeNodeS2C(world, pos);
 			}
 		}
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	@Override
@@ -150,7 +152,7 @@ public class BlockNode extends BlockDirectionalMapper {
 		}
 
 		@Override
-		public void appendHoverText(ItemStack itemStack, BlockGetter blockGetter, List<Component> tooltip, TooltipFlag tooltipFlag) {
+		public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
 			final String[] strings = Text.translatable("tooltip.mtr.cable_car_node" + (isStation ? "_station" : "")).getString().split("\n");
 			for (final String string : strings) {
 				tooltip.add(Text.literal(string).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));

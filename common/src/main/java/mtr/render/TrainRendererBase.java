@@ -76,7 +76,7 @@ public abstract class TrainRendererBase {
 		entityX = hasEntity ? Mth.lerp(tickDelta, entity.xOld, entity.getX()) : 0;
 		entityY = hasEntity ? Mth.lerp(tickDelta, entity.yOld, entity.getY()) : 0;
 		entityZ = hasEntity ? Mth.lerp(tickDelta, entity.zOld, entity.getZ()) : 0;
-		playerEyePosition = player == null ? Vec3.ZERO : player.getEyePosition(client.getFrameTime());
+		playerEyePosition = player == null ? Vec3.ZERO : player.getEyePosition(client.getTimer().getGameTimeDeltaTicks());
 	}
 
 	public static void setBatch(boolean isTranslucentBatch) {

@@ -107,15 +107,13 @@ public abstract class TrainSensorScreenBase extends ScreenMapper implements IGui
 
 	@Override
 	public void tick() {
-		for (final WidgetBetterTextField textField : textFields) {
-			textField.tick();
-		}
+
 	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			for (int i = 0; i < textFieldCount; i++) {
 				guiGraphics.drawString(font, textFieldLabels[i], SQUARE_SIZE + (width / 2 - SQUARE_SIZE) * i, SQUARE_SIZE, ARGB_WHITE);
 			}

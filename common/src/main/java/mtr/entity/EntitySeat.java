@@ -68,9 +68,9 @@ public class EntitySeat extends EntityBase {
 	}
 
 	@Override
-	public void lerpTo(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
+	public void lerpTo(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
 		if (!hasPassenger(clientPlayer)) {
-			super.lerpTo(x, y, z, yaw, pitch, interpolationSteps, interpolate);
+			super.lerpTo(x, y, z, yaw, pitch, interpolationSteps);
 		}
 	}
 
@@ -85,8 +85,8 @@ public class EntitySeat extends EntityBase {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		entityData.define(PLAYER_ID, Optional.of(new UUID(0, 0)));
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		builder.define(PLAYER_ID, Optional.of(new UUID(0, 0)));
 	}
 
 	public void initialize(Player player) {
@@ -101,6 +101,6 @@ public class EntitySeat extends EntityBase {
 	}
 
 	public void setPosByTrain(double x, double y, double z) {
-		super.lerpTo(x, y, z, 0, 0, 1, false);
+		super.lerpTo(x, y, z, 0, 0, 1);
 	}
 }

@@ -407,15 +407,15 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
 		if (mouseX >= PANEL_WIDTH && mouseX < width - PANEL_WIDTH) {
 			scale = Math.max(scale - (float) amount, MIN_SCALE);
 			final float bound = cars * RenderTrains.creatorProperties.getLength() / 2F;
 			translation = Mth.clamp(translation, -bound, bound);
 		}
-		availableModelPartsList.mouseScrolled(mouseX, mouseY, amount);
-		usedModelPartsList.mouseScrolled(mouseX, mouseY, amount);
-		return super.mouseScrolled(mouseX, mouseY, amount);
+		availableModelPartsList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		usedModelPartsList.mouseScrolled(mouseX, mouseY, scrollX, amount);
+		return super.mouseScrolled(mouseX, mouseY, scrollX, amount);
 	}
 
 	@Override
@@ -437,9 +437,6 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 	public void tick() {
 		availableModelPartsList.tick();
 		usedModelPartsList.tick();
-		textFieldPositions.tick();
-		textFieldWhitelistedCars.tick();
-		textFieldBlacklistedCars.tick();
 
 		final float maxTime = EnumHelper.valueOf(DoorAnimationType.STANDARD, RenderTrains.creatorProperties.getDoorAnimationType()).maxTime;
 		final float increment = 1F / Train.DOOR_MOVE_TIME;

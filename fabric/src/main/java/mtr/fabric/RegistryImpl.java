@@ -1,7 +1,9 @@
 package mtr.fabric;
 
+import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.NetworkUtilities;
+import mtr.mappings.Utilities;
 import mtr.mixin.PlayerTeleportationStateAccessor;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -19,6 +21,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -27,6 +31,10 @@ public class RegistryImpl {
 
 	public static boolean isFabric() {
 		return true;
+	}
+
+	public static <T extends BlockEntityMapper> BlockEntityType<T> getBlockEntityType(Utilities.TileEntitySupplier<T> supplier, Block block) {
+		return BlockEntityType.Builder.of(supplier::supplier, block).build(null);
 	}
 
 	public static Supplier<CreativeModeTab> getCreativeModeTab(ResourceLocation id, Supplier<ItemStack> supplier) {

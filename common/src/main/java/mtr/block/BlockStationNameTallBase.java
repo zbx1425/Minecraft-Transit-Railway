@@ -27,7 +27,7 @@ public abstract class BlockStationNameTallBase extends BlockStationNameBase impl
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		return IBlock.checkHoldingBrush(world, player, () -> {
 			final boolean isWhite = IBlock.getStatePropertySafe(state, COLOR) == 0;
 			final int newColorProperty = isWhite ? 2 : 0;
@@ -61,7 +61,7 @@ public abstract class BlockStationNameTallBase extends BlockStationNameBase impl
 	}
 
 	@Override
-	public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
 		switch (IBlock.getStatePropertySafe(state, THIRD)) {
 			case MIDDLE:
 				IBlock.onBreakCreative(world, player, pos.below());
@@ -70,7 +70,7 @@ public abstract class BlockStationNameTallBase extends BlockStationNameBase impl
 				IBlock.onBreakCreative(world, player, pos.below(2));
 				break;
 		}
-		super.playerWillDestroy(world, pos, state, player);
+		return super.playerWillDestroy(world, pos, state, player);
 	}
 
 	@Override

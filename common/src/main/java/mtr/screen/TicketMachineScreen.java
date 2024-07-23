@@ -62,7 +62,7 @@ public class TicketMachineScreen extends ScreenMapper implements IGui, IPacket {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			final Component emeraldsText = Text.translatable("gui.mtr.emeralds", getEmeraldCount());
 			guiGraphics.drawString(font, balanceText, TEXT_PADDING, TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.drawString(font, emeraldsText, width - TEXT_PADDING - font.width(emeraldsText), TEXT_PADDING, ARGB_WHITE);

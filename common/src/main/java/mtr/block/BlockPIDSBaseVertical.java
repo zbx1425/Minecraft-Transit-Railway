@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
@@ -34,7 +35,7 @@ public abstract class BlockPIDSBaseVertical extends BlockDirectionalDoubleBlockB
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		final boolean isUpper = IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER;
 		return IBlock.checkHoldingBrush(world, player, () -> {
 			final BlockPos finalPos = isUpper ? pos : pos.relative(Direction.Axis.Y, 1);
@@ -48,7 +49,7 @@ public abstract class BlockPIDSBaseVertical extends BlockDirectionalDoubleBlockB
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, BlockGetter blockGetter, List<Component> tooltip, TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
 		final BlockEntity blockEntity = createBlockEntity(new BlockPos(0, 0, 0), null);
 		if (blockEntity instanceof TileEntityPIDS) {
 			tooltip.add(Text.translatable("tooltip.mtr.arrivals", ((TileEntityPIDS) blockEntity).getMaxArrivals()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));

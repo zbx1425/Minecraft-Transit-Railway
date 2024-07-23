@@ -22,7 +22,7 @@ public abstract class EntityBase extends EntityMapper {
 	}
 
 	@Override
-	public void lerpTo(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
+	public void lerpTo(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
 		clientX = x;
 		clientY = y;
 		clientZ = z;
@@ -36,11 +36,6 @@ public abstract class EntityBase extends EntityMapper {
 		this.speedY = speedY;
 		this.speedZ = speedZ;
 		setDeltaMovement(speedX, speedY, speedZ);
-	}
-
-	@Override
-	public final Packet<?> getAddEntityPacket2() {
-		return Registry.createAddEntityPacket(this);
 	}
 
 	@Override

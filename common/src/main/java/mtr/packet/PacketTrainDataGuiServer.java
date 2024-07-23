@@ -22,6 +22,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.scores.Score;
+import net.minecraft.world.scores.ScoreAccess;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -53,7 +54,7 @@ public class PacketTrainDataGuiServer extends PacketTrainDataBase {
 
 	public static void openTicketMachineScreenS2C(Level world, ServerPlayer player) {
 		final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
-		packet.writeInt(TicketSystem.getPlayerScore(world, player, TicketSystem.BALANCE_OBJECTIVE).getScore());
+		packet.writeInt(TicketSystem.getPlayerScore(world, player, TicketSystem.BALANCE_OBJECTIVE).get());
 		Registry.sendToPlayer(player, PACKET_OPEN_TICKET_MACHINE_SCREEN, packet);
 	}
 
@@ -360,8 +361,8 @@ public class PacketTrainDataGuiServer extends PacketTrainDataBase {
 			final Level world = player.level();
 
 			TicketSystem.addObjectivesIfMissing(world);
-			Score balanceScore = TicketSystem.getPlayerScore(world, player, TicketSystem.BALANCE_OBJECTIVE);
-			balanceScore.setScore(balanceScore.getScore() + addAmount);
+			ScoreAccess balanceScore = TicketSystem.getPlayerScore(world, player, TicketSystem.BALANCE_OBJECTIVE);
+			balanceScore.add(addAmount);
 
 			ContainerHelper.clearOrCountMatchingItems(Utilities.getInventory(player), itemStack -> itemStack.getItem() == Items.EMERALD, emeralds, false);
 			world.playSound(null, player.blockPosition(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.BLOCKS, 1, 1);

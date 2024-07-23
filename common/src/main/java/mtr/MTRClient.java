@@ -490,7 +490,7 @@ public class MTRClient implements IPacket {
 	}
 
 	public static float getLastFrameDuration() {
-		return isReplayMod ? 20F / 60 : Minecraft.getInstance().getDeltaFrameTime();
+		return isReplayMod ? 20F / 60 : Minecraft.getInstance().getTimer().getRealtimeDeltaTicks();
 	}
 
 	public static boolean canPlaySound() {

@@ -12,6 +12,7 @@ import mtr.packet.*;
 import mtr.path.PathData;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -249,7 +250,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 	}
 
 	@Override
-	public void save(File file) {
+	public void save(File file, HolderLookup.Provider registries) {
 		final MinecraftServer minecraftServer = ((ServerLevel) world).getServer();
 		if (minecraftServer.isStopped() || !minecraftServer.isRunning()) {
 			railwayDataFileSaveModule.fullSave();
@@ -258,11 +259,11 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		}
 		railwayDataLoggingModule.save();
 		setDirty();
-		super.save(file);
+		super.save(file, registries);
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compoundTag) {
+	public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
 		compoundTag.putBoolean(KEY_USE_TIME_AND_WIND_SYNC, useTimeAndWindSync);
 		return compoundTag;
 	}
@@ -276,7 +277,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 			if (!playerLastUpdatedPositions.containsKey(player) || playerLastUpdatedPositions.get(player).distManhattan(playerBlockPos) > PLAYER_MOVE_UPDATE_THRESHOLD) {
 				final Map<BlockPos, Map<BlockPos, Rail>> railsToAdd = new HashMap<>();
 				rails.forEach((startPos, blockPosRailMap) -> blockPosRailMap.forEach((endPos, rail) -> {
-					if (new AABB(startPos, endPos).inflate(RAIL_UPDATE_DISTANCE).contains(playerPos)) {
+					if (new AABB(startPos.getX(), startPos.getY(), startPos.getZ(), endPos.getX(), endPos.getY(), endPos.getZ()).inflate(RAIL_UPDATE_DISTANCE).contains(playerPos)) {
 						if (!railsToAdd.containsKey(startPos)) {
 							railsToAdd.put(startPos, new HashMap<>());
 						}
@@ -345,7 +346,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 
 			final Set<UUID> railsToAdd = new HashSet<>();
 			rails.forEach((startPos, blockPosRailMap) -> blockPosRailMap.forEach((endPos, rail) -> {
-				if (new AABB(startPos, endPos).inflate(RAIL_UPDATE_DISTANCE).contains(playerPos)) {
+				if (new AABB(startPos.getX(), startPos.getY(), startPos.getZ(), endPos.getX(), endPos.getY(), endPos.getZ()).inflate(RAIL_UPDATE_DISTANCE).contains(playerPos)) {
 					railsToAdd.add(PathData.getRailProduct(startPos, endPos));
 				}
 			}));

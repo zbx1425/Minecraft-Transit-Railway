@@ -18,7 +18,7 @@ public class MotorData4 extends MotorDataBase { // 4 for BVE4 and OpenBVE
 			channels[i] = new Channel();
 		}
 
-		String textContent = BveTrainSoundConfig.readResource(manager, new ResourceLocation(baseName + "/train.dat"));
+		String textContent = BveTrainSoundConfig.readResource(manager, ResourceLocation.parse(baseName + "/train.dat"));
 		String[] lines = textContent.split("[\\r\\n]+");
 		String section = "";
 		for (final String line : lines) {

@@ -1,8 +1,7 @@
 package mtr.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.*;
@@ -82,7 +81,7 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		final Tesselator tesselator = Tesselator.getInstance();
-		final BufferBuilder buffer = tesselator.getBuilder();
+		final BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 		UtilitiesClient.beginDrawingRectangle(buffer);
 		RenderSystem.enableBlend();
 
@@ -134,7 +133,7 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 			});
 		}
 
-		tesselator.end();
+		BufferUploader.drawWithShader(buffer.buildOrThrow());
 		RenderSystem.disableBlend();
 		UtilitiesClient.finishDrawingRectangle();
 
@@ -156,7 +155,7 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 			}
 		}
 
-		final MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+		final MultiBufferSource.BufferSource immediate = Minecraft.getInstance().renderBuffers().bufferSource();
 		if (showStations) {
 			for (final Station station : ClientData.STATIONS) {
 				if (canDrawAreaText(station)) {
@@ -227,7 +226,7 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double amount) {
 		final double oldScale = scale;
 		if (oldScale > SCALE_LOWER_LIMIT && amount < 0) {
 			centerX -= (mouseX - x - width / 2D) / scale;

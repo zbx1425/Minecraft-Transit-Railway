@@ -108,7 +108,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 				model.setupAnim(null, 0, 0, -0.1F, 0, 0);
 			}
 
-			model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+			model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 		} else if (!textureId.isEmpty()) {
 			final boolean renderDetails = MTRClient.isReplayMod() || posAverage.distSqr(camera.getBlockPosition()) <= RenderTrains.DETAIL_RADIUS_SQUARED;
 			model.render(matrices, vertexConsumers, train, resolveTexture(textureId, textureId -> textureId + ".png"), light, doorLeftValue, doorRightValue, train.isDoorOpening(), carIndex, train.trainCars, !train.isReversed(), train.getIsOnRoute(), isTranslucentBatch, renderDetails, atPlatform);
@@ -205,7 +205,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 
 	public ResourceLocation resolveTexture(String textureId, Function<String, String> formatter) {
 		final String textureString = formatter.apply(textureId);
-		final ResourceLocation id = new ResourceLocation(textureString);
+		final ResourceLocation id = ResourceLocation.parse(textureString);
 		final boolean available;
 
 		if (!RenderTrains.AVAILABLE_TEXTURES.contains(textureString) && !RenderTrains.UNAVAILABLE_TEXTURES.contains(textureString)) {
@@ -222,7 +222,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 			return id;
 		} else {
 			final TrainRendererBase baseRenderer = TrainClientRegistry.getTrainProperties(train.baseTrainType).renderer;
-			return new ResourceLocation((!(baseRenderer instanceof JonModelTrainRenderer) ? "mtr:textures/block/transparent.png" : formatter.apply(((JonModelTrainRenderer) baseRenderer).textureId)));
+			return ResourceLocation.parse((!(baseRenderer instanceof JonModelTrainRenderer) ? "mtr:textures/block/transparent.png" : formatter.apply(((JonModelTrainRenderer) baseRenderer).textureId)));
 		}
 	}
 

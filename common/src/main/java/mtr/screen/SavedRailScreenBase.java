@@ -78,7 +78,6 @@ public abstract class SavedRailScreenBase<T extends SavedRailBase> extends Scree
 
 	@Override
 	public void tick() {
-		textFieldSavedRailNumber.tick();
 		UtilitiesClient.setWidgetX(textFieldSavedRailNumber, shouldRenderExtra() ? width * 2 : SQUARE_SIZE + textWidth + TEXT_FIELD_PADDING / 2);
 
 		final int maxMin = (int) Math.floor(Platform.MAX_DWELL_TIME / 2F / SECONDS_PER_MINUTE);
@@ -93,7 +92,7 @@ public abstract class SavedRailScreenBase<T extends SavedRailBase> extends Scree
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics);
+			renderBackground(guiGraphics, mouseX, mouseY, delta);
 			if (shouldRenderExtra()) {
 				renderExtra(guiGraphics, mouseX, mouseY, delta);
 			} else {

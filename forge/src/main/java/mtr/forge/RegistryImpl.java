@@ -1,19 +1,35 @@
 package mtr.forge;
 
+import com.mojang.brigadier.CommandDispatcher;
+import dev.architectury.event.events.common.CommandRegistrationEvent;
+import dev.architectury.event.events.common.LifecycleEvent;
+import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.event.events.common.TickEvent;
+import dev.architectury.networking.NetworkManager;
 import mtr.forge.mappings.ForgeUtilities;
+import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.NetworkUtilities;
-import mtr.mappings.RegistryUtilities;
+import mtr.mappings.Utilities;
 import mtr.mixin.PlayerTeleportationStateAccessor;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,6 +38,10 @@ public class RegistryImpl {
 
 	public static boolean isFabric() {
 		return false;
+	}
+
+	public static <T extends BlockEntityMapper> BlockEntityType<T> getBlockEntityType(Utilities.TileEntitySupplier<T> supplier, Block block) {
+		return BlockEntityType.Builder.of(supplier::supplier, block).build(null);
 	}
 
 	public static Supplier<CreativeModeTab> getCreativeModeTab(ResourceLocation id, Supplier<ItemStack> supplier) {
@@ -35,12 +55,8 @@ public class RegistryImpl {
 		ForgeUtilities.registerCreativeModeTab(resourceLocation, item);
 	}
 
-	public static Packet<?> createAddEntityPacket(Entity entity) {
-		return ForgeUtilities.createAddEntityPacket(entity);
-	}
-
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback packetCallback) {
-		NetworkUtilities.registerReceiverC2S(resourceLocation, packetCallback);
+		MTRForge.PACKET_REGISTRY.registerNetworkReceiverC2S(resourceLocation, packetCallback);
 	}
 
 	public static void registerPlayerJoinEvent(Consumer<ServerPlayer> consumer) {
@@ -65,10 +81,44 @@ public class RegistryImpl {
 	}
 
 	public static void sendToPlayer(ServerPlayer player, ResourceLocation id, FriendlyByteBuf packet) {
-		NetworkUtilities.sendToPlayer(player, id, packet);
+		packet.resetReaderIndex();
+		MTRForge.PACKET_REGISTRY.sendS2C(player, id, packet);
 	}
 
 	public static void setInTeleportationState(Player player, boolean isRiding) {
 		((PlayerTeleportationStateAccessor) player).setInTeleportationState(isRiding);
 	}
+
+
+	public interface RegistryUtilities {
+
+		static void registerCommand(Consumer<CommandDispatcher<CommandSourceStack>> callback) {
+			CommandRegistrationEvent.EVENT.register((dispatcher, dedicated, commandSelection) -> callback.accept(dispatcher));
+		}
+
+		static void registerPlayerJoinEvent(Consumer<ServerPlayer> consumer) {
+			PlayerEvent.PLAYER_JOIN.register(consumer::accept);
+		}
+
+		static void registerPlayerQuitEvent(Consumer<ServerPlayer> consumer) {
+			PlayerEvent.PLAYER_QUIT.register(consumer::accept);
+		}
+
+		static void registerPlayerChangeDimensionEvent(Consumer<ServerPlayer> consumer) {
+			PlayerEvent.CHANGE_DIMENSION.register(((player, oldWorld, newWorld) -> consumer.accept(player)));
+		}
+
+		static void registerServerStartingEvent(Consumer<MinecraftServer> consumer) {
+			LifecycleEvent.SERVER_STARTING.register(consumer::accept);
+		}
+
+		static void registerServerStoppingEvent(Consumer<MinecraftServer> consumer) {
+			LifecycleEvent.SERVER_STOPPING.register(consumer::accept);
+		}
+
+		static void registerTickEvent(Consumer<MinecraftServer> consumer) {
+			TickEvent.SERVER_PRE.register(consumer::accept);
+		}
+	}
 }
+

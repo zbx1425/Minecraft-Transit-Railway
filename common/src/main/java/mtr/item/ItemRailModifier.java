@@ -35,7 +35,7 @@ public class ItemRailModifier extends ItemNodeModifierBase {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, Level level, List<Component> tooltip, TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext level, List<Component> tooltip, TooltipFlag tooltipFlag) {
 		if (isConnector && railType != null && railType.canAccelerate) {
 			tooltip.add(Text.translatable("tooltip.mtr.rail_speed_limit", railType.speedLimit).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 		}

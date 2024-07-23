@@ -127,7 +127,7 @@ public class CustomResources implements IResourcePackCreatorProperties, ICustomR
 						final boolean small = getOrDefault(jsonObject, CUSTOM_SIGNS_SMALL, false, JsonElement::getAsBoolean);
 						final int backgroundColor = getOrDefault(jsonObject, CUSTOM_SIGNS_BACKGROUND_COLOR, 0, jsonElement -> colorStringToInt(jsonElement.getAsString()));
 
-						CUSTOM_SIGNS.put(CUSTOM_SIGN_ID_PREFIX + entry.getKey(), new CustomSign(new ResourceLocation(jsonObject.get(CUSTOM_SIGNS_TEXTURE_ID).getAsString()), flipTexture, customText, flipCustomText, small, backgroundColor));
+						CUSTOM_SIGNS.put(CUSTOM_SIGN_ID_PREFIX + entry.getKey(), new CustomSign(ResourceLocation.parse(jsonObject.get(CUSTOM_SIGNS_TEXTURE_ID).getAsString()), flipTexture, customText, flipCustomText, small, backgroundColor));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -154,7 +154,7 @@ public class CustomResources implements IResourcePackCreatorProperties, ICustomR
 
 	private static void readResource(ResourceManager manager, String path, Consumer<JsonObject> callback) {
 		try {
-			UtilitiesClient.getResources(manager, new ResourceLocation(path)).forEach(resource -> {
+			UtilitiesClient.getResources(manager, ResourceLocation.parse(path)).forEach(resource -> {
 				try (final InputStream stream = Utilities.getInputStream(resource)) {
 					callback.accept(new JsonParser().parse(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject());
 				} catch (Exception e) {

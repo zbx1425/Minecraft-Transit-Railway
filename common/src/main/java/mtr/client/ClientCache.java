@@ -55,9 +55,9 @@ public class ClientCache extends DataCache implements IGui {
 	private final List<Runnable> resourceRegistryQueue = new ArrayList<>();
 
 	public static final float LINE_HEIGHT_MULTIPLIER = 1.25F;
-	private static final ResourceLocation DEFAULT_BLACK_RESOURCE = new ResourceLocation(MTR.MOD_ID, "textures/block/black.png");
-	private static final ResourceLocation DEFAULT_WHITE_RESOURCE = new ResourceLocation(MTR.MOD_ID, "textures/block/white.png");
-	private static final ResourceLocation DEFAULT_TRANSPARENT_RESOURCE = new ResourceLocation(MTR.MOD_ID, "textures/block/transparent.png");
+	private static final ResourceLocation DEFAULT_BLACK_RESOURCE = MTR.id("textures/block/black.png");
+	private static final ResourceLocation DEFAULT_WHITE_RESOURCE = MTR.id("textures/block/white.png");
+	private static final ResourceLocation DEFAULT_TRANSPARENT_RESOURCE = MTR.id("textures/block/transparent.png");
 
 	public ClientCache(Set<Station> stations, Set<Platform> platforms, Set<Siding> sidings, Set<Route> routes, Set<Depot> depots, Set<LiftClient> lifts) {
 		super(stations, platforms, sidings, routes, depots, new HashSet<>());
@@ -407,8 +407,8 @@ public class ClientCache extends DataCache implements IGui {
 		if (font == null || fontCjk == null) {
 			final ResourceManager resourceManager = minecraftClient.getResourceManager();
 			try {
-				font = Font.createFont(Font.TRUETYPE_FONT, Utilities.getInputStream(resourceManager.getResource(new ResourceLocation(MTR.MOD_ID, "font/noto-sans-semibold.ttf"))));
-				fontCjk = Font.createFont(Font.TRUETYPE_FONT, Utilities.getInputStream(resourceManager.getResource(new ResourceLocation(MTR.MOD_ID, "font/noto-serif-cjk-tc-semibold.ttf"))));
+				font = Font.createFont(Font.TRUETYPE_FONT, Utilities.getInputStream(resourceManager.getResource(MTR.id("font/noto-sans-semibold.ttf"))));
+				fontCjk = Font.createFont(Font.TRUETYPE_FONT, Utilities.getInputStream(resourceManager.getResource(MTR.id("font/noto-serif-cjk-tc-semibold.ttf"))));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -446,7 +446,7 @@ public class ClientCache extends DataCache implements IGui {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				final ResourceLocation resourceLocation = new ResourceLocation(MTR.MOD_ID, "dynamic_texture_" + newKey.toLowerCase(Locale.ENGLISH).replaceAll("[^0-9a-z_]", "_"));
+				final ResourceLocation resourceLocation = MTR.id("dynamic_texture_" + newKey.toLowerCase(Locale.ENGLISH).replaceAll("[^0-9a-z_]", "_"));
 				minecraftClient.getTextureManager().register(resourceLocation, dynamicTexture);
 				dynamicResourceNew = new DynamicResource(resourceLocation, dynamicTexture);
 			}
