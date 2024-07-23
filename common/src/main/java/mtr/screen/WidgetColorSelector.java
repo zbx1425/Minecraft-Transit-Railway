@@ -132,8 +132,10 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 		@Override
 		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 			try {
-				renderBackground(guiGraphics, mouseX, mouseY, delta);
 				super.render(guiGraphics, mouseX, mouseY, delta);
+				guiGraphics.pose().pushPose();
+				guiGraphics.pose().translate(0, 0, -100);
+				guiGraphics.pose().popPose();
 
 				final int mainWidth = getMainWidth();
 				final int mainHeight = getMainHeight();

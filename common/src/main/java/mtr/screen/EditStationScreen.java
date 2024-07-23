@@ -126,7 +126,9 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics, mouseX, mouseY, delta);
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
 			renderTextFields(guiGraphics);
 
 			guiGraphics.vLine(width / 2, EXIT_PANELS_START - SQUARE_SIZE, height, ARGB_WHITE_TRANSLUCENT);
@@ -140,7 +142,7 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 				guiGraphics.drawCenteredString(font, exitDestinationsText, 3 * width / 4, EXIT_PANELS_START - SQUARE_SIZE + TEXT_PADDING, ARGB_WHITE);
 			}
 
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

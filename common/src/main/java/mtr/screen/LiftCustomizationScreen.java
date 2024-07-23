@@ -153,8 +153,11 @@ public class LiftCustomizationScreen extends ScreenMapper implements IGui, IPack
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			guiGraphics.fill(0, 0, width2, height, ARGB_BACKGROUND);
 			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
+			guiGraphics.fill(0, 0, width2, height, ARGB_BACKGROUND);
+			guiGraphics.pose().popPose();
 			guiGraphics.drawCenteredString(font, Text.translatable("tooltip.mtr.rail_action_height", lift.liftHeight / 2F), width2 / 2, TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.drawCenteredString(font, Text.translatable("tooltip.mtr.rail_action_width", lift.liftWidth), width2 / 2, SQUARE_SIZE + TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.drawCenteredString(font, Text.translatable("tooltip.mtr.rail_action_depth", lift.liftDepth), width2 / 2, SQUARE_SIZE * 2 + TEXT_PADDING, ARGB_WHITE);

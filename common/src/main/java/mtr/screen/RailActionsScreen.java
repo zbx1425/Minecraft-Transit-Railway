@@ -35,10 +35,12 @@ public class RailActionsScreen extends ScreenMapper implements IGui, IPacket {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics, mouseX, mouseY, delta);
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
 			railActionsList.render(guiGraphics, font);
 			guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.rail_actions"), width / 2, SQUARE_SIZE + TEXT_PADDING, ARGB_WHITE);
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

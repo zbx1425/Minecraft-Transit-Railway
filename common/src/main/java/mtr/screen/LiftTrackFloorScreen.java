@@ -87,12 +87,14 @@ public class LiftTrackFloorScreen extends ScreenMapper implements IGui, IPacket 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics, mouseX, mouseY, delta);
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
 			final int startX = (width - textWidth - TEXT_PADDING - TEXT_FIELD_WIDTH) / 2;
 			final int startY = (height - SQUARE_SIZE * 3 - TEXT_FIELD_PADDING * 2) / 2;
 			guiGraphics.drawString(font, TEXT_FLOOR_NUMBER, startX, startY + TEXT_FIELD_PADDING / 2 + TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.drawString(font, TEXT_FLOOR_DESCRIPTION, startX, startY + SQUARE_SIZE + TEXT_FIELD_PADDING * 3 / 2 + TEXT_PADDING, ARGB_WHITE);
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

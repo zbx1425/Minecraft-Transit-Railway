@@ -175,7 +175,9 @@ public class ConfigScreen extends ScreenMapper implements IGui {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics, mouseX, mouseY, delta);
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
 			guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.mtr_options"), width / 2, TEXT_PADDING, ARGB_WHITE);
 
 			final int yStart1 = SQUARE_SIZE + TEXT_PADDING / 2 + (hasTimeAndWindControls ? SQUARE_SIZE : 0);
@@ -220,7 +222,7 @@ public class ConfigScreen extends ScreenMapper implements IGui {
 				y += TEXT_HEIGHT + 2;
 			}
 
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

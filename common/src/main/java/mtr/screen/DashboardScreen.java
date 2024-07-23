@@ -147,13 +147,15 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics, mouseX, mouseY, delta);
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
 			widgetMap.render(guiGraphics, mouseX, mouseY, delta);
 			guiGraphics.pose().pushPose();
-			guiGraphics.pose().translate(0, 0, 500);
+			guiGraphics.pose().translate(0, 0, -500);
 			guiGraphics.fill(0, 0, PANEL_WIDTH, height, ARGB_BACKGROUND);
 			dashboardList.render(guiGraphics, font);
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			e.printStackTrace();

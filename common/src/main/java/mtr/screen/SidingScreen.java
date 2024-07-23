@@ -148,6 +148,9 @@ public class SidingScreen extends SavedRailScreenBase<Siding> implements Icons {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		super.render(guiGraphics, mouseX, mouseY, delta);
+		guiGraphics.pose().pushPose();
+		guiGraphics.pose().translate(0, 0, -100);
+		guiGraphics.pose().popPose();
 		if (!isSelectingTrain) {
 			guiGraphics.drawString(font, SELECTED_TRAIN_TEXT, SQUARE_SIZE, SQUARE_SIZE * 2 + TEXT_FIELD_PADDING + TEXT_PADDING, ARGB_WHITE);
 			if (showScheduleControls) {

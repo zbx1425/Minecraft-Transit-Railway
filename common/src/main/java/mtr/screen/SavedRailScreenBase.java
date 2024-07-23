@@ -92,13 +92,15 @@ public abstract class SavedRailScreenBase<T extends SavedRailBase> extends Scree
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
-			renderBackground(guiGraphics, mouseX, mouseY, delta);
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
 			if (shouldRenderExtra()) {
 				renderExtra(guiGraphics, mouseX, mouseY, delta);
 			} else {
 				guiGraphics.drawString(font, savedRailNumberText, SQUARE_SIZE, SQUARE_SIZE + TEXT_FIELD_PADDING / 2 + TEXT_PADDING, ARGB_WHITE);
 			}
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

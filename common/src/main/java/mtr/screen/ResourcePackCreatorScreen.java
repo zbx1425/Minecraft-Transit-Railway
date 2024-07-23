@@ -370,6 +370,10 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
 		try {
+			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -100);
+
 			if (guiCounter == 0 && minecraft != null) {
 				hideGui = minecraft.options.hideGui;
 				guiGraphics.fill(0, 0, width, height, ARGB_BLACK);
@@ -380,7 +384,7 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 			availableModelPartsList.render(guiGraphics, font);
 			usedModelPartsList.render(guiGraphics, font);
 
-			super.render(guiGraphics, mouseX, mouseY, delta);
+			guiGraphics.pose().popPose();
 
 			if (isEditing()) {
 				guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.editing_part", RenderTrains.creatorProperties.getPropertiesPartsArray().get(editingPartIndex).getAsJsonObject().get(KEY_PROPERTIES_NAME).getAsString()), PANEL_WIDTH / 2, TEXT_PADDING, ARGB_WHITE);
