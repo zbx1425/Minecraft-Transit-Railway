@@ -1,9 +1,13 @@
-package mtr.forge.mappings;
+package mtr.neoforge.mappings;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
-import mtr.forge.DeferredRegisterHolder;
-import mtr.forge.MTRForge;
+import mtr.neoforge.DeferredRegisterHolder;
+import mtr.neoforge.MTRForge;
+import mtr.render.RenderTrains;
+import mtr.screen.ResourcePackCreatorScreen;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
@@ -20,6 +24,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -123,9 +128,18 @@ public class ForgeUtilities {
 		}
 
 		@SubscribeEvent
-		public static void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
-			PayloadRegistrar registrar = event.registrar("1");
-			MTRForge.PACKET_REGISTRY.commit(registrar);
+		public static void onRenderLevelStageEvent(RenderLevelStageEvent event) {
+			if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
+				PoseStack matrices = event.getPoseStack();
+				matrices.pushPose();
+				final Vec3 cameraPos = event.getCamera().getPosition();
+				matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+				RenderTrains.render(null, 0, matrices, Minecraft.getInstance().renderBuffers().bufferSource());
+				matrices.popPose();
+			} else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
+				PoseStack matrices = event.getPoseStack();
+				ResourcePackCreatorScreen.render(matrices);
+			}
 		}
 	}
 

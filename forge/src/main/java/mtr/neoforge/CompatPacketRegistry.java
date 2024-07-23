@@ -1,4 +1,4 @@
-package mtr.forge;
+package mtr.neoforge;
 
 import mtr.mappings.NetworkUtilities;
 import net.minecraft.network.FriendlyByteBuf;
@@ -6,8 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.HashMap;
@@ -21,34 +19,35 @@ public class CompatPacketRegistry {
     public HashMap<ResourceLocation, NetworkUtilities.PacketCallback> packetsC2S = new HashMap<>();
 
     public void registerNetworkReceiverS2C(ResourceLocation resourceLocation, Consumer<FriendlyByteBuf> consumer) {
+        packets.computeIfAbsent(resourceLocation, CompatPacket::new);
         packetsS2C.put(resourceLocation, consumer);
     }
 
     public void registerNetworkReceiverC2S(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback consumer) {
+        packets.computeIfAbsent(resourceLocation, CompatPacket::new);
         packetsC2S.put(resourceLocation, consumer);
     }
 
     public void commit(PayloadRegistrar registrar) {
-        for (Map.Entry<ResourceLocation, Consumer<FriendlyByteBuf>> entry : packetsS2C.entrySet()) {
-            CompatPacket packet = packets.computeIfAbsent(entry.getKey(), CompatPacket::new);
-            registrar.playToClient(packet.TYPE, packet.STREAM_CODEC,
-                    (arg, iPayloadContext) -> entry.getValue().accept(arg.buffer));
-        }
-        for (Map.Entry<ResourceLocation, NetworkUtilities.PacketCallback> entry : packetsC2S.entrySet()) {
-            CompatPacket packet = packets.computeIfAbsent(entry.getKey(), CompatPacket::new);
-            registrar.playToClient(packet.TYPE, packet.STREAM_CODEC,
-                    (arg, iPayloadContext) -> entry.getValue().packetCallback(
-                            iPayloadContext.player().getServer(), (ServerPlayer)iPayloadContext.player(), arg.buffer));
+        for (Map.Entry<ResourceLocation, CompatPacket> packets : packets.entrySet()) {
+            Consumer<FriendlyByteBuf> handlerS2C = packetsS2C.getOrDefault(packets.getKey(), arg -> {});
+            NetworkUtilities.PacketCallback handlerC2S = packetsC2S.getOrDefault(packets.getKey(), (server, player, arg) -> {});
+            CompatPacket packet = packets.getValue();
+            registrar.playBidirectional(packet.TYPE, packet.STREAM_CODEC, new DirectionalPayloadHandler<>(
+                    (arg, iPayloadContext) -> handlerS2C.accept(arg.buffer),
+                    (arg, iPayloadContext) -> handlerC2S.packetCallback(
+                            iPayloadContext.player().getServer(), (ServerPlayer)iPayloadContext.player(), arg.buffer)
+            ));
         }
     }
 
     public void sendS2C(ServerPlayer player, ResourceLocation id, FriendlyByteBuf payload) {
-        CompatPacket packet = packets.computeIfAbsent(id, CompatPacket::new);
+        CompatPacket packet = packets.get(id);
         PacketDistributor.sendToPlayer(player, packet.new Payload(payload));
     }
 
     public void sendC2S(ResourceLocation id, FriendlyByteBuf payload) {
-        CompatPacket packet = packets.computeIfAbsent(id, CompatPacket::new);
+        CompatPacket packet = packets.get(id);
         PacketDistributor.sendToServer(packet.new Payload(payload));
     }
 }

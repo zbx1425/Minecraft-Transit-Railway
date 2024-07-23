@@ -1,4 +1,4 @@
-package mtr.forge;
+package mtr.neoforge;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
@@ -34,6 +34,7 @@ public class CompatPacket {
     public final StreamCodec<ByteBuf, Payload> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public void encode(ByteBuf dest, Payload src) {
+            src.buffer.resetReaderIndex();
             dest.writeInt(src.buffer.readableBytes());
             dest.writeBytes(src.buffer);
         }
@@ -41,7 +42,9 @@ public class CompatPacket {
         @Override
         public Payload decode(ByteBuf src) {
             final int length = src.readInt();
-            return new Payload(new FriendlyByteBuf(src.readBytes(length)));
+            FriendlyByteBuf result = new FriendlyByteBuf(src.readBytes(length));
+            result.resetReaderIndex();
+            return new Payload(result);
         }
     };
 }

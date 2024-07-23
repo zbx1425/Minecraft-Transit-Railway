@@ -1,4 +1,4 @@
-package mtr.forge;
+package mtr.neoforge;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

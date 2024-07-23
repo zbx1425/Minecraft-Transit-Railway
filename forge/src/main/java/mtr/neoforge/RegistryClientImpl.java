@@ -1,15 +1,14 @@
-package mtr.forge;
+package mtr.neoforge;
 
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
-import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
 import mtr.MTRClient;
-import mtr.forge.mappings.ForgeUtilities;
+import mtr.neoforge.mappings.ForgeUtilities;
 import mtr.mappings.*;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;

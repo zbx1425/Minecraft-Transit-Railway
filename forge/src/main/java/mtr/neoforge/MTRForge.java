@@ -1,11 +1,11 @@
-package mtr.forge;
+package mtr.neoforge;
 
 import mtr.*;
 import mtr.client.CustomResources;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.BlockEntityMapper;
-import mtr.forge.mappings.ForgeUtilities;
+import mtr.neoforge.mappings.ForgeUtilities;
 import mtr.mappings.RegistryUtilities;
 import mtr.render.RenderDrivingOverlay;
 import mtr.render.RenderLift;
@@ -29,6 +29,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(MTR.MOD_ID)
 public class MTRForge {
@@ -135,6 +136,12 @@ public class MTRForge {
 					CustomResources.reload(Minecraft.getInstance().getResourceManager());
 				}
 			});
+		}
+
+		@SubscribeEvent
+		public static void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
+			PayloadRegistrar registrar = event.registrar("1");
+			MTRForge.PACKET_REGISTRY.commit(registrar);
 		}
 	}
 }

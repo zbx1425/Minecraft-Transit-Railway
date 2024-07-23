@@ -40,6 +40,7 @@ public class Patreon implements Keys, IGui, Comparable<Patreon> {
 
 	public static void getPatreonList(List<Patreon> patreonList) {
 		patreonList.clear();
+		if (PATREON_API_KEY.isEmpty()) return;
 		CompletableFuture.runAsync(() -> openConnectionSafeJson("https://www.patreon.com/api/oauth2/v2/campaigns/7782318/members?include=currently_entitled_tiers&fields%5Bmember%5D=full_name,lifetime_support_cents,patron_status&fields%5Btier%5D=title,amount_cents&page%5Bcount%5D=" + Integer.MAX_VALUE, jsonElement -> {
 			final JsonObject jsonObjectData = jsonElement.getAsJsonObject();
 			final Map<String, JsonObject> idMap = new HashMap<>();
