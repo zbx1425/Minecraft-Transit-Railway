@@ -36,9 +36,9 @@ public class RenderTrainD51 extends TrainRendererBase {
 
     public static void initGLModel(ResourceManager resourceManager) {
         try {
-            MainClient.atlasManager.load(resourceManager, new ResourceLocation("mtrsteamloco:models/atlas/d51.json"));
+            MainClient.atlasManager.load(resourceManager, ResourceLocation.parse("mtrsteamloco:models/atlas/d51.json"));
             modelD51 = AnimatedLoader.loadModel(resourceManager, MainClient.modelManager, MainClient.atlasManager,
-                    new ResourceLocation("mtrsteamloco:models/d51/d51.animated"));
+                    ResourceLocation.parse("mtrsteamloco:models/d51/d51.animated"));
         } catch (IOException e) {
             modelD51 = null;
             Main.LOGGER.error("Failed loading model for D51:", e);

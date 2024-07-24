@@ -30,7 +30,7 @@ public class ResourceUtil {
 
         if (relative.contains(":")) {
             relative = relative.replaceAll("[^a-z0-9/.:_-]", "_");
-            return new ResourceLocation(relative);
+            return ResourceLocation.parse(relative);
         }
 
         relative = relative.replaceAll("[^a-z0-9/._-]", "_");
@@ -44,6 +44,6 @@ public class ResourceUtil {
         }
         String resolvedPath = FileSystems.getDefault().getPath(baseFile.getPath()).getParent().resolve(relative)
                 .normalize().toString().replace('\\', '/');
-        return new ResourceLocation(baseFile.getNamespace(), resolvedPath);
+        return ResourceLocation.fromNamespaceAndPath(baseFile.getNamespace(), resolvedPath);
     }
 }

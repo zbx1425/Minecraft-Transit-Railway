@@ -225,7 +225,6 @@ configure(allprojects.findAll {it.name != 'rhino'}) {
 
 	tasks.withType(JavaCompile) {
 		options.encoding = "UTF-8"
-		options.compilerArgs += ['-Xplugin:Manifold', '-AMC_VERSION=' + rootProject.minecraft_version_int]
 	}
 
 	afterEvaluate {

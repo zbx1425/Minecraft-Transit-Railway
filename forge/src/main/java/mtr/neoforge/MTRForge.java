@@ -1,5 +1,7 @@
 package mtr.neoforge;
 
+import cn.zbx1425.mtrsteamloco.neoforge.ClientProxy;
+import cn.zbx1425.mtrsteamloco.neoforge.RegistriesWrapperImpl;
 import mtr.*;
 import mtr.client.CustomResources;
 import mtr.item.ItemBlockEnchanted;
@@ -40,11 +42,13 @@ public class MTRForge {
 	private static final DeferredRegisterHolder<EntityType<?>> ENTITY_TYPES = new DeferredRegisterHolder<>(MTR.MOD_ID, ForgeUtilities.registryGetEntityType());
 	private static final DeferredRegisterHolder<SoundEvent> SOUND_EVENTS = new DeferredRegisterHolder<>(MTR.MOD_ID, ForgeUtilities.registryGetSoundEvent());
 	private static final DeferredRegisterHolder<CreativeModeTab> CREATIVE_MODE_TABS = new DeferredRegisterHolder<>(MTR.MOD_ID, Registries.CREATIVE_MODE_TAB);
+	private static final RegistriesWrapperImpl registries = new RegistriesWrapperImpl();
 
 	public static final CompatPacketRegistry PACKET_REGISTRY = new CompatPacketRegistry();
 
 	static {
 		MTR.init(MTRForge::registerItem, MTRForge::registerBlock, MTRForge::registerBlock, MTRForge::registerEnchantedBlock, MTRForge::registerBlockEntityType, MTRForge::registerEntityType, MTRForge::registerSoundEvent);
+		cn.zbx1425.mtrsteamloco.Main.init(registries);
 	}
 
 	public MTRForge(IEventBus eventBus) {
@@ -54,6 +58,7 @@ public class MTRForge {
 		BLOCK_ENTITY_TYPES.register(eventBus);
 		ENTITY_TYPES.register(eventBus);
 		SOUND_EVENTS.register(eventBus);
+		registries.registerAllDeferred(eventBus);
 
 		ForgeUtilities.registerCreativeModeTabsToDeferredRegistry(CREATIVE_MODE_TABS);
 		CREATIVE_MODE_TABS.register(eventBus);
@@ -76,6 +81,10 @@ public class MTRForge {
 			ForgeUtilities.renderGameOverlayAction((guiGraphics) -> RenderDrivingOverlay.render((GuiGraphics) guiGraphics));
 			NeoForge.EVENT_BUS.register(ForgeUtilities.Events.class);
 			eventBus.register(ForgeUtilities.ClientsideEvents.class);
+
+			// NTE
+			NeoForge.EVENT_BUS.register(ClientProxy.ForgeEventBusListener.class);
+			eventBus.register(ClientProxy.ModEventBusListener.class);
 		}
 	}
 

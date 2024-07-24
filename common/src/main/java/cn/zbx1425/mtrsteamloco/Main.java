@@ -5,6 +5,7 @@ import cn.zbx1425.mtrsteamloco.block.BlockEyeCandy;
 import cn.zbx1425.mtrsteamloco.network.*;
 import com.google.gson.JsonParser;
 import mtr.CreativeModeTabs;
+import mtr.Registry;
 import mtr.RegistryObject;
 import mtr.item.ItemBridgeCreator;
 import mtr.item.ItemWithCreativeTabBase;
@@ -51,16 +52,20 @@ public class Main {
 	public static final RegistryObject<Block> BLOCK_EYE_CANDY = new RegistryObject<>(BlockEyeCandy::new);
 	public static final RegistryObject<BlockEntityType<BlockEyeCandy.BlockEntityEyeCandy>>
 			BLOCK_ENTITY_TYPE_EYE_CANDY = new RegistryObject<>(() ->
-			RegistryUtilities.getBlockEntityType(
+			Registry.getBlockEntityType(
 					BlockEyeCandy.BlockEntityEyeCandy::new,
 					BLOCK_EYE_CANDY.get()
 			));
 
 	public static final RegistryObject<ItemWithCreativeTabBase> BRIDGE_CREATOR_1 = new RegistryObject<>(() -> new ItemBridgeCreator(1));
 
-	public static final SoundEvent SOUND_EVENT_BELL = RegistryUtilities.createSoundEvent(new ResourceLocation("mtrsteamloco:bell"));
+	public static final SoundEvent SOUND_EVENT_BELL = RegistryUtilities.createSoundEvent(Main.id("bell"));
 
 	public static SimpleParticleType PARTICLE_STEAM_SMOKE;
+
+	public static ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+	}
 
 	public static void init(RegistriesWrapper registries) {
 		LOGGER.info("MTR-NTE " + BuildConfig.MOD_VERSION + " built at "

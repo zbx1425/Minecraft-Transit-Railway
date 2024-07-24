@@ -20,8 +20,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -186,7 +188,7 @@ public class BrushEditRailScreen extends SelectListScreen {
         }
         if (!expectedText.equals(radiusInput.getValue())) {
             radiusInput.setValue(expectedText);
-            radiusInput.moveCursorToStart();
+            radiusInput.moveCursorToStart(false);
         }
 
         if (send) {
@@ -227,7 +229,7 @@ public class BrushEditRailScreen extends SelectListScreen {
         if (Minecraft.getInstance().player == null) return null;
         ItemStack brushItem = Minecraft.getInstance().player.getMainHandItem();
         if (!brushItem.is(mtr.Items.BRUSH.get())) return null;
-        CompoundTag nteTag = brushItem.getTagElement("NTERailBrush");
+        CompoundTag nteTag = brushItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         return nteTag;
     }
 
@@ -235,8 +237,9 @@ public class BrushEditRailScreen extends SelectListScreen {
         if (Minecraft.getInstance().player == null) return;
         ItemStack brushItem = Minecraft.getInstance().player.getMainHandItem();
         if (!brushItem.is(mtr.Items.BRUSH.get())) return;
-        CompoundTag nteTag = brushItem.getOrCreateTagElement("NTERailBrush");
+        CompoundTag nteTag = brushItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         modifier.accept(nteTag);
+        brushItem.set(DataComponents.CUSTOM_DATA, CustomData.of(nteTag));
         applyBrushToPickedRail(nteTag, false);
         PacketUpdateHoldingItem.sendUpdateC2S();
     }

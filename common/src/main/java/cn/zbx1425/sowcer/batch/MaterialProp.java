@@ -56,7 +56,7 @@ public class MaterialProp {
         String content = new String(dis.readNBytes(len), StandardCharsets.UTF_8);
         JsonObject mtlObj = (JsonObject)new JsonParser().parse(content);
         this.shaderName = mtlObj.get("shaderName").getAsString();
-        this.texture = mtlObj.get("texture").isJsonNull() ? null : new ResourceLocation(mtlObj.get("texture").getAsString());
+        this.texture = mtlObj.get("texture").isJsonNull() ? null : ResourceLocation.parse(mtlObj.get("texture").getAsString());
         this.attrState.color = mtlObj.get("color").isJsonNull() ? null : mtlObj.get("color").getAsInt();
         this.attrState.lightmapUV = mtlObj.get("lightmapUV").isJsonNull() ? null : mtlObj.get("lightmapUV").getAsInt();
         this.translucent = mtlObj.has("translucent") && mtlObj.get("translucent").getAsBoolean();
@@ -65,7 +65,7 @@ public class MaterialProp {
         this.cutoutHack = mtlObj.has("cutoutHack") && mtlObj.get("cutoutHack").getAsBoolean();
     }
 
-    public static final ResourceLocation WHITE_TEXTURE_LOCATION = new ResourceLocation("minecraft:textures/misc/white.png");
+    public static final ResourceLocation WHITE_TEXTURE_LOCATION = ResourceLocation.parse("minecraft:textures/misc/white.png");
 
     public void setupCompositeState() {
 #if MC_VERSION <= "11903"

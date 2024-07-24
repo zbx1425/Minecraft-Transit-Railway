@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class PacketUpdateRail {
 
-    public static ResourceLocation PACKET_UPDATE_RAIL = new ResourceLocation(Main.MOD_ID, "update_rail");
+    public static ResourceLocation PACKET_UPDATE_RAIL = Main.id("update_rail");
 
     public static void sendUpdateC2S(Rail newState, BlockPos posStart, BlockPos posEnd) {
         final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());

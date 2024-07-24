@@ -45,7 +45,7 @@ public class DynamicTrainModelLoader {
             boolean bbModelPreload = MtrModelRegistryUtil.getBbModelPreloadFromDummyBbData(
                     model.get("dummyBbData").getAsJsonObject());
             if (ClientConfig.enableBbModelPreload || bbModelPreload) {
-                loadVanillaModelInto(model, target);
+
             }
         }
     }
@@ -58,7 +58,7 @@ public class DynamicTrainModelLoader {
             if (target.properties.has("atlasIndex")) {
                 MainClient.atlasManager.load(
                         MtrModelRegistryUtil.resourceManager,
-                        new ResourceLocation(target.properties.get("atlasIndex").getAsString())
+                        ResourceLocation.parse(target.properties.get("atlasIndex").getAsString())
                 );
             }
 
@@ -73,7 +73,7 @@ public class DynamicTrainModelLoader {
                             .forEach(elem -> previousParts.add(elem.getAsJsonObject()));
                     JsonArray newParts = new JsonArray();
                     for (int i = 0; i < rlListPairs.length / 2; i++) {
-                        ResourceLocation modelLocation = new ResourceLocation(rlListPairs[i * 2]);
+                        ResourceLocation modelLocation = ResourceLocation.parse(rlListPairs[i * 2]);
                         String[] extraAttribs = rlListPairs[i * 2 + 1].split(";", -1)[2].split(",");
                         boolean isModelReversed = Arrays.asList(extraAttribs).contains("reversed");
                         String modelLocationName = modelLocation.getPath().substring(modelLocation.getPath().lastIndexOf('/') + 1)
@@ -87,7 +87,7 @@ public class DynamicTrainModelLoader {
                         );
                         for (Map.Entry<String, RawModel> entry : modelParts.entrySet()) {
                             if (isModelReversed) {
-                                entry.getValue().sourceLocation = new ResourceLocation(
+                                entry.getValue().sourceLocation = ResourceLocation.parse(
                                         entry.getValue().sourceLocation.toString().substring(0, entry.getValue().sourceLocation.toString().lastIndexOf("/"))
                                                 + "/reversed"
                                                 + entry.getValue().sourceLocation.toString().substring(entry.getValue().sourceLocation.toString().lastIndexOf("/"))
@@ -106,7 +106,7 @@ public class DynamicTrainModelLoader {
                         previousParts.removeIf(elem -> elem.get("name").getAsString().startsWith(modelLocationName));
                     }
                     for (int i = 0; i < rlListPairs.length / 2; i++) {
-                        ResourceLocation modelLocation = new ResourceLocation(rlListPairs[i * 2]);
+                        ResourceLocation modelLocation = ResourceLocation.parse(rlListPairs[i * 2]);
                         String[] extraAttribs = rlListPairs[i * 2 + 1].split(";", -1)[2].split(",");
                         boolean isModelReversed = Arrays.asList(extraAttribs).contains("reversed");
                         String modelLocationName = modelLocation.getPath().substring(modelLocation.getPath().lastIndexOf('/') + 1)
@@ -168,7 +168,7 @@ public class DynamicTrainModelLoader {
                 } else {
                     models = ObjModelLoader.loadModels(
                             MtrModelRegistryUtil.resourceManager,
-                            new ResourceLocation(modelLocations),
+                            ResourceLocation.parse(modelLocations),
                             MainClient.atlasManager
                     );
                 }
@@ -194,7 +194,7 @@ public class DynamicTrainModelLoader {
             String repaintTexture = MtrModelRegistryUtil.getTextureIdFromDummyBbData(model);
             if (!StringUtils.isEmpty(repaintTexture)) {
                 for (RawModel partModel : models.values()) {
-                    partModel.replaceTexture("default.png", new ResourceLocation(repaintTexture));
+                    partModel.replaceTexture("default.png", ResourceLocation.parse(repaintTexture));
                 }
             }
             // Apply FlipV
@@ -292,72 +292,6 @@ public class DynamicTrainModelLoader {
         }
     }
 
-    public static void loadVanillaModelInto(JsonObject model, DynamicTrainModel target) {
-        if (!model.has("dummyBbData")) return;
-        String path = MtrModelRegistryUtil.getPathFromDummyBbData(model.get("dummyBbData").getAsJsonObject());
-        try {
-            String textureId = MtrModelRegistryUtil.getTextureIdFromDummyBbData(model.get("dummyBbData").getAsJsonObject());
-            ResourceLocation texture = resolveTexture(textureId, str -> str.endsWith(".png") ? str : (str + ".png"));
-
-            Map<PartBatch, CapturingVertexConsumer> mergeVertexConsumers = new HashMap<>();
-            target.properties.getAsJsonArray(IResourcePackCreatorProperties.KEY_PROPERTIES_PARTS).forEach(elem -> {
-                JsonObject partObject = elem.getAsJsonObject();
-                String partName = partObject.get(IResourcePackCreatorProperties.KEY_PROPERTIES_NAME).getAsString();
-                ModelMapper partModel = target.parts.get(partName);
-                if (partModel == null) return;
-
-                ModelTrainBase.RenderStage renderStage = EnumHelper.valueOf(ModelTrainBase.RenderStage.EXTERIOR,
-                        partObject.get(IResourcePackCreatorProperties.KEY_PROPERTIES_STAGE).getAsString().toUpperCase(Locale.ROOT));
-                final boolean mirror = partObject.get(IResourcePackCreatorProperties.KEY_PROPERTIES_MIRROR).getAsBoolean();
-                PartBatch batch = new PartBatch(partObject, mirror);
-                CapturingVertexConsumer vertexConsumer = mergeVertexConsumers.computeIfAbsent(batch, ignored -> new CapturingVertexConsumer());
-
-                vertexConsumer.beginStage(texture, renderStage);
-                partObject.getAsJsonArray(IResourcePackCreatorProperties.KEY_PROPERTIES_POSITIONS).forEach(positionElement -> {
-                    final float x = positionElement.getAsJsonArray().get(0).getAsFloat();
-                    final float z = positionElement.getAsJsonArray().get(1).getAsFloat();
-                    ModelPart modelPart = ((ModelMapperAccessor)partModel).getModelPart();
-                    if (mirror) {
-                        modelPart.setPos(-x, 0, z);
-                        modelPart.yRot = (float) Math.PI;
-                    } else {
-                        modelPart.setPos(x, 0, z);
-                        modelPart.yRot = 0;
-                    }
-                    vertexConsumer.captureModelPart(modelPart);
-                });
-            });
-
-            target.parts.clear();
-            JsonArray partsPropArray = new JsonArray();
-            List<JsonObject> propertiesToKeep = new ArrayList<>();
-            target.properties.getAsJsonArray(IResourcePackCreatorProperties.KEY_PROPERTIES_PARTS).forEach(partElement -> {
-                final JsonObject partObject = partElement.getAsJsonObject();
-                final String partName = partObject.get(IResourcePackCreatorProperties.KEY_PROPERTIES_NAME).getAsString();
-                if (!target.partsInfo.containsKey(partName) || !partObject.has(IResourcePackCreatorProperties.KEY_PROPERTIES_DISPLAY)) {
-                    return;
-                }
-                propertiesToKeep.add(partObject);
-            });
-            target.properties.add(IResourcePackCreatorProperties.KEY_PROPERTIES_PARTS, partsPropArray);
-            for (JsonObject partObject : propertiesToKeep) {
-                partsPropArray.add(partObject);
-            }
-
-            for (Map.Entry<PartBatch, CapturingVertexConsumer> entry : mergeVertexConsumers.entrySet()) {
-                PartBatch batch = entry.getKey();
-                CapturingVertexConsumer vertexConsumer = entry.getValue();
-                RawModel rawModel = vertexConsumer.models[0];
-                rawModel.triangulate();
-                target.parts.put(batch.batchId, new SowcerModelAgent(rawModel, true));
-                partsPropArray.add(batch.getPartObject());
-            }
-        } catch (Exception e) {
-            Main.LOGGER.error("Error when optimizing BBMODEL in DynamicTrainModel", e);
-            MtrModelRegistryUtil.recordLoadingError("Error when optimizing BBMODEL " + path, e);
-        }
-    }
-
     public static class PartBatch {
 
         public final ResourcePackCreatorProperties.DoorOffset doorOffset;
@@ -427,7 +361,7 @@ public class DynamicTrainModelLoader {
 
     private static ResourceLocation resolveTexture(String textureId, Function<String, String> formatter) {
         final String textureString = formatter.apply(textureId);
-        final ResourceLocation id = new ResourceLocation(textureString);
+        final ResourceLocation id = ResourceLocation.parse(textureString);
         final boolean available;
 
         if (!RenderTrains.AVAILABLE_TEXTURES.contains(textureString) && !RenderTrains.UNAVAILABLE_TEXTURES.contains(textureString)) {
@@ -443,7 +377,7 @@ public class DynamicTrainModelLoader {
         if (available) {
             return id;
         } else {
-            return new ResourceLocation("mtr:textures/block/transparent.png");
+            return ResourceLocation.parse("mtr:textures/block/transparent.png");
         }
     }
 }

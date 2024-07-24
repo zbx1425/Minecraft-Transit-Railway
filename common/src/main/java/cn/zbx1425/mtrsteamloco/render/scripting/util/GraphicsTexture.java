@@ -33,7 +33,7 @@ public class GraphicsTexture implements Closeable {
         this.width = width;
         this.height = height;
         dynamicTexture = new DynamicTexture(new NativeImage(width, height, false));
-        identifier = new ResourceLocation(Main.MOD_ID, String.format("dynamic/graphics/%s", UUID.randomUUID()));
+        identifier = ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, String.format("dynamic/graphics/%s", UUID.randomUUID()));
         Minecraft.getInstance().execute(() -> {
             Minecraft.getInstance().getTextureManager().register(identifier, dynamicTexture);
         });

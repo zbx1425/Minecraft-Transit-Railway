@@ -1,38 +1,26 @@
-package cn.zbx1425.mtrsteamloco.forge;
+package cn.zbx1425.mtrsteamloco.neoforge;
 
 import cn.zbx1425.mtrsteamloco.Main;
 import cn.zbx1425.mtrsteamloco.RegistriesWrapper;
-import cn.zbx1425.mtrsteamloco.mappings.ForgeUtilities;
 import mtr.CreativeModeTabs;
 import mtr.Registry;
 import mtr.RegistryObject;
 import mtr.item.ItemWithCreativeTabBase;
-import mtr.mappings.DeferredRegisterHolder;
 import mtr.mappings.RegistryUtilities;
-import net.minecraft.client.KeyMapping;
+import mtr.neoforge.DeferredRegisterHolder;
+import mtr.neoforge.mappings.ForgeUtilities;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.neoforged.bus.EventBus;
+import net.neoforged.bus.api.IEventBus;
 
 public class RegistriesWrapperImpl implements RegistriesWrapper {
 
@@ -93,12 +81,12 @@ public class RegistriesWrapperImpl implements RegistriesWrapper {
         return new SimpleParticleType(overrideLimiter);
     }
 
-    public void registerAllDeferred() {
-        ITEMS.register();
-        BLOCKS.register();
-        BLOCK_ENTITY_TYPES.register();
-        ENTITY_TYPES.register();
-        SOUND_EVENTS.register();
-        PARTICLE_TYPES.register();
+    public void registerAllDeferred(IEventBus eventBus) {
+        ITEMS.register(eventBus);
+        BLOCKS.register(eventBus);
+        BLOCK_ENTITY_TYPES.register(eventBus);
+        ENTITY_TYPES.register(eventBus);
+        SOUND_EVENTS.register(eventBus);
+        PARTICLE_TYPES.register(eventBus);
     }
 }

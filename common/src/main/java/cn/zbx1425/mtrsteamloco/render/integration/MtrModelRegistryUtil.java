@@ -24,7 +24,7 @@ public class MtrModelRegistryUtil {
 
     public static final List<String> loadingErrorList = new ArrayList<>();
 
-    public static final ResourceLocation PLACEHOLDER_TILE_TEXTURE_LOCATION = new ResourceLocation("mtrsteamloco:textures/misc/nte_tile_faded.png");
+    public static final ResourceLocation PLACEHOLDER_TILE_TEXTURE_LOCATION = ResourceLocation.parse("mtrsteamloco:textures/misc/nte_tile_faded.png");
 
     public static void recordLoadingError(String context, Exception ex) {
         final String[] uselessPrefixes = {

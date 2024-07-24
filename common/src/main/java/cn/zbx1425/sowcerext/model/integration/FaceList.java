@@ -35,13 +35,12 @@ public class FaceList {
         for (TransformedFace face : queuedFaces) {
             for (Vertex vertex : face.vertices) {
                 vertexConsumer
-                        .vertex(vertex.position.x(), vertex.position.y(), vertex.position.z())
-                        .color((byte)(face.color >>> 24), (byte)(face.color >>> 16), (byte)(face.color >>> 8), (byte)(int)face.color)
-                        .uv(vertex.u, vertex.v)
-                        .overlayCoords(OverlayTexture.NO_OVERLAY)
-                        .uv2(face.light)
-                        .normal(vertex.normal.x(), vertex.normal.y(), vertex.normal.z())
-                        .endVertex();
+                        .addVertex(vertex.position.x(), vertex.position.y(), vertex.position.z())
+                        .setColor((byte)(face.color >>> 24), (byte)(face.color >>> 16), (byte)(face.color >>> 8), (byte)(int)face.color)
+                        .setUv(vertex.u, vertex.v)
+                        .setOverlay(OverlayTexture.NO_OVERLAY)
+                        .setLight(face.light)
+                        .setNormal(vertex.normal.x(), vertex.normal.y(), vertex.normal.z());
             }
         }
     }

@@ -68,7 +68,7 @@ public class CustomResourcesMixin {
             return;
         }
 
-        ResourceLocation location = new ResourceLocation(path);
+        ResourceLocation location = ResourceLocation.parse(path);
         try {
             UtilitiesClient.getResources(manager, location).forEach(resource -> {
                 try (final InputStream stream = Utilities.getInputStream(resource)) {

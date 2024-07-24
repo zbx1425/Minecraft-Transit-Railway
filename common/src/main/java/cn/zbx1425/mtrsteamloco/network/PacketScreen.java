@@ -14,7 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class PacketScreen {
 
-    public static ResourceLocation PACKET_SHOW_SCREEN = new ResourceLocation(Main.MOD_ID, "show_screen");
+    public static ResourceLocation PACKET_SHOW_SCREEN = Main.id("show_screen");
 
     public static void sendScreenBlockS2C(ServerPlayer player, String screenName, BlockPos pos) {
         final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());

@@ -52,15 +52,15 @@ public class RenderTrainDK3 extends TrainRendererBase {
 
     public static void initGLModel(ResourceManager resourceManager) {
         try {
-            MainClient.atlasManager.load(resourceManager, new ResourceLocation("mtrsteamloco:models/atlas/dk3.json"));
+            MainClient.atlasManager.load(resourceManager, ResourceLocation.parse("mtrsteamloco:models/atlas/dk3.json"));
             models[MODEL_BODY_HEAD] = AnimatedLoader.loadModel(resourceManager, MainClient.modelManager, MainClient.atlasManager,
-                    new ResourceLocation("mtrsteamloco:models/dk3/ch.animated"));
+                    ResourceLocation.parse("mtrsteamloco:models/dk3/ch.animated"));
             models[MODEL_BODY_TAIL] = AnimatedLoader.loadModel(resourceManager, MainClient.modelManager, MainClient.atlasManager,
-                    new ResourceLocation("mtrsteamloco:models/dk3/c.animated"));
+                    ResourceLocation.parse("mtrsteamloco:models/dk3/c.animated"));
             models[MODEL_AUX_HEAD] = MiLoader.loadModel(resourceManager, MainClient.modelManager, MainClient.atlasManager,
-                    new ResourceLocation("mtrsteamloco:models/alex/dk3auxhead.json"));
+                    ResourceLocation.parse("mtrsteamloco:models/alex/dk3auxhead.json"));
             models[MODEL_AUX_TAIL] = MiLoader.loadModel(resourceManager, MainClient.modelManager, MainClient.atlasManager,
-                    new ResourceLocation("mtrsteamloco:models/alex/dk3auxtail.json"));
+                    ResourceLocation.parse("mtrsteamloco:models/alex/dk3auxtail.json"));
         } catch (IOException e) {
             Main.LOGGER.error("Failed loading model for DK3 regular:", e);
         }

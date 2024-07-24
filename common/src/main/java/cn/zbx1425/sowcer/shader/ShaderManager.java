@@ -25,16 +25,15 @@ import java.util.Map;
 public class ShaderManager {
 
     public static final VertexFormatElement MC_ELEMENT_MATRIX =
-            new VertexFormatElement(0, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.GENERIC, 16);
+            new VertexFormatElement(6, 0, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.GENERIC, 16);
 
-    public static final VertexFormat MC_FORMAT_ENTITY_MAT = new VertexFormat(ImmutableMap.<String, VertexFormatElement>builder()
-            .put("Position", DefaultVertexFormat.ELEMENT_POSITION).put("Color", DefaultVertexFormat.ELEMENT_COLOR)
-            .put("UV0", DefaultVertexFormat.ELEMENT_UV0).put("UV1", DefaultVertexFormat.ELEMENT_UV1).put("UV2", DefaultVertexFormat.ELEMENT_UV2)
-            .put("Normal", DefaultVertexFormat.ELEMENT_NORMAL)
-            .put("ModelMat", MC_ELEMENT_MATRIX)
-            .put("Padding", DefaultVertexFormat.ELEMENT_PADDING)
-            .build()
-    );
+    public static final VertexFormat MC_FORMAT_ENTITY_MAT = VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION).add("Color", VertexFormatElement.COLOR)
+            .add("UV0", VertexFormatElement.UV0).add("UV1", VertexFormatElement.UV1).add("UV2", VertexFormatElement.UV2)
+            .add("Normal", VertexFormatElement.NORMAL)
+            .add("ModelMat", MC_ELEMENT_MATRIX)
+            .padding(1)
+            .build();
 
     public final Map<String, ShaderInstance> shaders = new HashMap<>();
 
@@ -88,11 +87,6 @@ public class ShaderManager {
         if (shaderInstance.PROJECTION_MATRIX != null) {
             shaderInstance.PROJECTION_MATRIX.set(RenderSystem.getProjectionMatrix());
         }
-#if MC_VERSION >= "11800"
-        if (shaderInstance.INVERSE_VIEW_ROTATION_MATRIX != null) {
-            shaderInstance.INVERSE_VIEW_ROTATION_MATRIX.set(RenderSystem.getInverseViewRotationMatrix());
-        }
-#endif
         if (shaderInstance.COLOR_MODULATOR != null) {
             shaderInstance.COLOR_MODULATOR.set(RenderSystem.getShaderColor());
         }

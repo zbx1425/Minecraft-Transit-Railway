@@ -54,7 +54,7 @@ public class BlockEyeCandy extends BlockDirectionalMapper implements EntityBlock
     }
 
     @Override
-    public InteractionResult use(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
+    public InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
         if (player.getMainHandItem().is(mtr.Items.BRUSH.get())) {
             if (!level.isClientSide) {
                 PacketScreen.sendScreenBlockS2C((ServerPlayer) player, "eye_candy", pos);

@@ -68,17 +68,17 @@ public class EyeCandyRegistry {
     private static EyeCandyProperties loadFromJson(ResourceManager resourceManager, String key, JsonObject obj) throws Exception {
         if (obj.has("atlasIndex")) {
             MainClient.atlasManager.load(
-                    MtrModelRegistryUtil.resourceManager,  new ResourceLocation(obj.get("atlasIndex").getAsString())
+                    MtrModelRegistryUtil.resourceManager,  ResourceLocation.parse(obj.get("atlasIndex").getAsString())
             );
         }
 
         ModelCluster cluster = null;
         if (obj.has("model")) {
             RawModel rawModel = MainClient.modelManager.loadRawModel(resourceManager,
-                    new ResourceLocation(obj.get("model").getAsString()), MainClient.atlasManager).copy();
+                    ResourceLocation.parse(obj.get("model").getAsString()), MainClient.atlasManager).copy();
 
             if (obj.has("textureId")) {
-                rawModel.replaceTexture("default.png", new ResourceLocation(obj.get("textureId").getAsString()));
+                rawModel.replaceTexture("default.png", ResourceLocation.parse(obj.get("textureId").getAsString()));
             }
             if (obj.has("flipV") && obj.get("flipV").getAsBoolean()) {
                 rawModel.applyUVMirror(false, true);
@@ -106,7 +106,7 @@ public class EyeCandyRegistry {
                 );
             }
 
-            rawModel.sourceLocation = new ResourceLocation(rawModel.sourceLocation.toString() + "/" + key);
+            rawModel.sourceLocation = ResourceLocation.parse(rawModel.sourceLocation.toString() + "/" + key);
 
             cluster = MainClient.modelManager.uploadVertArrays(rawModel);
         }
@@ -117,13 +117,13 @@ public class EyeCandyRegistry {
             if (obj.has("scriptTexts")) {
                 JsonArray scriptTexts = obj.get("scriptTexts").getAsJsonArray();
                 for (int i = 0; i < scriptTexts.size(); i++) {
-                    scripts.put(new ResourceLocation("mtrsteamloco", "script_texts/" + key + "/" + i),
+                    scripts.put(ResourceLocation.fromNamespaceAndPath("mtrsteamloco", "script_texts/" + key + "/" + i),
                             scriptTexts.get(i).getAsString());
                 }
             }
             JsonArray scriptFiles = obj.get("scriptFiles").getAsJsonArray();
             for (int i = 0; i < scriptFiles.size(); i++) {
-                ResourceLocation scriptLocation = new ResourceLocation(scriptFiles.get(i).getAsString());
+                ResourceLocation scriptLocation = ResourceLocation.parse(scriptFiles.get(i).getAsString());
                 scripts.put(scriptLocation, ResourceUtil.readResource(resourceManager, scriptLocation));
             }
             script.load("EyeCandy " + key, "Block", resourceManager, scripts);

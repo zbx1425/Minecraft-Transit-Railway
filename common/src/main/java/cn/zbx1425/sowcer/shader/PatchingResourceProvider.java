@@ -36,7 +36,7 @@ public class PatchingResourceProvider implements ResourceProvider {
 #endif
         try {
             if (resourceLocation.getPath().contains("_modelmat"))
-                resourceLocation = new ResourceLocation(resourceLocation.getNamespace(),
+                resourceLocation = ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(),
                         resourceLocation.getPath().replace("_modelmat", ""));
 
             InputStream srcInputStream;

@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class PacketVersionCheck {
 
-    public static final ResourceLocation PACKET_VERSION_CHECK = new ResourceLocation(Main.MOD_ID, "version_check");
+    public static final ResourceLocation PACKET_VERSION_CHECK = Main.id("version_check");
 
     public static void sendVersionCheckS2C(ServerPlayer player) {
         final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());

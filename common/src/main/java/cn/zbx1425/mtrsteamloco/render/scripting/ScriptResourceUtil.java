@@ -89,10 +89,10 @@ public class ScriptResourceUtil {
     }
 
     public static ResourceLocation identifier(String textForm) {
-        return new ResourceLocation(textForm);
+        return ResourceLocation.parse(textForm);
     }
     public static ResourceLocation id(String textForm) {
-        return new ResourceLocation(textForm);
+        return ResourceLocation.parse(textForm);
     }
 
     public static ResourceLocation idRelative(String textForm) {
@@ -122,9 +122,9 @@ public class ScriptResourceUtil {
         }
     }
 
-    private static final ResourceLocation NOTO_SANS_CJK_LOCATION = new ResourceLocation(mtr.MTR.MOD_ID, "font/noto-sans-cjk-tc-medium.otf");
-    private static final ResourceLocation NOTO_SANS_LOCATION = new ResourceLocation(mtr.MTR.MOD_ID, "font/noto-sans-semibold.ttf");
-    private static final ResourceLocation NOTO_SERIF_LOCATION = new ResourceLocation(mtr.MTR.MOD_ID, "font/noto-serif-cjk-tc-semibold.ttf");
+    private static final ResourceLocation NOTO_SANS_CJK_LOCATION = mtr.MTR.id("font/noto-sans-cjk-tc-medium.otf");
+    private static final ResourceLocation NOTO_SANS_LOCATION = mtr.MTR.id("font/noto-sans-semibold.ttf");
+    private static final ResourceLocation NOTO_SERIF_LOCATION = mtr.MTR.id("font/noto-serif-cjk-tc-semibold.ttf");
     private static boolean hasNotoSansCjk = false;
     private static Font NOTO_SANS_MAYBE_CJK;
 

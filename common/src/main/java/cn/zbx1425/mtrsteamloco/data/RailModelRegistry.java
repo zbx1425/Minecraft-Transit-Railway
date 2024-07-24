@@ -49,7 +49,7 @@ public class RailModelRegistry {
 
         try {
             RawModel railNodeRawModel = MainClient.modelManager.loadRawModel(resourceManager,
-                    new ResourceLocation("mtrsteamloco:models/rail_node.csv"), MainClient.atlasManager);
+                    ResourceLocation.parse("mtrsteamloco:models/rail_node.csv"), MainClient.atlasManager);
             railNodeModel = MainClient.modelManager.uploadVertArrays(railNodeRawModel);
         } catch (Exception ex) {
             Main.LOGGER.error("Failed loading rail node model", ex);
@@ -93,21 +93,21 @@ public class RailModelRegistry {
     private static RailModelProperties loadFromJson(ResourceManager resourceManager, String key, JsonObject obj) throws IOException {
         if (obj.has("atlasIndex")) {
             MainClient.atlasManager.load(
-                    MtrModelRegistryUtil.resourceManager,  new ResourceLocation(obj.get("atlasIndex").getAsString())
+                    MtrModelRegistryUtil.resourceManager,  ResourceLocation.parse(obj.get("atlasIndex").getAsString())
             );
         }
 
         RawModel rawModel = MainClient.modelManager.loadRawModel(resourceManager,
-                new ResourceLocation(obj.get("model").getAsString()), MainClient.atlasManager).copy();
+                ResourceLocation.parse(obj.get("model").getAsString()), MainClient.atlasManager).copy();
 
         if (obj.has("textureId")) {
-            rawModel.replaceTexture("default.png", new ResourceLocation(obj.get("textureId").getAsString()));
+            rawModel.replaceTexture("default.png", ResourceLocation.parse(obj.get("textureId").getAsString()));
         }
         if (obj.has("flipV") && obj.get("flipV").getAsBoolean()) {
             rawModel.applyUVMirror(false, true);
         }
 
-        rawModel.sourceLocation = new ResourceLocation(rawModel.sourceLocation.toString() + "/" + key);
+        rawModel.sourceLocation = ResourceLocation.parse(rawModel.sourceLocation.toString() + "/" + key);
 
         float repeatInterval = obj.has("repeatInterval") ? obj.get("repeatInterval").getAsFloat() : 0.5f;
         float yOffset = obj.has("yOffset") ? obj.get("yOffset").getAsFloat() : 0f;
