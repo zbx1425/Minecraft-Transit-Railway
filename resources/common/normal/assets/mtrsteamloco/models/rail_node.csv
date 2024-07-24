@@ -1,0 +1,4 @@
+CreateMeshBuilder
+Cube, 0.72, 0.1, 0.1
+SetColor, 240, 240, 100
+TranslateAll, 0, 0.1, 0

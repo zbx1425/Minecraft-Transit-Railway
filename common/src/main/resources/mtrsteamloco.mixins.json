@@ -1,0 +1,40 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.zbx1425.mtrsteamloco.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "BlockNodeMixin",
+    "ClientCacheAccessor",
+    "CustomResourcesMixin",
+    "DynamicTrainModelMixin",
+    "GameRendererMixin",
+    "JonModelTrainRendererMixin",
+    "KeyboardHandlerMixin",
+    "LevelRendererAccessor",
+    "LevelRendererMixin",
+    "ModelMapperAccessor",
+    "ModelPartAccessor",
+    "ModelSimpleTrainBaseAccessor",
+    "NativeImageAccessor",
+    "RailAccessor",
+    "RenderTrainsMixin",
+    "ResourcePackCreatorPropertiesMixin",
+    "ResourcePackCreatorScreenMixin",
+    "TrainAccessor",
+    "TrainClientAccessor",
+    "TrainClientMixin",
+    "TrainClientRegistryMixin",
+    "GLFWMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "ItemWithCreativeTabBaseMixin",
+    "PackMixin",
+    "RailActionsMixin",
+    "RailMixin",
+    "RailwayDataAccessor"
+  ]
+}
