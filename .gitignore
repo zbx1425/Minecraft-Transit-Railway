@@ -47,9 +47,9 @@ common/src/main/resources/data/minecraft/
 common/src/main/resources/data/mtr/
 common/src/main/resources/assets/mtrsteamloco/
 fabric/src/main/resources
-forge/src/main/resources
+neoforge/src/main/resources
 fabric/server
-forge/server
+neoforge/server
 
 .architectury-transformer/
 

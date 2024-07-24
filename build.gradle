@@ -102,7 +102,7 @@ tasks.register("setupFiles") {
 	delete fileTree("common/src/main/resources/data/mtr/loot_tables")
 	delete fileTree("common/src/main/resources/data/mtr/recipes")
 	delete fileTree("fabric/src/main/resources")
-	delete fileTree("forge/src/main/resources")
+	delete fileTree("neoforge/src/main/resources")
 	copy {
 		outputs.upToDateWhen { false }
 		from "resources/common/lifts"
@@ -135,7 +135,7 @@ tasks.register("setupFiles") {
 	copy {
 		outputs.upToDateWhen { false }
 		from "resources/forge/" + (rootProject.variation == "lifts" ? "lifts" : "normal")
-		into "forge/src/main/resources"
+		into "neoforge/src/main/resources"
 	}
 
 /*
@@ -289,7 +289,7 @@ class DummyArchiveTask extends AbstractArchiveTask {
 task dummyForgeOutput(type: DummyArchiveTask) {
 	// This is to make github.com/teaconmc/longjing happy.
 	destinationDirectory = file("build/release/")
-	archiveBaseName = "NeoMTR-forge"
+	archiveBaseName = "NeoMTR-neoforge"
 	archiveVersion = rootProject.mod_version + "+" + minecraft_version
 	archiveExtension = "jar"
 }

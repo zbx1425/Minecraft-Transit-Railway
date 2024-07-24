@@ -87,7 +87,7 @@ remapJar {
 	dependsOn shadowJar
 	archiveClassifier = null
 
-	atAccessWideners.add "mtrsteamloco.accessWidener"
+	atAccessWideners.add "mtrsteamloco.accesswidener"
 }
 
 components.java {
@@ -99,13 +99,13 @@ components.java {
 tasks.register("moveForgeBuilds") {
 	doLast {
 		delete fileTree("../build/release").matching {
-			include "**/${rootProject.variation_header}-forge*"
+			include "**/${rootProject.variation_header}-neoforge*"
 		}
 		delete fileTree("../build/libs").matching {
-			include "**/${rootProject.variation_header}-forge*"
+			include "**/${rootProject.variation_header}-neoforge*"
 		}
 		delete fileTree("../build/latest").matching {
-			include "**/${rootProject.variation_header}-forge*"
+			include "**/${rootProject.variation_header}-neoforge*"
 		}
 		copy {
 			from "build/libs"
