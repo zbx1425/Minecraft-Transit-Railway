@@ -2,7 +2,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.apache.tools.ant.taskdefs.condition.Os
 
 loom {
-
+	accessWidenerPath = project(":common").loom.accessWidenerPath
 }
 
 architectury {
@@ -13,6 +13,7 @@ architectury {
 configurations {
 	common
 	shadowCommon
+	clothConfigJar
 	compileClasspath.extendsFrom common
 	runtimeClasspath.extendsFrom common
 	developmentNeoForge.extendsFrom common
@@ -32,6 +33,13 @@ dependencies {
 	forgeRuntimeLibrary "javax.servlet:javax.servlet-api:+"
 	forgeRuntimeLibrary "org.msgpack:msgpack-core:+"
 
+	forgeRuntimeLibrary project(":rhino")
+
+	modApi("me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}") { transitive false }
+	modApi("me.shedaniel.cloth:basic-math:0.6.1") { transitive false }
+	clothConfigJar("me.shedaniel.cloth:cloth-config-neoforge:${rootProject.cloth_config_version}") { transitive = false }
+	clothConfigJar("me.shedaniel.cloth:basic-math:0.6.1") { transitive false }
+
 	common(project(path: ":common", configuration: "namedElements")) { transitive false }
 	shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
@@ -46,6 +54,23 @@ processResources {
 
 shadowJar {
 	exclude "fabric.mod.json"
+	exclude "*.bmp"
+
+	relocate 'de.javagl', 'vendor.cn.zbx1425.sowcerext.de.javagl'
+
+
+	from project.configurations.clothConfigJar.files.collect {
+		return zipTree(it).matching { filter ->
+			filter.include { e ->
+				matchInnerClass e.path as String,
+						"me/shedaniel/clothconfig2",
+						"me/shedaniel/math",
+						"assets/cloth-config2"
+			}
+		}
+	}
+
+	relocate "me.shedaniel", "cn.zbx1425.mtrsteamloco.vendor.me.shedaniel"
 
 	configurations = [project.configurations.shadowCommon]
 	archiveClassifier = "dev-shadow"
@@ -53,10 +78,16 @@ shadowJar {
 	relocate "org.eclipse", "mtr.libraries.org.eclipse"
 }
 
+static boolean matchInnerClass(String path, String... names) {
+	names.any { name -> path.startsWith(name) }
+}
+
 remapJar {
 	input.set shadowJar.archiveFile
 	dependsOn shadowJar
 	archiveClassifier = null
+
+	atAccessWideners.add "mtrsteamloco.accessWidener"
 }
 
 components.java {

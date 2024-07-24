@@ -36,7 +36,6 @@ Keys.java
 BlockEntityExtension.java
 RandomSource.java
 UnknownPacketMixin.java
-LevelRendererMixin.java
 **/lang/*.json
 !en_us.json
 
@@ -46,6 +45,7 @@ common/src/main/resources/assets/mtr/website/
 common/src/main/resources/assets/mtr/sounds.json
 common/src/main/resources/data/minecraft/
 common/src/main/resources/data/mtr/
+common/src/main/resources/assets/mtrsteamloco/
 fabric/src/main/resources
 forge/src/main/resources
 fabric/server

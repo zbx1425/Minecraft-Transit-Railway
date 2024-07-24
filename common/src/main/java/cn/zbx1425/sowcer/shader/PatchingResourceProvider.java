@@ -58,12 +58,14 @@ public class PatchingResourceProvider implements ResourceProvider {
                 JsonObject data = Main.JSON_PARSER.parse(srcContent).getAsJsonObject();
                 data.addProperty("vertex", data.get("vertex").getAsString() + "_modelmat");
 
-                JsonArray attribArray = data.get("attributes").getAsJsonArray();
-                int dummyAttribCount = 6 - attribArray.size();
-                for (int i = 0; i < dummyAttribCount; i++) {
-                    attribArray.add("Dummy" + i);
+                if (data.has("attributes")) {
+                    JsonArray attribArray = data.get("attributes").getAsJsonArray();
+                    int dummyAttribCount = 6 - attribArray.size();
+                    for (int i = 0; i < dummyAttribCount; i++) {
+                        attribArray.add("Dummy" + i);
+                    }
+                    attribArray.add("ModelMat");
                 }
-                attribArray.add("ModelMat");
                 returningContent = data.toString();
                 srcInputStream.close();
             } else if (resourceLocation.getPath().endsWith(".vsh")) {

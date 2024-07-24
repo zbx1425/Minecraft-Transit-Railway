@@ -58,7 +58,6 @@ public class EyeCandyScreen extends SelectListScreen {
 #else
     public void render(@NotNull PoseStack guiGraphics, int i, int j, float f) {
 #endif
-        this.renderBackground(guiGraphics);
         super.render(guiGraphics, i, j, f);
 
         if (isSelectingModel) {

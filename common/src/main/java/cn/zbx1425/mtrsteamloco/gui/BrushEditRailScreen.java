@@ -278,7 +278,6 @@ public class BrushEditRailScreen extends SelectListScreen {
 #else
     public void render(PoseStack guiGraphics, int mouseX, int mouseY, float partialTick) {
 #endif
-        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (isSelectingModel) {
