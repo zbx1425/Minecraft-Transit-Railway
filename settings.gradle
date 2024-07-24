@@ -11,4 +11,6 @@ include("common")
 include("fabric")
 include("forge")
 
+include("rhino")
+
 rootProject.name = "Minecraft-Transit-Railway"

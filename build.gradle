@@ -23,7 +23,7 @@ architectury {
 	minecraft = minecraft_version
 }
 
-subprojects {
+configure(subprojects.findAll {it.name != 'rhino'}) {
 	apply plugin: "dev.architectury.loom"
 	apply plugin: "com.github.johnrengelman.shadow"
 
@@ -69,6 +69,9 @@ subprojects {
 		shadowCommon "org.eclipse.jetty:jetty-util-ajax:9.+"
 		shadowCommon "javax.servlet:javax.servlet-api:+"
 		shadowCommon "org.msgpack:msgpack-core:+"
+
+		implementation project(":rhino")
+		shadowCommon project(":rhino")
 	}
 }
 
@@ -201,7 +204,7 @@ tasks.register("setupFiles") {
 	}
 }
 
-allprojects {
+configure(allprojects.findAll {it.name != 'rhino'}) {
 	apply plugin: "architectury-plugin"
 
 	version = rootProject.mod_version + "+" + minecraft_version
@@ -218,6 +221,11 @@ allprojects {
 		flatDir {
 			dirs "../libs"
 		}
+	}
+
+	tasks.withType(JavaCompile) {
+		options.encoding = "UTF-8"
+		options.compilerArgs += ['-Xplugin:Manifold', '-AMC_VERSION=' + rootProject.minecraft_version_int]
 	}
 
 	afterEvaluate {
