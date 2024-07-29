@@ -14,17 +14,17 @@ public class NoopTrainRenderer extends TrainRendererBase {
     }
 
     @Override
-    public void renderCar(int i, double v, double v1, double v2, float v3, float v4, boolean b, boolean b1) {
+    public void renderCar(int i, double v, double v1, double v2, float v3, float v4, float roll, boolean b, boolean b1) {
 
     }
 
     @Override
-    public void renderConnection(Vec3 vec3, Vec3 vec31, Vec3 vec32, Vec3 vec33, Vec3 vec34, Vec3 vec35, Vec3 vec36, Vec3 vec37, double v, double v1, double v2, float v3, float v4) {
+    public void renderConnection(Vec3 vec3, Vec3 vec31, Vec3 vec32, Vec3 vec33, Vec3 vec34, Vec3 vec35, Vec3 vec36, Vec3 vec37, double v, double v1, double v2, float v3, float v4, float roll) {
 
     }
 
     @Override
-    public void renderBarrier(Vec3 vec3, Vec3 vec31, Vec3 vec32, Vec3 vec33, Vec3 vec34, Vec3 vec35, Vec3 vec36, Vec3 vec37, double v, double v1, double v2, float v3, float v4) {
+    public void renderBarrier(Vec3 vec3, Vec3 vec31, Vec3 vec32, Vec3 vec33, Vec3 vec34, Vec3 vec35, Vec3 vec36, Vec3 vec37, double v, double v1, double v2, float v3, float v4, float roll) {
 
     }
 }

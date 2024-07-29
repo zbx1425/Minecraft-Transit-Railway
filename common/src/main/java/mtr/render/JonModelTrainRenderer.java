@@ -65,7 +65,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 	}
 
 	@Override
-	public void renderCar(int carIndex, double x, double y, double z, float yaw, float pitch, boolean doorLeftOpen, boolean doorRightOpen) {
+	public void renderCar(int carIndex, double x, double y, double z, float yaw, float pitch, float roll, boolean doorLeftOpen, boolean doorRightOpen) {
 		final float doorLeftValue = doorLeftOpen ? train.getDoorValue() : 0;
 		final float doorRightValue = doorRightOpen ? train.getDoorValue() : 0;
 		final boolean atPlatform = train.path.get(train.getIndex(0, train.spacing, true)).dwellTime > 0;
@@ -87,6 +87,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 		matrices.translate(x, y, z);
 		UtilitiesClient.rotateY(matrices, (float) Math.PI + yaw);
 		UtilitiesClient.rotateX(matrices, (float) Math.PI + (hasPitch ? pitch : 0));
+		UtilitiesClient.rotateZ(matrices, roll);
 
 		final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
 
@@ -143,7 +144,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 	}
 
 	@Override
-	public void renderConnection(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch) {
+	public void renderConnection(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch, float roll) {
 		final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
 		if (posAverage == null) {
 			return;
@@ -174,6 +175,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 			matrices.translate(x, y, z);
 			UtilitiesClient.rotateY(matrices, (float) Math.PI + yaw);
 			UtilitiesClient.rotateX(matrices, (float) Math.PI + ((pitch < 0 ? train.transportMode.hasPitchAscending : train.transportMode.hasPitchDescending) ? pitch : 0));
+			UtilitiesClient.rotateZ(matrices, roll);
 			MODEL_BOGIE.render(matrices, vertexConsumers, light, 0);
 			matrices.popPose();
 		}
@@ -182,7 +184,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 	}
 
 	@Override
-	public void renderBarrier(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch) {
+	public void renderBarrier(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch, float roll) {
 		if (StringUtils.isEmpty(trainBarrierId)) {
 			return;
 		}

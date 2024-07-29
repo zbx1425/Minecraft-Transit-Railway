@@ -43,11 +43,11 @@ public abstract class TrainRendererBase {
 
 	public abstract TrainRendererBase createTrainInstance(TrainClient train);
 
-	public abstract void renderCar(int carIndex, double x, double y, double z, float yaw, float pitch, boolean doorLeftOpen, boolean doorRightOpen);
+	public abstract void renderCar(int carIndex, double x, double y, double z, float yaw, float pitch, float roll, boolean doorLeftOpen, boolean doorRightOpen);
 
-	public abstract void renderConnection(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch);
+	public abstract void renderConnection(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch, float roll);
 
-	public abstract void renderBarrier(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch);
+	public abstract void renderBarrier(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch, float roll);
 
 	public static void renderRidingPlayer(Vec3 viewOffset, UUID playerId, Vec3 playerPositionOffset) {
 		final BlockPos posAverage = applyAverageTransform(viewOffset, playerPositionOffset.x, playerPositionOffset.y, playerPositionOffset.z);
@@ -57,6 +57,10 @@ public abstract class TrainRendererBase {
 		matrices.translate(0, RenderTrains.PLAYER_RENDER_OFFSET, 0);
 		final Player renderPlayer = world.getPlayerByUUID(playerId);
 		if (renderPlayer != null && (!playerId.equals(player.getUUID()) || camera.isDetached())) {
+			// Maybe this can stop the player from appearing moving and cape from flapping
+			renderPlayer.walkDist = renderPlayer.walkDistO;
+			renderPlayer.walkAnimation.setSpeed(0);
+
 			entityRenderDispatcher.render(renderPlayer, playerPositionOffset.x, playerPositionOffset.y, playerPositionOffset.z, 0, 1, matrices, vertexConsumers, 0xF000F0);
 		}
 		matrices.popPose();
