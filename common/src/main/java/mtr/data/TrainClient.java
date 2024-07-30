@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TrainClient extends Train implements IGui {
 
@@ -54,10 +53,6 @@ public class TrainClient extends Train implements IGui {
 	private static final float CONNECTION_Z_OFFSET = 0.5F;
 	private static final float CONNECTION_X_OFFSET = 0.25F;
 
-	private final LowPassNoise irregX = new LowPassNoise(50, 0.003184857);
-	private final LowPassNoise irregY = new LowPassNoise(50, 0.001990536);
-	private final LowPassNoise irregR = new LowPassNoise(50, 0.001254038);
-
 	public TrainClient(FriendlyByteBuf packet) {
 		super(packet);
 		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
@@ -68,8 +63,8 @@ public class TrainClient extends Train implements IGui {
 	@Override
 	protected void simulateCar(
 			Level world, int ridingCar, float ticksElapsed,
-			double carX, double carY, double carZ, float carYaw, float carPitch,
-			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch,
+			double carX, double carY, double carZ, float carYaw, float carPitch, float carRoll,
+			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch, float prevCarRoll,
 			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
 	) {
 		final LocalPlayer clientPlayer = Minecraft.getInstance().player;
@@ -89,8 +84,8 @@ public class TrainClient extends Train implements IGui {
 		final double newZ = carZ - offset.z;
 
 		doorOpening = doorValue > oldDoorValue;
-		trainRenderer.renderCar(ridingCar, newX, newY, newZ, carYaw, carPitch, doorLeftOpen, doorRightOpen);
-		trainTranslucentRenders.add(() -> trainRenderer.renderCar(ridingCar, newX, newY, newZ, carYaw, carPitch, doorLeftOpen, doorRightOpen));
+		trainRenderer.renderCar(ridingCar, newX, newY, newZ, carYaw, carPitch, carRoll, doorLeftOpen, doorRightOpen);
+		trainTranslucentRenders.add(() -> trainRenderer.renderCar(ridingCar, newX, newY, newZ, carYaw, carPitch, carRoll, doorLeftOpen, doorRightOpen));
 
 		if (ridingCar > 0) {
 			final double newPrevCarX = prevCarX - offset.x;
@@ -103,11 +98,13 @@ public class TrainClient extends Train implements IGui {
 			final float connectYaw = (float) Mth.atan2(thisPos0.x - prevPos0.x, thisPos0.z - prevPos0.z);
 			final double connectRealSpacing = thisPos0.distanceTo(prevPos0);
 			final float connectPitch = (float) asin((thisPos0.y - prevPos0.y) / connectRealSpacing);
+			final float connectRoll = (carRoll + prevCarRoll) / 2;
 
 			for (int i = 0; i < 2; i++) {
 				final double xStart = width / 2D + (i == 0 ? -1 : 0.5) * CONNECTION_X_OFFSET;
 				final double zStart = spacing / 2D - (i == 0 ? 1 : 2) * CONNECTION_Z_OFFSET;
 
+				final float SMALL_OFFSET = 0.02f;
 				final Vec3 prevPos1 = new Vec3(xStart, SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
 				final Vec3 prevPos2 = new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
 				final Vec3 prevPos3 = new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
@@ -119,9 +116,9 @@ public class TrainClient extends Train implements IGui {
 				final Vec3 thisPos4 = new Vec3(xStart, SMALL_OFFSET, -zStart).xRot(carPitch).yRot(carYaw).add(newX, newY, newZ);
 
 				if (i == 0) {
-					trainRenderer.renderConnection(prevPos1, prevPos2, prevPos3, prevPos4, thisPos1, thisPos2, thisPos3, thisPos4, connectPos.x, connectPos.y, connectPos.z, connectYaw, connectPitch);
+					trainRenderer.renderConnection(prevPos1, prevPos2, prevPos3, prevPos4, thisPos1, thisPos2, thisPos3, thisPos4, connectPos.x, connectPos.y, connectPos.z, connectYaw, connectPitch, connectRoll);
 				} else {
-					trainRenderer.renderBarrier(prevPos1, prevPos2, prevPos3, prevPos4, thisPos1, thisPos2, thisPos3, thisPos4, connectPos.x, connectPos.y, connectPos.z, connectYaw, connectPitch);
+					trainRenderer.renderBarrier(prevPos1, prevPos2, prevPos3, prevPos4, thisPos1, thisPos2, thisPos3, thisPos4, connectPos.x, connectPos.y, connectPos.z, connectYaw, connectPitch, connectRoll);
 				}
 			}
 		}
@@ -160,7 +157,7 @@ public class TrainClient extends Train implements IGui {
 
 			final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
 			vehicleRidingClient.movePlayer(uuid -> {
-				final CalculateCarCallback calculateCarCallback = (x, y, z, yaw, pitch, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> vehicleRidingClient.setOffsets(uuid, x, y, z, yaw, pitch, transportMode.maxLength == 1 ? spacing : realSpacingRender, width, doorLeftOpenRender, doorRightOpenRender, transportMode.hasPitchAscending, transportMode.hasPitchDescending, trainProperties.riderOffset, trainProperties.riderOffsetDismounting, speed > 0, doorValue == 0, () -> {
+				final CalculateCarCallback calculateCarCallback = (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> vehicleRidingClient.setOffsets(uuid, x, y, z, yaw, pitch, transportMode.maxLength == 1 ? spacing : realSpacingRender, width, doorLeftOpenRender, doorRightOpenRender, transportMode.hasPitchAscending, transportMode.hasPitchDescending, trainProperties.riderOffset, trainProperties.riderOffsetDismounting, speed > 0, doorValue == 0, () -> {
 					final boolean isShifting = clientPlayer.isShiftKeyDown();
 					if (Config.shiftToToggleSitting() && !MTRClient.isVivecraft()) {
 						if (isShifting && !previousShifting) {
@@ -171,13 +168,13 @@ public class TrainClient extends Train implements IGui {
 					previousShifting = isShifting;
 				});
 
-				final int currentRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, positions.length - 2);
-				calculateCar(world, positions, currentRidingCar, 0, (x, y, z, yaw, pitch, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
+				final int currentRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
+				calculateCar(world, positions, currentRidingCar, 0, (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
 					vehicleRidingClient.moveSelf(id, uuid, realSpacingRender, width, yaw, currentRidingCar, trainCars, doorLeftOpenRender, doorRightOpenRender, !trainProperties.hasGangwayConnection, ticksElapsed);
 
-					final int newRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, positions.length - 2);
+					final int newRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
 					if (currentRidingCar == newRidingCar) {
-						calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, realSpacingRender, doorLeftOpenRender, doorRightOpenRender);
+						calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender);
 					} else {
 						calculateCar(world, positions, newRidingCar, 0, calculateCarCallback);
 					}
@@ -194,33 +191,33 @@ public class TrainClient extends Train implements IGui {
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		int nearestCar = 0;
 		for (int i = 0; i < trainCars; i++) {
-			Vec3 v = positions[i + 1].subtract(positions[i]);
-			Vec3 w = cameraPos.subtract(positions[i]);
+			Vec3 v = positions[i * 2 + 1].subtract(positions[i * 2]);
+			Vec3 w = cameraPos.subtract(positions[i * 2]);
 
 			double c1 = w.dot(v);
 			if ( c1 <= 0 ) {
-				final double checkDistance = positions[i].distanceToSqr(cameraPos);
+				final double checkDistance = positions[i * 2].distanceToSqr(cameraPos);
 				if (checkDistance < nearestDistance) {
 					nearestCar = i;
 					nearestDistance = checkDistance;
-					nearestPoint = positions[i];
+					nearestPoint = positions[i * 2];
 				}
 				continue;
 			}
 
 			double c2 = v.dot(v);
 			if ( c2 <= c1 ) {
-				final double checkDistance = positions[i + 1].distanceToSqr(cameraPos);
+				final double checkDistance = positions[i * 2 + 1].distanceToSqr(cameraPos);
 				if (checkDistance < nearestDistance) {
 					nearestCar = i;
 					nearestDistance = checkDistance;
-					nearestPoint = positions[i + 1];
+					nearestPoint = positions[i * 2 + 1];
 				}
 				continue;
 			}
 
 			double b = c1 / c2;
-			Vec3 Pb = positions[i].add(v.scale(b));
+			Vec3 Pb = positions[i * 2].add(v.scale(b));
 			final double checkDistance = Pb.distanceToSqr(cameraPos);
 			if (checkDistance < nearestDistance) {
 				nearestCar = i;
@@ -419,77 +416,5 @@ public class TrainClient extends Train implements IGui {
 	@FunctionalInterface
 	public interface AnnouncementCallback {
 		void announcementCallback(int stopIndex, List<Long> routeIds);
-	}
-
-	public static class LowPassNoise {
-
-		public double cutoffFreq = 50.0;
-		public double stdDev = 0.001;
-		private final Random random;
-		private double prevX = 0;
-		private int baseI;
-		private final double[] noiseValue1 = new double[400];
-		private final double[] noiseValue2 = new double[400];
-
-		public LowPassNoise() {
-			random = new Random();
-			resetBuffer();
-		}
-
-		public LowPassNoise(double cutoffFreq, double stdDev) {
-			this();
-			this.cutoffFreq = cutoffFreq;
-			this.stdDev = stdDev;
-		}
-
-		private void tick(double x) {
-			double deltaX = x - prevX;
-			prevX = x;
-			int prevBaseI = baseI;
-			baseI = (int)Math.ceil(x * 4.0);
-			if (deltaX == 0.0 || Math.abs(deltaX) >= 100.0) {
-				resetBuffer();
-				return;
-			}
-			if (deltaX < 0.0) {
-				int crntBase = (prevBaseI + 1) % 400;
-				for (int i = prevBaseI; i > baseI; i--) {
-					int crntTg = i % 400;
-					generateNoise(crntBase, crntTg);
-					crntBase = crntTg;
-				}
-			} else {
-				int crntBase = prevBaseI % 400;
-				for (int j = prevBaseI + 1; j <= baseI; j++) {
-					int crntTg = j % 400;
-					generateNoise(crntBase, crntTg);
-					crntBase = crntTg;
-				}
-			}
-		}
-
-		private void resetBuffer() {
-			for (int i = 0; i < 400; i++) {
-				noiseValue1[i] = 0.0;
-				noiseValue2[i] = 0.0;
-			}
-		}
-
-		private void generateNoise(int baseI, int tgI) {
-			double omega = Mth.TWO_PI / cutoffFreq;
-			double k = 1.0 - Math.exp(-omega / 4.0);
-			double normalNoise = stdDev * Math.sqrt(-2.0 * Math.log(random.nextDouble())) * Mth.cos(Mth.TWO_PI * random.nextFloat());
-			noiseValue1[tgI] = noiseValue1[baseI] + (normalNoise / omega - noiseValue1[baseI]) * k;
-			noiseValue2[tgI] = noiseValue2[baseI] + (noiseValue1[tgI] / omega - noiseValue2[baseI]) * k;
-		}
-
-		public double getAt(double x) {
-			double reqX = x * 4.0;
-			int reqXFloor = (int)Math.floor(reqX);
-			double interpolateRatio = reqX - (double)reqXFloor;
-			int prevEntry = (reqXFloor + 400) % 400;
-			int nextEntry = (reqXFloor + 400 + 1) % 400;
-			return (1.0 - interpolateRatio) * noiseValue2[prevEntry] + interpolateRatio * noiseValue2[nextEntry];
-		}
 	}
 }

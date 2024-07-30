@@ -530,27 +530,41 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 			}
 
 			if (!path.isEmpty()) {
-				final Vec3[] positions = new Vec3[trainCars + 1];
-				for (int i = 0; i <= trainCars; i++) {
-					positions[i] = getRoutePosition(reversed ? trainCars - i : i, spacing);
+				final Vec3[] positions = new Vec3[trainCars * 2];
+				for (int i = 0; i < trainCars; i++) {
+					double centerOffset = i * spacing + spacing / 2.0;
+					centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
+//					double bogiePosition = getBogiePosition() == 0 ? spacing / 2.0 : getBogiePosition();
+					double bogiePosition = 3;
+					double bogieFOffset = reversed ? centerOffset + bogiePosition : centerOffset - bogiePosition;
+					double bogieBOffset = reversed ? centerOffset - bogiePosition : centerOffset + bogiePosition;
+//					if (getIsJacobsBogie() && i != 0) bogieFOffset = centerOffset - spacing / 2.0;
+//					if (getIsJacobsBogie() && i != trainCars - 1) bogieBOffset = centerOffset + spacing / 2.0;
+					positions[i * 2] = getRoutePosition(bogieFOffset);
+					positions[i * 2 + 1] = getRoutePosition(bogieBOffset);
 				}
 
 				if (handlePositions(world, positions, ticksElapsed)) {
+					irregX.tick(railProgress);
+					irregY.tick(railProgress);
+					irregR.tick(railProgress);
+
 					final double[] prevX = {0};
 					final double[] prevY = {0};
 					final double[] prevZ = {0};
 					final float[] prevYaw = {0};
 					final float[] prevPitch = {0};
+					final float[] prevRoll = {0};
 
 					for (int i = 0; i < trainCars; i++) {
 						final int ridingCar = i;
-						calculateCar(world, positions, i, totalDwellTicks, (x, y, z, yaw, pitch, realSpacing, doorLeftOpen, doorRightOpen) -> {
+						calculateCar(world, positions, i, totalDwellTicks, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
 							simulateCar(
 									world, ridingCar, ticksElapsed,
 									x, y, z,
-									yaw, pitch,
+									yaw, pitch, roll,
 									prevX[0], prevY[0], prevZ[0],
-									prevYaw[0], prevPitch[0],
+									prevYaw[0], prevPitch[0], prevRoll[0],
 									doorLeftOpen, doorRightOpen, realSpacing
 							);
 							prevX[0] = x;
@@ -558,6 +572,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 							prevZ[0] = z;
 							prevYaw[0] = yaw;
 							prevPitch[0] = pitch;
+							prevRoll[0] = roll;
 						});
 					}
 				}
@@ -567,22 +582,42 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		}
 	}
 
+	private final LowPassNoise irregX = new LowPassNoise(30, 0.0100);
+	private final LowPassNoise irregY = new LowPassNoise(30, 0.0050);
+	private final LowPassNoise irregR = new LowPassNoise(30, 0.0035);
+
 	protected final void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
-		final Vec3 pos1 = positions[index];
-		final Vec3 pos2 = positions[index + 1];
+		final Vec3 pos1 = positions[index * 2];
+		final Vec3 pos2 = positions[index * 2 + 1];
 
 		if (pos1 != null && pos2 != null) {
-			final double x = getAverage(pos1.x, pos2.x);
-			final double y = getAverage(pos1.y, pos2.y) + 1;
-			final double z = getAverage(pos1.z, pos2.z);
+			double centerOffset = index * spacing + spacing / 2.0;
+			centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
+			double bogiePosition = getBogiePosition() == 0 ? spacing / 2.0 : getBogiePosition();
+			double bogieFOffset = centerOffset - bogiePosition;
+			double bogieBOffset = centerOffset + bogiePosition;
+			if (getIsJacobsBogie() && index != 0) bogieFOffset = centerOffset - spacing / 2.0;
+			if (getIsJacobsBogie() && index != trainCars - 1) bogieBOffset = centerOffset + spacing / 2.0;
+
+			final float irregRatio = Mth.clamp(speed / (5.56f * 0.05f), 0, 1);
+
+			final float roll = (float)(irregR.getAt(railProgress - bogieFOffset) + irregR.getAt(railProgress - bogieBOffset)) / 2 * irregRatio;
+
+			double irregY1 = irregY.getAt(railProgress - bogieFOffset) * irregRatio, irregY2 = irregY.getAt(railProgress - bogieBOffset) * irregRatio;
+			final float yaw = (float) Mth.atan2(pos2.x - pos1.x, pos2.z - pos1.z);
+			final Vec3 latIrreg = new Vec3((irregX.getAt(railProgress - bogieFOffset) + irregX.getAt(railProgress - bogieBOffset)) / 2 * irregRatio, 0, 0)
+					.yRot(yaw);
+
+			final double x = getAverage(pos1.x, pos2.x) + latIrreg.x;
+			final double y = getAverage(pos1.y + irregY1, pos2.y + irregY2) + 1;
+			final double z = getAverage(pos1.z, pos2.z) + latIrreg.z;
 
 			final double realSpacing = pos2.distanceTo(pos1);
-			final float yaw = (float) Mth.atan2(pos2.x - pos1.x, pos2.z - pos1.z);
-			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y - pos1.y) / realSpacing);
+			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y + irregY2 - pos1.y - irregY1) / realSpacing);
 			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
 			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
 
-			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, realSpacing, doorLeftOpen, doorRightOpen);
+			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen);
 		}
 	}
 
@@ -600,14 +635,22 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		return 0;
 	}
 
+	protected float getBogiePosition() {
+		return 0;
+	}
+
+	protected boolean getIsJacobsBogie() {
+		return false;
+	}
+
 	protected boolean isRepeat() {
 		return repeatIndex1 > 0 && repeatIndex2 > 0;
 	}
 
 	protected abstract void simulateCar(
 			Level world, int ridingCar, float ticksElapsed,
-			double carX, double carY, double carZ, float carYaw, float carPitch,
-			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch,
+			double carX, double carY, double carZ, float carYaw, float carPitch, float carRoll,
+			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch, float prevCarRoll,
 			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
 	);
 
@@ -631,8 +674,8 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		return railProgress - car * trainSpacing;
 	}
 
-	private Vec3 getRoutePosition(int car, int trainSpacing) {
-		final double tempRailProgress = Math.max(getRailProgress(car, trainSpacing) - getModelZOffset(), 0);
+	private Vec3 getRoutePosition(double offset) {
+		final double tempRailProgress = Math.max(railProgress - offset - getModelZOffset(), 0);
 		final int index = getIndex(tempRailProgress, false);
 		return path.get(index).rail.getPosition(tempRailProgress - (index == 0 ? 0 : distances.get(index - 1))).add(0, transportMode.railOffset, 0);
 	}
@@ -683,6 +726,6 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 	@FunctionalInterface
 	protected interface CalculateCarCallback {
-		void calculateCarCallback(double x, double y, double z, float yaw, float pitch, double realSpacing, boolean doorLeftOpen, boolean doorRightOpen);
+		void calculateCarCallback(double x, double y, double z, float yaw, float pitch, float roll, double realSpacing, boolean doorLeftOpen, boolean doorRightOpen);
 	}
 }

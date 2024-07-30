@@ -106,8 +106,8 @@ public class TrainServer extends Train {
 	@Override
 	protected void simulateCar(
 			Level world, int ridingCar, float ticksElapsed,
-			double carX, double carY, double carZ, float carYaw, float carPitch,
-			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch,
+			double carX, double carY, double carZ, float carYaw, float carPitch, float carRoll,
+			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch, float prevCarRoll,
 			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
 	) {
 		VehicleRidingServer.mountRider(world, ridingEntities, id, routeId, carX, carY, carZ, realSpacing, width, carYaw, carPitch, doorLeftOpen || doorRightOpen, isManualAllowed || doorLeftOpen || doorRightOpen, ridingCar, PACKET_UPDATE_TRAIN_PASSENGERS, player -> !isManualAllowed || doorLeftOpen || doorRightOpen || Train.isHoldingKey(player), player -> {
@@ -119,6 +119,7 @@ public class TrainServer extends Train {
 
 	@Override
 	protected boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed) {
+
 		final AABB trainAABB = new AABB(positions[0], positions[positions.length - 1]).inflate(TRAIN_UPDATE_DISTANCE);
 		final boolean[] playerNearby = {false};
 		world.players().forEach(player -> {
@@ -131,7 +132,7 @@ public class TrainServer extends Train {
 			}
 		});
 
-		final BlockPos frontPos = RailwayData.newBlockPos(positions[reversed ? positions.length - 1 : 0]);
+		final BlockPos frontPos = RailwayData.newBlockPos(reversed ? positions[positions.length - 1] : positions[0]);
 		if (RailwayData.chunkLoaded(world, frontPos)) {
 			checkBlock(frontPos, checkPos -> {
 				if (RailwayData.chunkLoaded(world, checkPos)) {
