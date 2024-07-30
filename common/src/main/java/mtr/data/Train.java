@@ -534,21 +534,17 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 				for (int i = 0; i < trainCars; i++) {
 					double centerOffset = i * spacing + spacing / 2.0;
 					centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
-//					double bogiePosition = getBogiePosition() == 0 ? spacing / 2.0 : getBogiePosition();
-					double bogiePosition = 3;
-					double bogieFOffset = reversed ? centerOffset + bogiePosition : centerOffset - bogiePosition;
-					double bogieBOffset = reversed ? centerOffset - bogiePosition : centerOffset + bogiePosition;
-//					if (getIsJacobsBogie() && i != 0) bogieFOffset = centerOffset - spacing / 2.0;
-//					if (getIsJacobsBogie() && i != trainCars - 1) bogieBOffset = centerOffset + spacing / 2.0;
+					double bogiePosition = (getBogiePosition() == 0 || getIsJacobsBogie()) ? (spacing - 1) / 2.0 : getBogiePosition();
+					double kr = reversed ? -1 : 1;
+					double bogieFOffset = centerOffset - kr * bogiePosition;
+					double bogieBOffset = centerOffset + kr * bogiePosition;
+//					if (getIsJacobsBogie() && i != 0) bogieFOffset = centerOffset - kr * spacing / 2.0;
+//					if (getIsJacobsBogie() && i != trainCars - 1) bogieBOffset = centerOffset + kr * spacing / 2.0;
 					positions[i * 2] = getRoutePosition(bogieFOffset);
 					positions[i * 2 + 1] = getRoutePosition(bogieBOffset);
 				}
 
 				if (handlePositions(world, positions, ticksElapsed)) {
-					irregX.tick(railProgress);
-					irregY.tick(railProgress);
-					irregR.tick(railProgress);
-
 					final double[] prevX = {0};
 					final double[] prevY = {0};
 					final double[] prevZ = {0};
@@ -582,42 +578,22 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		}
 	}
 
-	private final LowPassNoise irregX = new LowPassNoise(30, 0.0100);
-	private final LowPassNoise irregY = new LowPassNoise(30, 0.0050);
-	private final LowPassNoise irregR = new LowPassNoise(30, 0.0035);
-
-	protected final void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
+	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
 		final Vec3 pos1 = positions[index * 2];
 		final Vec3 pos2 = positions[index * 2 + 1];
 
 		if (pos1 != null && pos2 != null) {
-			double centerOffset = index * spacing + spacing / 2.0;
-			centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
-			double bogiePosition = getBogiePosition() == 0 ? spacing / 2.0 : getBogiePosition();
-			double bogieFOffset = centerOffset - bogiePosition;
-			double bogieBOffset = centerOffset + bogiePosition;
-			if (getIsJacobsBogie() && index != 0) bogieFOffset = centerOffset - spacing / 2.0;
-			if (getIsJacobsBogie() && index != trainCars - 1) bogieBOffset = centerOffset + spacing / 2.0;
+			final double x = getAverage(pos1.x, pos2.x);
+			final double y = getAverage(pos1.y, pos2.y) + 1;
+			final double z = getAverage(pos1.z, pos2.z);
 
-			final float irregRatio = Mth.clamp(speed / (5.56f * 0.05f), 0, 1);
-
-			final float roll = (float)(irregR.getAt(railProgress - bogieFOffset) + irregR.getAt(railProgress - bogieBOffset)) / 2 * irregRatio;
-
-			double irregY1 = irregY.getAt(railProgress - bogieFOffset) * irregRatio, irregY2 = irregY.getAt(railProgress - bogieBOffset) * irregRatio;
+			final double realSpacing = spacing;
 			final float yaw = (float) Mth.atan2(pos2.x - pos1.x, pos2.z - pos1.z);
-			final Vec3 latIrreg = new Vec3((irregX.getAt(railProgress - bogieFOffset) + irregX.getAt(railProgress - bogieBOffset)) / 2 * irregRatio, 0, 0)
-					.yRot(yaw);
-
-			final double x = getAverage(pos1.x, pos2.x) + latIrreg.x;
-			final double y = getAverage(pos1.y + irregY1, pos2.y + irregY2) + 1;
-			final double z = getAverage(pos1.z, pos2.z) + latIrreg.z;
-
-			final double realSpacing = pos2.distanceTo(pos1);
-			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y + irregY2 - pos1.y - irregY1) / realSpacing);
+			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y - pos1.y) / realSpacing);
 			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
 			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
 
-			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen);
+			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, 0, realSpacing, doorLeftOpen, doorRightOpen);
 		}
 	}
 
@@ -680,7 +656,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		return path.get(index).rail.getPosition(tempRailProgress - (index == 0 ? 0 : distances.get(index - 1))).add(0, transportMode.railOffset, 0);
 	}
 
-	private boolean scanDoors(Level world, double trainX, double trainY, double trainZ, float checkYaw, float pitch, double halfSpacing, int dwellTicks) {
+	protected boolean scanDoors(Level world, double trainX, double trainY, double trainZ, float checkYaw, float pitch, double halfSpacing, int dwellTicks) {
 		if (skipScanBlocks(world, trainX, trainY, trainZ)) {
 			return false;
 		}

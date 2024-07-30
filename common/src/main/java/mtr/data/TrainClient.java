@@ -231,6 +231,46 @@ public class TrainClient extends Train implements IGui {
 		return true;
 	}
 
+	private final LowPassNoise irregX = new LowPassNoise(30, 0.0100);
+	private final LowPassNoise irregY = new LowPassNoise(30, 0.0050);
+	private final LowPassNoise irregR = new LowPassNoise(30, 0.0035);
+
+	@Override
+	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
+		final Vec3 pos1 = positions[index * 2];
+		final Vec3 pos2 = positions[index * 2 + 1];
+
+		if (pos1 != null && pos2 != null) {
+			double centerOffset = index * spacing + spacing / 2.0;
+			centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
+			double bogiePosition = getBogiePosition() == 0 ? spacing / 2.0 : getBogiePosition();
+			double bogieFOffset = centerOffset - bogiePosition;
+			double bogieBOffset = centerOffset + bogiePosition;
+			if (getIsJacobsBogie() && index != 0) bogieFOffset = centerOffset - spacing / 2.0;
+			if (getIsJacobsBogie() && index != trainCars - 1) bogieBOffset = centerOffset + spacing / 2.0;
+
+			final float irregRatio = Mth.clamp(speed / (5.56f * 0.05f), 0, 1);
+
+			final float roll = (float)(irregR.getAt(railProgress - bogieFOffset) + irregR.getAt(railProgress - bogieBOffset)) / 2 * irregRatio;
+
+			double irregY1 = irregY.getAt(railProgress - bogieFOffset) * irregRatio, irregY2 = irregY.getAt(railProgress - bogieBOffset) * irregRatio;
+			final float yaw = (float) Mth.atan2(pos2.x - pos1.x, pos2.z - pos1.z);
+			final Vec3 latIrreg = new Vec3((irregX.getAt(railProgress - bogieFOffset) + irregX.getAt(railProgress - bogieBOffset)) / 2 * irregRatio, 0, 0)
+					.yRot(yaw);
+
+			final double x = getAverage(pos1.x, pos2.x) + latIrreg.x;
+			final double y = getAverage(pos1.y + irregY1, pos2.y + irregY2) + 1;
+			final double z = getAverage(pos1.z, pos2.z) + latIrreg.z;
+
+			final double realSpacing = spacing;
+			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y + irregY2 - pos1.y - irregY1) / realSpacing);
+			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
+			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
+
+			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen);
+		}
+	}
+
 	@Override
 	protected boolean canDeploy(Depot depot) {
 		return false;
@@ -306,10 +346,26 @@ public class TrainClient extends Train implements IGui {
 			}
 		}
 
+		irregX.tick(railProgress);
+		irregY.tick(railProgress);
+		irregR.tick(railProgress);
+
 		final LocalPlayer player = Minecraft.getInstance().player;
 		if (isManualAllowed && Train.isHoldingKey(player) && isPlayerRiding(player)) {
 			RenderDrivingOverlay.setData(manualNotch, this);
 		}
+	}
+
+	@Override
+	protected float getBogiePosition() {
+		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
+		return trainProperties.bogiePosition;
+	}
+
+	@Override
+	protected boolean getIsJacobsBogie() {
+		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
+		return trainProperties.isJacobsBogie;
 	}
 
 	public void renderTranslucent() {
