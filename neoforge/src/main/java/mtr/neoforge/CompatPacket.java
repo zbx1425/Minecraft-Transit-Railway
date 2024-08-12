@@ -34,17 +34,14 @@ public class CompatPacket {
     public final StreamCodec<ByteBuf, Payload> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public void encode(ByteBuf dest, Payload src) {
-            src.buffer.resetReaderIndex();
-            dest.writeInt(src.buffer.readableBytes());
-            dest.writeBytes(src.buffer);
+            dest.writeBytes(src.buffer, 0, src.buffer.writerIndex());
         }
 
         @Override
         public Payload decode(ByteBuf src) {
-            final int length = src.readInt();
-            FriendlyByteBuf result = new FriendlyByteBuf(src.readBytes(length));
-            result.resetReaderIndex();
-            return new Payload(result);
+            ByteBuf data = src.retainedDuplicate();
+            src.readerIndex(src.writerIndex());
+            return new Payload(new FriendlyByteBuf(data));
         }
     };
 }
