@@ -82,6 +82,9 @@ public class Main {
 			mtr.Registry.registerNetworkReceiver(PacketUpdateHoldingItem.PACKET_UPDATE_HOLDING_ITEM,
 					PacketUpdateHoldingItem::receiveUpdateC2S);
 
+			mtr.Registry.registerNetworkPacket(PacketVersionCheck.PACKET_VERSION_CHECK);
+			mtr.Registry.registerNetworkPacket(PacketScreen.PACKET_SHOW_SCREEN);
+
 			mtr.Registry.registerPlayerJoinEvent(PacketVersionCheck::sendVersionCheckS2C);
 		}
 	}

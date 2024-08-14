@@ -1,13 +1,16 @@
 package mtr;
 
+import mtr.client.ClientData;
 import mtr.data.Depot;
 import mtr.data.RailwayData;
 import mtr.data.Route;
 import mtr.data.Station;
 import mtr.mappings.BlockEntityMapper;
 import mtr.packet.IPacket;
+import mtr.packet.PacketTrainDataGuiClient;
 import mtr.packet.PacketTrainDataGuiServer;
 import mtr.servlet.Webserver;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -446,6 +449,48 @@ public class MTR implements IPacket {
 		Registry.registerNetworkReceiver(PACKET_UPDATE_ENTITY_SEAT_POSITION, PacketTrainDataGuiServer::receiveUpdateEntitySeatPassengerPosition);
 		Registry.registerNetworkReceiver(PACKET_DRIVE_TRAIN, PacketTrainDataGuiServer::receiveDriveTrainC2S);
 		Registry.registerNetworkReceiver(PACKET_PRESS_LIFT_BUTTON, PacketTrainDataGuiServer::receivePressLiftButtonC2S);
+
+		Registry.registerNetworkPacket(PACKET_VERSION_CHECK);
+		Registry.registerNetworkPacket(PACKET_CHUNK_S2C);
+		Registry.registerNetworkPacket(PACKET_OPEN_DASHBOARD_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_PIDS_CONFIG_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_ARRIVAL_PROJECTOR_CONFIG_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_RAILWAY_SIGN_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_TICKET_MACHINE_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_TRAIN_SENSOR_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_RESOURCE_PACK_CREATOR_SCREEN);
+		Registry.registerNetworkPacket(PACKET_ANNOUNCE);
+		Registry.registerNetworkPacket(PACKET_GENERATE_PATH);
+		Registry.registerNetworkPacket(PACKET_CREATE_RAIL);
+		Registry.registerNetworkPacket(PACKET_CREATE_SIGNAL);
+		Registry.registerNetworkPacket(PACKET_REMOVE_NODE);
+		Registry.registerNetworkPacket(PACKET_REMOVE_RAIL);
+		Registry.registerNetworkPacket(PACKET_REMOVE_SIGNALS);
+		Registry.registerNetworkPacket(PACKET_REMOVE_LIFT_FLOOR_TRACK);
+		Registry.registerNetworkPacket(PACKET_UPDATE_STATION);
+		Registry.registerNetworkPacket(PACKET_UPDATE_PLATFORM);
+		Registry.registerNetworkPacket(PACKET_UPDATE_SIDING);
+		Registry.registerNetworkPacket(PACKET_UPDATE_ROUTE);
+		Registry.registerNetworkPacket(PACKET_UPDATE_DEPOT);
+		Registry.registerNetworkPacket(PACKET_DELETE_STATION);
+		Registry.registerNetworkPacket(PACKET_DELETE_PLATFORM);
+		Registry.registerNetworkPacket(PACKET_DELETE_SIDING);
+		Registry.registerNetworkPacket(PACKET_DELETE_ROUTE);
+		Registry.registerNetworkPacket(PACKET_DELETE_DEPOT);
+		Registry.registerNetworkPacket(PACKET_UPDATE_LIFT);
+		Registry.registerNetworkPacket(PACKET_WRITE_RAILS);
+		Registry.registerNetworkPacket(PACKET_UPDATE_TRAINS);
+		Registry.registerNetworkPacket(PACKET_UPDATE_LIFTS);
+		Registry.registerNetworkPacket(PACKET_DELETE_TRAINS);
+		Registry.registerNetworkPacket(PACKET_DELETE_LIFTS);
+		Registry.registerNetworkPacket(PACKET_UPDATE_TRAIN_PASSENGERS);
+		Registry.registerNetworkPacket(PACKET_UPDATE_LIFT_PASSENGERS);
+		Registry.registerNetworkPacket(PACKET_UPDATE_TRAIN_PASSENGER_POSITION);
+		Registry.registerNetworkPacket(PACKET_UPDATE_LIFT_PASSENGER_POSITION);
+		Registry.registerNetworkPacket(PACKET_UPDATE_RAIL_ACTIONS);
+		Registry.registerNetworkPacket(PACKET_UPDATE_SCHEDULE);
+		Registry.registerNetworkPacket(PACKET_OPEN_LIFT_TRACK_FLOOR_SCREEN);
+		Registry.registerNetworkPacket(PACKET_OPEN_LIFT_CUSTOMIZATION_SCREEN);
 
 		Registry.registerTickEvent(minecraftServer -> {
 			minecraftServer.getAllLevels().forEach(serverWorld -> {

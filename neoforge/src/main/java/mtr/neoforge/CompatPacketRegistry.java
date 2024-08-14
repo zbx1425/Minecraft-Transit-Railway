@@ -18,6 +18,10 @@ public class CompatPacketRegistry {
     public HashMap<ResourceLocation, Consumer<FriendlyByteBuf>> packetsS2C = new HashMap<>();
     public HashMap<ResourceLocation, NetworkUtilities.PacketCallback> packetsC2S = new HashMap<>();
 
+    public void registerPacket(ResourceLocation resourceLocation) {
+        packets.computeIfAbsent(resourceLocation, CompatPacket::new);
+    }
+
     public void registerNetworkReceiverS2C(ResourceLocation resourceLocation, Consumer<FriendlyByteBuf> consumer) {
         packets.computeIfAbsent(resourceLocation, CompatPacket::new);
         packetsS2C.put(resourceLocation, consumer);

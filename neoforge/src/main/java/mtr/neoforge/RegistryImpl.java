@@ -46,6 +46,10 @@ public class RegistryImpl {
 		ForgeUtilities.registerCreativeModeTab(resourceLocation, item);
 	}
 
+	public static void registerNetworkPacket(ResourceLocation resourceLocation) {
+		MTRForge.PACKET_REGISTRY.registerPacket(resourceLocation);
+	}
+
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback packetCallback) {
 		MTRForge.PACKET_REGISTRY.registerNetworkReceiverC2S(resourceLocation, packetCallback);
 	}

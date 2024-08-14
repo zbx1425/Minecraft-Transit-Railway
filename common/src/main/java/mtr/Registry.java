@@ -48,6 +48,11 @@ public class Registry {
 	}
 
 	@ExpectPlatform
+	public static void registerNetworkPacket(ResourceLocation resourceLocation) {
+		throw new AssertionError();
+	}
+
+	@ExpectPlatform
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback packetCallback) {
 		throw new AssertionError();
 	}

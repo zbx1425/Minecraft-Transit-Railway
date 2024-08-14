@@ -48,6 +48,10 @@ public class RegistryImpl {
 		return new ClientboundAddEntityPacket(entity);
 	}
 
+	public static void registerNetworkPacket(ResourceLocation resourceLocation) {
+
+	}
+
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback packetCallback) {
 		ServerPlayNetworking.registerGlobalReceiver(resourceLocation, (server, player, handler, packet, responseSender) -> packetCallback.packetCallback(server, player, packet));
 	}
