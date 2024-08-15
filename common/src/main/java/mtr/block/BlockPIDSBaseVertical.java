@@ -50,10 +50,11 @@ public abstract class BlockPIDSBaseVertical extends BlockDirectionalDoubleBlockB
 
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
-		final BlockEntity blockEntity = createBlockEntity(new BlockPos(0, 0, 0), null);
-		if (blockEntity instanceof TileEntityPIDS) {
-			tooltip.add(Text.translatable("tooltip.mtr.arrivals", ((TileEntityPIDS) blockEntity).getMaxArrivals()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
-		}
+		// TODO Make it work (1.21.1 checks BlockEntityType at given BlockPos)
+//		final BlockEntity blockEntity = createBlockEntity(new BlockPos(0, 0, 0), null);
+//		if (blockEntity instanceof TileEntityPIDS) {
+//			tooltip.add(Text.translatable("tooltip.mtr.arrivals", ((TileEntityPIDS) blockEntity).getMaxArrivals()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
+//		}
 	}
 
 	@Override
