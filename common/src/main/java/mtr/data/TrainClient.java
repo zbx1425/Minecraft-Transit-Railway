@@ -73,9 +73,9 @@ public class TrainClient extends Train implements IGui {
 		}
 
 		final BlockPos soundPos = RailwayData.newBlockPos(carX, carY, carZ);
-		trainSound.playAllCars(world, soundPos, ridingCar);
+		if (ticksElapsed > 0) trainSound.playAllCars(world, soundPos, ridingCar);
 		if (doorLeftOpen || doorRightOpen) {
-			trainSound.playAllCarsDoorOpening(world, soundPos, ridingCar);
+			if (ticksElapsed > 0) trainSound.playAllCarsDoorOpening(world, soundPos, ridingCar);
 		}
 
 		final Vec3 offset = vehicleRidingClient.renderPlayerAndGetOffset();
@@ -226,7 +226,7 @@ public class TrainClient extends Train implements IGui {
 			}
 		}
 		final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
-		trainSound.playNearestCar(world, soundPos, nearestCar);
+		if (ticksElapsed > 0) trainSound.playNearestCar(world, soundPos, nearestCar);
 
 		return true;
 	}
@@ -312,9 +312,11 @@ public class TrainClient extends Train implements IGui {
 		this.speedCallback = speedCallback;
 		this.announcementCallback = announcementCallback;
 		this.lightRailAnnouncementCallback = lightRailAnnouncementCallback;
-		oldSpeed = speed;
-		oldRailProgress = railProgress;
-		oldDoorValue = doorValue;
+		if (ticksElapsed > 0) {
+			oldSpeed = speed;
+			oldRailProgress = railProgress;
+			oldDoorValue = doorValue;
+		}
 
 		if (ticksElapsed != 0) {
 			final int stopIndex = path.get(getIndex(0, spacing, false)).stopIndex - 1;

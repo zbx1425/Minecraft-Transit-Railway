@@ -12,8 +12,8 @@ public class LowPassNoise {
     private final Random random;
     private double prevX = 0;
     private int baseI;
-    private final double[] noiseValue1 = new double[400];
-    private final double[] noiseValue2 = new double[400];
+    private final double[] noiseEma = new double[400];
+    private final double[] noiseDema = new double[400];
 
     public LowPassNoise() {
         random = new Random();
@@ -54,8 +54,8 @@ public class LowPassNoise {
 
     private void resetBuffer() {
         for (int i = 0; i < 400; i++) {
-            noiseValue1[i] = 0.0;
-            noiseValue2[i] = 0.0;
+            noiseEma[i] = 0.0;
+            noiseDema[i] = 0.0;
         }
     }
 
@@ -63,8 +63,8 @@ public class LowPassNoise {
         double omega = Mth.TWO_PI / cutoffFreq;
         double k = 1.0 - Math.exp(-omega / 4.0);
         double normalNoise = stdDev * Math.sqrt(-2.0 * Math.log(random.nextDouble())) * Mth.cos(Mth.TWO_PI * random.nextFloat());
-        noiseValue1[tgI] = noiseValue1[baseI] + (normalNoise / omega - noiseValue1[baseI]) * k;
-        noiseValue2[tgI] = noiseValue2[baseI] + (noiseValue1[tgI] / omega - noiseValue2[baseI]) * k;
+        noiseEma[tgI] = noiseEma[baseI] + (normalNoise / omega - noiseEma[baseI]) * k;
+        noiseDema[tgI] = noiseDema[baseI] + (noiseEma[tgI] / omega - noiseDema[baseI]) * k;
     }
 
     public double getAt(double x) {
@@ -73,6 +73,6 @@ public class LowPassNoise {
         double interpolateRatio = reqX - (double)reqXFloor;
         int prevEntry = (reqXFloor + 400) % 400;
         int nextEntry = (reqXFloor + 400 + 1) % 400;
-        return (1.0 - interpolateRatio) * noiseValue2[prevEntry] + interpolateRatio * noiseValue2[nextEntry];
+        return (1.0 - interpolateRatio) * noiseDema[prevEntry] + interpolateRatio * noiseDema[nextEntry];
     }
 }
