@@ -20,12 +20,12 @@ jobs:
       - name: Make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
-      - name: Build 1.20.1 Fabric
+      - name: Build 1.21.1 Fabric
         if: ${{ matrix.java == '17' }}
-        run: ./gradlew fabric:build -PbuildVersion="1.20.1" -PpatreonApiKey="${{ secrets.PATREON_API_KEY }}"
-      - name: Build 1.20.1 Forge
+        run: ./gradlew fabric:build -PbuildVersion="1.21.1" -PpatreonApiKey="${{ secrets.PATREON_API_KEY }}"
+      - name: Build 1.21.1 Forge
         if: ${{ matrix.java == '17' }}
-        run: ./gradlew forge:build -PbuildVersion="1.20.1" -PpatreonApiKey="${{ secrets.PATREON_API_KEY }}"
+        run: ./gradlew forge:build -PbuildVersion="1.21.1" -PpatreonApiKey="${{ secrets.PATREON_API_KEY }}"
       - name: Get commit SHA
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
