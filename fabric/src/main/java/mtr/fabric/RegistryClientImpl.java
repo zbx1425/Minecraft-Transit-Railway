@@ -1,6 +1,7 @@
 package mtr.fabric;
 
 import mtr.MTRClient;
+import mtr.MTRFabric;
 import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.BlockEntityRendererMapper;
 import mtr.mappings.EntityRendererMapper;
@@ -54,7 +55,7 @@ public class RegistryClientImpl {
 	}
 
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, Consumer<FriendlyByteBuf> consumer) {
-		ClientPlayNetworking.registerGlobalReceiver(resourceLocation, (client, handler, packet, responseSender) -> consumer.accept(packet));
+		MTRFabric.PACKET_REGISTRY.registerNetworkReceiverS2C(resourceLocation, consumer);
 	}
 
 	public static void registerPlayerJoinEvent(Consumer<LocalPlayer> consumer) {
@@ -70,6 +71,6 @@ public class RegistryClientImpl {
 	}
 
 	public static void sendToServer(ResourceLocation id, FriendlyByteBuf packet) {
-		ClientPlayNetworking.send(id, packet);
+		MTRFabric.PACKET_REGISTRY.sendC2S(id, packet);
 	}
 }

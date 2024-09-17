@@ -1,5 +1,6 @@
 package mtr.fabric;
 
+import mtr.MTRFabric;
 import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.NetworkUtilities;
@@ -44,16 +45,12 @@ public class RegistryImpl {
 	public static void registerCreativeModeTab(ResourceLocation resourceLocation, Item item) {
 	}
 
-	public static Packet<?> createAddEntityPacket(Entity entity) {
-		return new ClientboundAddEntityPacket(entity);
-	}
-
 	public static void registerNetworkPacket(ResourceLocation resourceLocation) {
 
 	}
 
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback packetCallback) {
-		ServerPlayNetworking.registerGlobalReceiver(resourceLocation, (server, player, handler, packet, responseSender) -> packetCallback.packetCallback(server, player, packet));
+		MTRFabric.PACKET_REGISTRY.registerNetworkReceiverC2S(resourceLocation, packetCallback);
 	}
 
 	public static void registerPlayerJoinEvent(Consumer<ServerPlayer> consumer) {
@@ -81,7 +78,7 @@ public class RegistryImpl {
 	}
 
 	public static void sendToPlayer(ServerPlayer player, ResourceLocation id, FriendlyByteBuf packet) {
-		ServerPlayNetworking.send(player, id, packet);
+		MTRFabric.PACKET_REGISTRY.sendS2C(player, id, packet);
 	}
 
 	public static void setInTeleportationState(Player player, boolean isRiding) {

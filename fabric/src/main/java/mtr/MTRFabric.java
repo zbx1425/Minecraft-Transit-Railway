@@ -1,5 +1,6 @@
 package mtr;
 
+import mtr.fabric.CompatPacketRegistry;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.BlockEntityMapper;
@@ -18,9 +19,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class MTRFabric implements ModInitializer {
 
+	public static CompatPacketRegistry PACKET_REGISTRY = new CompatPacketRegistry();
+
 	@Override
 	public void onInitialize() {
 		MTR.init(MTRFabric::registerItem, MTRFabric::registerBlock, MTRFabric::registerBlock, MTRFabric::registerEnchantedBlock, MTRFabric::registerBlockEntityType, MTRFabric::registerEntityType, MTRFabric::registerSoundEvent);
+		PACKET_REGISTRY.commitCommon();
 	}
 
 	private static void registerItem(String path, RegistryObject<Item> item) {

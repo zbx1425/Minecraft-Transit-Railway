@@ -32,6 +32,7 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 		WorldRenderEvents.END.register(event -> MTRClient.incrementGameTick());
 		HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> RenderDrivingOverlay.render(guiGraphics));
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CustomResourcesWrapper());
+		MTRFabric.PACKET_REGISTRY.commitClient();
 	}
 
 	private static class CustomResourcesWrapper implements SimpleSynchronousResourceReloadListener {

@@ -7,10 +7,8 @@
 		"PlayerTeleportationStateAccessor"
 	],
 	"client": [
-		"EntitySpawnMixin",
 		"GameRendererMixin",
-		"PlayerRendererOffsetMixin",
-		"UnknownPacketMixin"
+		"PlayerRendererOffsetMixin"
 	],
 	"server": [],
 	"injectors": {
