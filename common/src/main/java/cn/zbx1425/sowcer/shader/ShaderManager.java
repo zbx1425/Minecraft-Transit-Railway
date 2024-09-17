@@ -74,49 +74,11 @@ public class ShaderManager {
                     + (useCustomShader ? "_modelmat" : ""));
         }
 
-        for (int l = 0; l < 8; ++l) {
-            int o = RenderSystem.getShaderTexture(l);
-            shaderInstance.setSampler("Sampler" + l, o);
-        }
-        if (shaderInstance.MODEL_VIEW_MATRIX != null) {
-            Matrix4f mvMatrix = new Matrix4f(RenderSystem.getModelViewMatrix()).copy();
-            if (shaderProp.viewMatrix != null) mvMatrix.multiply(shaderProp.viewMatrix);
-            if (materialProp.billboard) AttrUtil.zeroRotation(mvMatrix);
-            shaderInstance.MODEL_VIEW_MATRIX.set(mvMatrix.asMoj());
-        }
-        if (shaderInstance.PROJECTION_MATRIX != null) {
-            shaderInstance.PROJECTION_MATRIX.set(RenderSystem.getProjectionMatrix());
-        }
-        if (shaderInstance.COLOR_MODULATOR != null) {
-            shaderInstance.COLOR_MODULATOR.set(RenderSystem.getShaderColor());
-        }
-        if (shaderInstance.FOG_START != null) {
-            shaderInstance.FOG_START.set(RenderSystem.getShaderFogStart());
-        }
-        if (shaderInstance.FOG_END != null) {
-            shaderInstance.FOG_END.set(RenderSystem.getShaderFogEnd());
-        }
-        if (shaderInstance.FOG_COLOR != null) {
-            shaderInstance.FOG_COLOR.set(RenderSystem.getShaderFogColor());
-        }
-#if MC_VERSION >= "11800"
-        if (shaderInstance.FOG_SHAPE != null) {
-            shaderInstance.FOG_SHAPE.set(RenderSystem.getShaderFogShape().getIndex());
-        }
-#endif
-        if (shaderInstance.TEXTURE_MATRIX != null) {
-            shaderInstance.TEXTURE_MATRIX.set(RenderSystem.getTextureMatrix());
-        }
-        if (shaderInstance.GAME_TIME != null) {
-            shaderInstance.GAME_TIME.set(RenderSystem.getShaderGameTime());
-        }
-        if (shaderInstance.SCREEN_SIZE != null) {
-            Window window = Minecraft.getInstance().getWindow();
-            shaderInstance.SCREEN_SIZE.set((float)window.getWidth(), (float)window.getHeight());
-        }
-
-        RenderSystem.setupShaderLights(shaderInstance);
-
+        Matrix4f mvMatrix = new Matrix4f(RenderSystem.getModelViewMatrix()).copy();
+        if (shaderProp.viewMatrix != null) mvMatrix.multiply(shaderProp.viewMatrix);
+        if (materialProp.billboard) AttrUtil.zeroRotation(mvMatrix);
+        shaderInstance.setDefaultUniforms(VertexFormat.Mode.TRIANGLES, mvMatrix.asMoj(),
+                RenderSystem.getProjectionMatrix(), Minecraft.getInstance().getWindow());
         shaderInstance.apply();
 
         if (shaderInstance.programId != ShaderInstance.lastProgramId) {
