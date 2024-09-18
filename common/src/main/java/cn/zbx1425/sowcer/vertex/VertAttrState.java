@@ -65,19 +65,19 @@ public class VertAttrState {
                     break;
                 case MATRIX_MODEL:
                     if (matrixModel == null) continue;
-                    Matrix4f mvMatrix = shaderProp.renderSystemViewMatrix.copy();
-                    mvMatrix.multiply(matrixModel);
                     final boolean useCustomShader = ShadersModHandler.canUseCustomShader();
                     if (useCustomShader) {
                         ByteBuffer byteBuf = ByteBuffer.allocate(64);
                         FloatBuffer floatBuf = byteBuf.asFloatBuffer();
-                        mvMatrix.store(floatBuf);
+                        matrixModel.store(floatBuf); // This is put into Vertex Attrib, original ModelViewMat not touched
                         GL33.glVertexAttrib4f(attr.location, floatBuf.get(0), floatBuf.get(1), floatBuf.get(2), floatBuf.get(3));
                         GL33.glVertexAttrib4f(attr.location + 1, floatBuf.get(4), floatBuf.get(5), floatBuf.get(6), floatBuf.get(7));
                         GL33.glVertexAttrib4f(attr.location + 2, floatBuf.get(8), floatBuf.get(9), floatBuf.get(10), floatBuf.get(11));
                         GL33.glVertexAttrib4f(attr.location + 3, floatBuf.get(12), floatBuf.get(13), floatBuf.get(14), floatBuf.get(15));
                     } else {
                         ShaderInstance shaderInstance = RenderSystem.getShader();
+                        Matrix4f mvMatrix = shaderProp.renderSystemViewMatrix.copy();
+                        mvMatrix.multiply(matrixModel); // Only one uniform so combine them together
                         if (shaderInstance != null && shaderInstance.MODEL_VIEW_MATRIX != null) {
                             shaderInstance.MODEL_VIEW_MATRIX.set(mvMatrix.asMoj());
                             if (ShadersModHandler.canUseCustomShader()) {

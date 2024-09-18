@@ -102,10 +102,7 @@ public class PatchingResourceProvider implements ResourceProvider {
             contentParts[0] = contentParts[0].replace("ivec2", "vec2");
         }
         contentParts[1] = contentParts[1]
-                .replaceAll("\\bPosition\\b", "(MODELVIEWMAT * ModelMat * vec4(Position, 1.0)).xyz")
-                .replaceAll("\\bNormal\\b", "normalize(mat3(MODELVIEWMAT * ModelMat) * Normal)")
-                .replace("ModelViewMat", "mat4(1.0)")
-                .replace("MODELVIEWMAT", "ModelViewMat")
+                .replace("ModelViewMat", "ModelViewMat * ModelMat")
         ;
         return contentParts[0] + "void main" + contentParts[1];
     }
