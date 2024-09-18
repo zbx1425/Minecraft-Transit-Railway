@@ -158,7 +158,7 @@ public class DashboardList implements IGui {
 				Tesselator tesselator = Tesselator.getInstance();
 				BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 				UtilitiesClient.beginDrawingRectangle(buffer);
-				IDrawing.drawRectangle(buffer, x + TEXT_PADDING, y + drawY, x + TEXT_PADDING + TEXT_HEIGHT, y + drawY + TEXT_HEIGHT, ARGB_BLACK | data.color);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, x + TEXT_PADDING, y + drawY, x + TEXT_PADDING + TEXT_HEIGHT, y + drawY + TEXT_HEIGHT, ARGB_BLACK | data.color);
 				BufferUploader.drawWithShader(buffer.buildOrThrow());
 				UtilitiesClient.finishDrawingRectangle();
 

@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import cn.zbx1425.sowcer.math.Matrices;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import mtr.client.ClientData;
@@ -92,7 +93,7 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 			for (int j = topLeft.getB(); j <= bottomRight.getB(); j += increment) {
 				if (world != null) {
 					final int color = divideColorRGB(world.getBlockState(RailwayData.newBlockPos(i, world.getHeight(Heightmap.Types.MOTION_BLOCKING, i, j) - 1, j)).getBlock().defaultMapColor().col, 2);
-					drawRectangleFromWorldCoords(buffer, i, j, i + increment, j + increment, ARGB_BLACK | color);
+					drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, i, j, i + increment, j + increment, ARGB_BLACK | color);
 				}
 			}
 		}
@@ -101,35 +102,35 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 
 		try {
 			if (showStations) {
-				ClientData.DATA_CACHE.getPosToPlatforms(transportMode).forEach((platformPos, platforms) -> drawRectangleFromWorldCoords(buffer, platformPos.getX(), platformPos.getZ(), platformPos.getX() + 1, platformPos.getZ() + 1, ARGB_WHITE));
+				ClientData.DATA_CACHE.getPosToPlatforms(transportMode).forEach((platformPos, platforms) -> drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, platformPos.getX(), platformPos.getZ(), platformPos.getX() + 1, platformPos.getZ() + 1, ARGB_WHITE));
 				for (final Station station : ClientData.STATIONS) {
 					if (AreaBase.nonNullCorners(station)) {
-						drawRectangleFromWorldCoords(buffer, station.corner1, station.corner2, ARGB_BLACK_TRANSLUCENT + station.color);
+						drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, station.corner1, station.corner2, ARGB_BLACK_TRANSLUCENT + station.color);
 					}
 				}
-				mouseOnSavedRail(mouseWorldPos, (savedRail, x1, z1, x2, z2) -> drawRectangleFromWorldCoords(buffer, x1, z1, x2, z2, ARGB_WHITE), true);
+				mouseOnSavedRail(mouseWorldPos, (savedRail, x1, z1, x2, z2) -> drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, x1, z1, x2, z2, ARGB_WHITE), true);
 			} else {
-				ClientData.DATA_CACHE.getPosToSidings(transportMode).forEach((sidingPos, sidings) -> drawRectangleFromWorldCoords(buffer, sidingPos.getX(), sidingPos.getZ(), sidingPos.getX() + 1, sidingPos.getZ() + 1, ARGB_WHITE));
+				ClientData.DATA_CACHE.getPosToSidings(transportMode).forEach((sidingPos, sidings) -> drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, sidingPos.getX(), sidingPos.getZ(), sidingPos.getX() + 1, sidingPos.getZ() + 1, ARGB_WHITE));
 				for (final Depot depot : ClientData.DEPOTS) {
 					if (depot.isTransportMode(transportMode) && AreaBase.nonNullCorners(depot)) {
-						drawRectangleFromWorldCoords(buffer, depot.corner1, depot.corner2, ARGB_BLACK_TRANSLUCENT + depot.color);
+						drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, depot.corner1, depot.corner2, ARGB_BLACK_TRANSLUCENT + depot.color);
 					}
 				}
-				mouseOnSavedRail(mouseWorldPos, (savedRail, x1, z1, x2, z2) -> drawRectangleFromWorldCoords(buffer, x1, z1, x2, z2, ARGB_WHITE), false);
+				mouseOnSavedRail(mouseWorldPos, (savedRail, x1, z1, x2, z2) -> drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, x1, z1, x2, z2, ARGB_WHITE), false);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		if (mapState == MapState.EDITING_AREA && drawArea1 != null && drawArea2 != null) {
-			drawRectangleFromWorldCoords(buffer, drawArea1, drawArea2, ARGB_WHITE_TRANSLUCENT);
+			drawRectangleFromWorldCoords(guiGraphics.pose(), buffer, drawArea1, drawArea2, ARGB_WHITE_TRANSLUCENT);
 		}
 
 		if (player != null) {
 			drawFromWorldCoords(player.getX(), player.getZ(), (x1, y1) -> {
-				drawRectangle(buffer, x1 - 2, y1 - 3, x1 + 2, y1 + 3, ARGB_WHITE);
-				drawRectangle(buffer, x1 - 3, y1 - 2, x1 + 3, y1 + 2, ARGB_WHITE);
-				drawRectangle(buffer, x1 - 2, y1 - 2, x1 + 2, y1 + 2, ARGB_BLUE);
+				drawRectangle(guiGraphics.pose(), buffer, x1 - 2, y1 - 3, x1 + 2, y1 + 3, ARGB_WHITE);
+				drawRectangle(guiGraphics.pose(), buffer, x1 - 3, y1 - 2, x1 + 3, y1 + 2, ARGB_WHITE);
+				drawRectangle(guiGraphics.pose(), buffer, x1 - 2, y1 - 2, x1 + 2, y1 + 2, ARGB_BLUE);
 			});
 		}
 
@@ -333,25 +334,25 @@ public class WidgetMap implements WidgetMapper, SelectableMapper, GuiEventListen
 		}
 	}
 
-	private void drawRectangleFromWorldCoords(BufferBuilder buffer, Tuple<Integer, Integer> corner1, Tuple<Integer, Integer> corner2, int color) {
-		drawRectangleFromWorldCoords(buffer, corner1.getA(), corner1.getB(), corner2.getA(), corner2.getB(), color);
+	private void drawRectangleFromWorldCoords(PoseStack matrices, BufferBuilder buffer, Tuple<Integer, Integer> corner1, Tuple<Integer, Integer> corner2, int color) {
+		drawRectangleFromWorldCoords(matrices, buffer, corner1.getA(), corner1.getB(), corner2.getA(), corner2.getB(), color);
 	}
 
-	private void drawRectangleFromWorldCoords(BufferBuilder buffer, double posX1, double posZ1, double posX2, double posZ2, int color) {
+	private void drawRectangleFromWorldCoords(PoseStack matrices, BufferBuilder buffer, double posX1, double posZ1, double posX2, double posZ2, int color) {
 		final double x1 = (posX1 - centerX) * scale + width / 2D;
 		final double z1 = (posZ1 - centerY) * scale + height / 2D;
 		final double x2 = (posX2 - centerX) * scale + width / 2D;
 		final double z2 = (posZ2 - centerY) * scale + height / 2D;
-		drawRectangle(buffer, x1, z1, x2, z2, color);
+		drawRectangle(matrices, buffer, x1, z1, x2, z2, color);
 	}
 
-	private void drawRectangle(BufferBuilder buffer, double xA, double yA, double xB, double yB, int color) {
+	private void drawRectangle(PoseStack matrices, BufferBuilder buffer, double xA, double yA, double xB, double yB, int color) {
 		final double x1 = Math.min(xA, xB);
 		final double y1 = Math.min(yA, yB);
 		final double x2 = Math.max(xA, xB);
 		final double y2 = Math.max(yA, yB);
 		if (x1 < width && y1 < height && x2 >= 0 && y2 >= 0) {
-			IDrawing.drawRectangle(buffer, x + Math.max(0, x1), y + y1, x + x2, y + y2, color);
+			IDrawing.drawRectangle(matrices, buffer, x + Math.max(0, x1), y + y1, x + x2, y + y2, color);
 		}
 	}
 

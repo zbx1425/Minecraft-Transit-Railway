@@ -126,7 +126,7 @@ public interface IDrawing {
 		vertexConsumer.addVertex(pose.pose(), x2, y2, z2).setColor(r, g, b, 0xFF).setNormal(pose, 0, 1, 0);
 	}
 
-	static void drawRectangle(VertexConsumer vertexConsumer, double x1, double y1, double x2, double y2, int color) {
+	static void drawRectangle(PoseStack matrices, VertexConsumer vertexConsumer, double x1, double y1, double x2, double y2, int color) {
 		final int a = (color >> 24) & 0xFF;
 		final int r = (color >> 16) & 0xFF;
 		final int g = (color >> 8) & 0xFF;
@@ -134,10 +134,10 @@ public interface IDrawing {
 		if (a == 0) {
 			return;
 		}
-		vertexConsumer.addVertex((float)x1, (float)y1, 0).setColor(r, g, b, a);
-		vertexConsumer.addVertex((float)x1, (float)y2, 0).setColor(r, g, b, a);
-		vertexConsumer.addVertex((float)x2, (float)y2, 0).setColor(r, g, b, a);
-		vertexConsumer.addVertex((float)x2, (float)y1, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex(matrices.last(), (float)x1, (float)y1, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex(matrices.last(), (float)x1, (float)y2, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex(matrices.last(), (float)x2, (float)y2, 0).setColor(r, g, b, a);
+		vertexConsumer.addVertex(matrices.last(), (float)x2, (float)y1, 0).setColor(r, g, b, a);
 	}
 
 	static void drawTexture(PoseStack matrices, VertexConsumer vertexConsumer, float x1, float y1, float z1, float x2, float y2, float z2, Direction facing, int color, int light) {

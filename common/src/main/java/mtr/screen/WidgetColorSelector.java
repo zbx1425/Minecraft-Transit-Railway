@@ -148,28 +148,28 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 				UtilitiesClient.beginDrawingRectangle(buffer);
 
 				final int selectedColor = Color.HSBtoRGB(hue, saturation, brightness);
-				IDrawing.drawRectangle(buffer, SQUARE_SIZE * 4 + mainWidth + 1, SQUARE_SIZE * 7 + TEXT_FIELD_PADDING * 4 + 1, SQUARE_SIZE * 4 + mainWidth + RIGHT_WIDTH - 1, mainHeight - 1, selectedColor);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE * 4 + mainWidth + 1, SQUARE_SIZE * 7 + TEXT_FIELD_PADDING * 4 + 1, SQUARE_SIZE * 4 + mainWidth + RIGHT_WIDTH - 1, mainHeight - 1, selectedColor);
 
 				for (int drawHue = 0; drawHue < mainHeight; drawHue++) {
 					final int color = Color.HSBtoRGB((float) drawHue / (mainHeight - 1), 1, 1);
-					IDrawing.drawRectangle(buffer, SQUARE_SIZE * 2 + mainWidth, SQUARE_SIZE + drawHue, SQUARE_SIZE * 3 + mainWidth, SQUARE_SIZE + drawHue + 1, color);
+					IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE * 2 + mainWidth, SQUARE_SIZE + drawHue, SQUARE_SIZE * 3 + mainWidth, SQUARE_SIZE + drawHue + 1, color);
 				}
 
 				for (int drawSaturation = 0; drawSaturation < mainWidth; drawSaturation++) {
 					for (int drawBrightness = 0; drawBrightness < mainHeight; drawBrightness++) {
 						final int color = Color.HSBtoRGB(hue, (float) drawSaturation / (mainWidth - 1), (float) drawBrightness / (mainHeight - 1));
-						IDrawing.drawRectangle(buffer, SQUARE_SIZE + drawSaturation, SQUARE_SIZE + mainHeight - drawBrightness - 1, SQUARE_SIZE + drawSaturation + 1, SQUARE_SIZE + mainHeight - drawBrightness, color);
+						IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE + drawSaturation, SQUARE_SIZE + mainHeight - drawBrightness - 1, SQUARE_SIZE + drawSaturation + 1, SQUARE_SIZE + mainHeight - drawBrightness, color);
 					}
 				}
 
 				final int selectedHueInt = Math.round(hue * (mainHeight - 1));
 				final int selectedSaturationInt = Math.round(saturation * (mainWidth - 1));
 				final int selectedBrightnessInt = Math.round(brightness * (mainHeight - 1));
-				IDrawing.drawRectangle(buffer, SQUARE_SIZE * 2 + mainWidth, SQUARE_SIZE + selectedHueInt - 1, SQUARE_SIZE * 3 + mainWidth, SQUARE_SIZE + selectedHueInt + 2, ARGB_BLACK);
-				IDrawing.drawRectangle(buffer, SQUARE_SIZE * 2 + mainWidth, SQUARE_SIZE + selectedHueInt, SQUARE_SIZE * 3 + mainWidth, SQUARE_SIZE + selectedHueInt + 1, ARGB_WHITE);
-				IDrawing.drawRectangle(buffer, SQUARE_SIZE + selectedSaturationInt - 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 1, SQUARE_SIZE + selectedSaturationInt + 2, SQUARE_SIZE + mainHeight - selectedBrightnessInt, ARGB_BLACK);
-				IDrawing.drawRectangle(buffer, SQUARE_SIZE + selectedSaturationInt, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 2, SQUARE_SIZE + selectedSaturationInt + 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt + 1, ARGB_BLACK);
-				IDrawing.drawRectangle(buffer, SQUARE_SIZE + selectedSaturationInt, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 1, SQUARE_SIZE + selectedSaturationInt + 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt, ARGB_WHITE);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE * 2 + mainWidth, SQUARE_SIZE + selectedHueInt - 1, SQUARE_SIZE * 3 + mainWidth, SQUARE_SIZE + selectedHueInt + 2, ARGB_BLACK);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE * 2 + mainWidth, SQUARE_SIZE + selectedHueInt, SQUARE_SIZE * 3 + mainWidth, SQUARE_SIZE + selectedHueInt + 1, ARGB_WHITE);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE + selectedSaturationInt - 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 1, SQUARE_SIZE + selectedSaturationInt + 2, SQUARE_SIZE + mainHeight - selectedBrightnessInt, ARGB_BLACK);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE + selectedSaturationInt, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 2, SQUARE_SIZE + selectedSaturationInt + 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt + 1, ARGB_BLACK);
+				IDrawing.drawRectangle(guiGraphics.pose(), buffer, SQUARE_SIZE + selectedSaturationInt, SQUARE_SIZE + mainHeight - selectedBrightnessInt - 1, SQUARE_SIZE + selectedSaturationInt + 1, SQUARE_SIZE + mainHeight - selectedBrightnessInt, ARGB_WHITE);
 
 				BufferUploader.drawWithShader(buffer.buildOrThrow());
 				UtilitiesClient.finishDrawingRectangle();
