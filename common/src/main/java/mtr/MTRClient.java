@@ -230,16 +230,16 @@ public class MTRClient implements IPacket {
 		RegistryClient.registerTileEntityRenderer(BlockEntityTypes.LIFT_DOOR_ODD_1_TILE_ENTITY.get(), dispatcher -> new RenderPSDAPGDoor<>(dispatcher, 4));
 
 		RegistryClient.registerEntityRenderer(EntityTypes.SEAT.get(), RenderTrains::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_2_2.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_2_2_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_2.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_2_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_3.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_3_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_3.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_3_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_4.registryObject.get(), RenderLift::new);
-		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_4_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_2_2.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_2_2_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_2.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_2_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_3.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_3_3_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_3.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_3_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_4.registryObject.get(), RenderLift::new);
+//		RegistryClient.registerEntityRenderer(EntityTypes.LiftType.SIZE_4_4_DOUBLE_SIDED.registryObject.get(), RenderLift::new);
 
 		RegistryClient.registerNetworkReceiver(PACKET_VERSION_CHECK, packet -> PacketTrainDataGuiClient.openVersionCheckS2C(Minecraft.getInstance(), packet));
 		RegistryClient.registerNetworkReceiver(PACKET_CHUNK_S2C, packet -> PacketTrainDataGuiClient.receiveChunk(Minecraft.getInstance(), packet));
