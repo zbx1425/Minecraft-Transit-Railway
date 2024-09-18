@@ -7,7 +7,6 @@
 		"PlayerTeleportationStateAccessor"
 	],
 	"client": [
-		"GameRendererMixin",
 		"PlayerRendererOffsetMixin"
 	],
 	"server": [],

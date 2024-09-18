@@ -46,7 +46,7 @@ public class RegistryImpl {
 	}
 
 	public static void registerNetworkPacket(ResourceLocation resourceLocation) {
-
+		MTRFabric.PACKET_REGISTRY.registerPacket(resourceLocation);
 	}
 
 	public static void registerNetworkReceiver(ResourceLocation resourceLocation, NetworkUtilities.PacketCallback packetCallback) {

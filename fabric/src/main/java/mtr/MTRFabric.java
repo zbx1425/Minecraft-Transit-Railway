@@ -1,5 +1,6 @@
 package mtr;
 
+import cn.zbx1425.mtrsteamloco.Main;
 import mtr.fabric.CompatPacketRegistry;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
@@ -20,10 +21,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 public class MTRFabric implements ModInitializer {
 
 	public static CompatPacketRegistry PACKET_REGISTRY = new CompatPacketRegistry();
+	private final RegistriesWrapperImpl REGISTRIES = new RegistriesWrapperImpl();
 
 	@Override
 	public void onInitialize() {
 		MTR.init(MTRFabric::registerItem, MTRFabric::registerBlock, MTRFabric::registerBlock, MTRFabric::registerEnchantedBlock, MTRFabric::registerBlockEntityType, MTRFabric::registerEntityType, MTRFabric::registerSoundEvent);
+		Main.init(REGISTRIES);
 		PACKET_REGISTRY.commitCommon();
 	}
 

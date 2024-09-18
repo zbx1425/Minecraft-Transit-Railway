@@ -1,10 +1,12 @@
 package mtr;
 
+import cn.zbx1425.mtrsteamloco.MainClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.client.CustomResources;
 import mtr.client.ICustomResources;
 import mtr.render.RenderDrivingOverlay;
 import mtr.render.RenderTrains;
+import mtr.screen.ResourcePackCreatorScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -21,6 +23,7 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 	public void onInitializeClient() {
 		MTRClient.init();
 		MTRClient.initItemModelPredicate();
+		MainClient.init();
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
 			final PoseStack matrices = context.matrixStack();
 			matrices.pushPose();
@@ -29,6 +32,7 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 			RenderTrains.render(null, 0, matrices, context.consumers());
 			matrices.popPose();
 		});
+		WorldRenderEvents.LAST.register(event -> ResourcePackCreatorScreen.render(event.matrixStack()));
 		WorldRenderEvents.END.register(event -> MTRClient.incrementGameTick());
 		HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> RenderDrivingOverlay.render(guiGraphics));
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CustomResourcesWrapper());

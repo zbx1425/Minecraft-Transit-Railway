@@ -33,16 +33,17 @@ public class CompatPacketRegistry {
     }
 
     public void commitCommon() {
+        for (Map.Entry<ResourceLocation, CompatPacket> packetEntry : packets.entrySet()) {
+            CompatPacket packet = packetEntry.getValue();
+            PayloadTypeRegistry.playC2S().register(packet.TYPE, packet.STREAM_CODEC);
+            PayloadTypeRegistry.playS2C().register(packet.TYPE, packet.STREAM_CODEC);
+        }
         for (Map.Entry<ResourceLocation, NetworkUtilities.PacketCallback> packetC2S : packetsC2S.entrySet()) {
             NetworkUtilities.PacketCallback handlerC2S = packetC2S.getValue();
             CompatPacket packet = packets.get(packetC2S.getKey());
             ServerPlayNetworking.registerGlobalReceiver(packet.TYPE, (payload, context) -> {
                 handlerC2S.packetCallback(context.server(), context.player(), payload.buffer);
             });
-        }
-        for (Map.Entry<ResourceLocation, Consumer<FriendlyByteBuf>> packetS2C : packetsS2C.entrySet()) {
-            CompatPacket packet = packets.get(packetS2C.getKey());
-            PayloadTypeRegistry.playS2C().register(packet.TYPE, packet.STREAM_CODEC);
         }
     }
 
@@ -53,10 +54,6 @@ public class CompatPacketRegistry {
             ClientPlayNetworking.registerGlobalReceiver(packet.TYPE, (payload, context) -> {
                 handlerS2C.accept(payload.buffer);
             });
-        }
-        for (Map.Entry<ResourceLocation, NetworkUtilities.PacketCallback> packetC2S : packetsC2S.entrySet()) {
-            CompatPacket packet = packets.get(packetC2S.getKey());
-            PayloadTypeRegistry.playC2S().register(packet.TYPE, packet.STREAM_CODEC);
         }
     }
 
