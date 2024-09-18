@@ -55,15 +55,17 @@ public class BatchManager {
     }
 
     private void drawBatch(ShaderManager shaderManager, Map.Entry<BatchTuple, Queue<RenderCall>> entry, DrawContext drawContext) {
-        pushDebugGroup(entry.getKey().materialProp.toString());
-        shaderManager.setupShaderBatchState(entry.getKey().materialProp, entry.getKey().shaderProp);
+        MaterialProp materialProp = entry.getKey().materialProp;
+        ShaderProp shaderProp = entry.getKey().shaderProp;
+        pushDebugGroup(materialProp.toString());
+        shaderManager.setupShaderBatchState(materialProp, shaderProp);
         Queue<RenderCall> queue = entry.getValue();
         while (!queue.isEmpty()) {
             RenderCall renderCall = queue.poll();
-            renderCall.draw();
+            renderCall.draw(shaderProp);
             drawContext.recordDrawCall(renderCall);
         }
-        shaderManager.cleanupShaderBatchState(entry.getKey().materialProp, entry.getKey().shaderProp);
+        shaderManager.cleanupShaderBatchState(materialProp, shaderProp);
         popDebugGroup();
     }
 
@@ -101,10 +103,10 @@ public class BatchManager {
             this.enqueueProp = enqueueProp;
         }
 
-        public void draw() {
+        public void draw(ShaderProp shaderProp) {
             vertArray.bind();
-            if (enqueueProp.attrState != null) enqueueProp.attrState.applyGlobal();
-            if (vertArray.materialProp.attrState != null) vertArray.materialProp.attrState.applyGlobal();
+            if (enqueueProp.attrState != null) enqueueProp.attrState.applyGlobal(shaderProp);
+            if (vertArray.materialProp.attrState != null) vertArray.materialProp.attrState.applyGlobal(shaderProp);
             vertArray.mapping.applyToggleableAttr(enqueueProp.attrState, vertArray.materialProp.attrState);
             vertArray.draw();
         }

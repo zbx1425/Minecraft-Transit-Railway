@@ -77,6 +77,8 @@ public class ShaderManager {
         Matrix4f mvMatrix = new Matrix4f(RenderSystem.getModelViewMatrix()).copy();
         if (shaderProp.viewMatrix != null) mvMatrix.multiply(shaderProp.viewMatrix);
         if (materialProp.billboard) AttrUtil.zeroRotation(mvMatrix);
+        shaderProp.renderSystemViewMatrix = mvMatrix;
+
         shaderInstance.setDefaultUniforms(VertexFormat.Mode.TRIANGLES, mvMatrix.asMoj(),
                 RenderSystem.getProjectionMatrix(), Minecraft.getInstance().getWindow());
         shaderInstance.apply();

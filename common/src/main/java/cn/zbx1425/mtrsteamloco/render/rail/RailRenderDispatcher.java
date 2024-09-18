@@ -165,7 +165,7 @@ public class RailRenderDispatcher {
             if (chunk.isDirty || !chunk.bufferBuilt) {
 #if DEBUG
                     chunk.rebuildBuffer(level);
-                    RenderUtil.displayStatusMessage("Rebuilt: " + chunk.getChunkPos().toString());
+//                    RenderUtil.displayStatusMessage("Rebuilt: " + chunk.getChunkPos().toString());
 #else
                 if (MTRClient.isReplayMod() || buffersRebuilt < 1) chunk.rebuildBuffer(level); // One per frame
 #endif
@@ -232,16 +232,6 @@ public class RailRenderDispatcher {
             boolean isChunkEven = chunk.isEven();
             LevelRenderer.renderLineBox(matrixStack, buffer, chunk.boundingBox,
                     1.0f, isChunkEven ? 1.0f : 0.0f, isChunkEven ? 0.0f : 1.0f, 1.0f);
-#if DEBUG
-            for (ArrayList<Matrix4f> rail : chunk.containingRails.values()) {
-                for (Matrix4f pieceMat : rail) {
-                    final Vector3f lightPos = pieceMat.getTranslationPart();
-                    final BlockPos lightBlockPos = new BlockPos(lightPos.x(), lightPos.y() + 0.1, lightPos.z());
-                    LevelRenderer.renderLineBox(matrixStack, buffer, new AABB(lightBlockPos),
-                            1.0f, isChunkEven ? 1.0f : 0.0f, isChunkEven ? 0.0f : 1.0f, 1.0f);
-                }
-            }
-#endif
         }
     }
 }

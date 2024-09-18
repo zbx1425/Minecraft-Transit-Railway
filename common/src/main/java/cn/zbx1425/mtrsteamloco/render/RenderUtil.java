@@ -5,9 +5,13 @@ import cn.zbx1425.mtrsteamloco.MainClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.MTRClient;
 import mtr.data.TrainClient;
+import mtr.mappings.Text;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class RenderUtil {
 
