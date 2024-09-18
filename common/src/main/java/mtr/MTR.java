@@ -74,16 +74,6 @@ public class MTR implements IPacket {
 		registerBlockEntityType.accept("lift_door_odd_1", BlockEntityTypes.LIFT_DOOR_ODD_1_TILE_ENTITY);
 
 		registerEntityType.accept("seat", EntityTypes.SEAT);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_2_2.key, EntityTypes.LiftType.SIZE_2_2.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_2_2_DOUBLE_SIDED.key, EntityTypes.LiftType.SIZE_2_2_DOUBLE_SIDED.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_3_2.key, EntityTypes.LiftType.SIZE_3_2.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_3_2_DOUBLE_SIDED.key, EntityTypes.LiftType.SIZE_3_2_DOUBLE_SIDED.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_3_3.key, EntityTypes.LiftType.SIZE_3_3.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_3_3_DOUBLE_SIDED.key, EntityTypes.LiftType.SIZE_3_3_DOUBLE_SIDED.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_4_3.key, EntityTypes.LiftType.SIZE_4_3.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_4_3_DOUBLE_SIDED.key, EntityTypes.LiftType.SIZE_4_3_DOUBLE_SIDED.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_4_4.key, EntityTypes.LiftType.SIZE_4_4.registryObject);
-//		registerEntityType.accept(EntityTypes.LiftType.SIZE_4_4_DOUBLE_SIDED.key, EntityTypes.LiftType.SIZE_4_4_DOUBLE_SIDED.registryObject);
 
 		if (!Keys.LIFTS_ONLY) {
 			registerItem.accept("apg_door", Items.APG_DOOR);
