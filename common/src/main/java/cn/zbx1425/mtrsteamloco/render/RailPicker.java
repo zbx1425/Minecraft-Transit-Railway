@@ -77,7 +77,7 @@ public class RailPicker {
         matrices.translate(pickedPosStart.getX(), pickedPosStart.getY(), pickedPosStart.getZ());
         matrices.translate(0.5, 0.5, 0.5);
         matrices.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
-        matrices.scale(-0.025F, -0.025F, 0.025F);
+        matrices.scale(0.025F, -0.025F, 0.025F);
         float opacity = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
         int bgColor = (int)(opacity * 255.0F) << 24;
         Font font = Minecraft.getInstance().font;
