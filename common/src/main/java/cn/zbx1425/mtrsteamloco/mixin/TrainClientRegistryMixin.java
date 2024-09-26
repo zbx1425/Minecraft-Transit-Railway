@@ -18,7 +18,7 @@ public class TrainClientRegistryMixin {
     private static void getTrainProperties(String key, CallbackInfoReturnable<TrainProperties> cir) {
         if (key.equals("$NTE_DUMMY_BLANK_PROPERTY")) {
             TrainProperties result = new TrainProperties(
-                    "train_1_1", Text.translatable(""), null, null, 0, 0, 0, 0, false, false,
+                    "train_1_1", Text.translatable(""), null, null, 0, 0, 0, -1, 0, false, false,
                     new JonModelTrainRenderer(null, "", "", ""),
                     new JonTrainSound("", new JonTrainSound.JonTrainSoundConfig(null, 0, 0.5F, false))
             );

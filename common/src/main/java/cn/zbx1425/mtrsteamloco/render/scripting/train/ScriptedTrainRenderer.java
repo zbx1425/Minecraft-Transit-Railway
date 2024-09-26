@@ -75,7 +75,7 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
         trainScripting.trainExtraWriting.doorRightOpen[carIndex] = doorRightOpen;
         trainScripting.trainExtraWriting.lastWorldPose[carIndex] = worldPose;
         trainScripting.trainExtraWriting.lastCarPosition[carIndex] = carPos.copy();
-        trainScripting.trainExtraWriting.lastCarRotation[carIndex] = new Vector3f(hasPitch ? pitch : 0, (float) Math.PI + yaw, 0);
+        trainScripting.trainExtraWriting.lastCarRotation[carIndex] = new Vector3f(hasPitch ? pitch : 0, (float) Math.PI + yaw, roll);
         trainScripting.trainExtraWriting.isInDetailDistance |= posAverage != null
                 && posAverage.distSqr(camera.getBlockPosition()) <= RenderTrains.DETAIL_RADIUS_SQUARED;
         trainScripting.trainExtraWriting.shouldRender = shouldRender;
@@ -89,10 +89,7 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
             return;
         }
 
-        matrices.translate(x, y, z);
-        PoseStackUtil.rotY(matrices, (float) Math.PI + yaw);
-        PoseStackUtil.rotX(matrices, hasPitch ? pitch : 0);
-        PoseStackUtil.rotZ(matrices, roll);
+        applyTransform(train, x, y, z, yaw, pitch, roll);
         final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
         Matrix4f drawPose = new Matrix4f(matrices.last().pose());
         if (shouldRender) {
@@ -122,11 +119,7 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
         final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
         if (posAverage == null) return;
         matrices.pushPose();
-        matrices.translate(x, y, z);
-        PoseStackUtil.rotY(matrices, (float) Math.PI + yaw);
-        final boolean hasPitch = pitch < 0 ? train.transportMode.hasPitchAscending : train.transportMode.hasPitchDescending;
-        PoseStackUtil.rotX(matrices, hasPitch ? pitch : 0);
-        PoseStackUtil.rotZ(matrices, roll);
+        applyTransform(train, x, y, z, yaw, pitch, roll);
         final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
         Matrix4f pose = new Matrix4f(matrices.last().pose());
         synchronized (trainScripting) {

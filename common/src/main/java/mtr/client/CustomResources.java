@@ -62,6 +62,7 @@ public class CustomResources implements IResourcePackCreatorProperties, ICustomR
 						final DoorAnimationType doorAnimationType = EnumHelper.valueOf(modelSimpleTrainBase == null ? DoorAnimationType.STANDARD : modelSimpleTrainBase.doorAnimationType, getOrDefault(jsonObject, CUSTOM_TRAINS_DOOR_ANIMATION_TYPE, "", JsonElement::getAsString));
 						final boolean renderDoorOverlay = getOrDefault(jsonObject, CUSTOM_TRAINS_RENDER_DOOR_OVERLAY, modelSimpleTrainBase != null, JsonElement::getAsBoolean);
 						final float riderOffset = getOrDefault(jsonObject, CUSTOM_TRAINS_RIDER_OFFSET, baseTrainProperties.riderOffset, JsonElement::getAsFloat);
+						final float railSurfaceOffset = getOrDefault(jsonObject, CUSTOM_TRAINS_RAIL_SURFACE_OFFSET, baseTrainProperties.railSurfaceOffset, JsonElement::getAsFloat);
 						final String bveSoundBaseId = getOrDefault(jsonObject, CUSTOM_TRAINS_BVE_SOUND_BASE_ID, baseBveSoundBaseId, JsonElement::getAsString);
 						final int speedSoundCount = getOrDefault(jsonObject, CUSTOM_TRAINS_SPEED_SOUND_COUNT, jonSoundOrDefault.config.speedSoundCount, JsonElement::getAsInt);
 						final String speedSoundBaseId = getOrDefault(jsonObject, CUSTOM_TRAINS_SPEED_SOUND_BASE_ID, jonSoundOrDefault.soundId, JsonElement::getAsString);
@@ -87,7 +88,7 @@ public class CustomResources implements IResourcePackCreatorProperties, ICustomR
 							final ModelTrainBase model = modelSimpleTrainBase == null ? jonRendererOrDefault.model : (ModelTrainBase) modelSimpleTrainBase.createNew(doorAnimationType, renderDoorOverlay);
 							final String soundBaseId = useBveSound ? bveSoundBaseId : speedSoundBaseId;
 							final JonTrainSound.JonTrainSoundConfig soundConfig = useBveSound ? null : new JonTrainSound.JonTrainSoundConfig(doorSoundBaseId, speedSoundCount, doorCloseSoundTime, accelSoundAtCoast, constPlaybackSpeed);
-							TrainClientRegistry.register(trainId, baseTrainType, name, description, wikipediaArticle, model, textureId, color, gangwayConnectionId, trainBarrierId, riderOffset, riderOffset, baseTrainProperties.bogiePosition, baseTrainProperties.isJacobsBogie, soundBaseId, soundConfig);
+							TrainClientRegistry.register(trainId, baseTrainType, name, description, wikipediaArticle, model, textureId, color, gangwayConnectionId, trainBarrierId, riderOffset, riderOffset, railSurfaceOffset, baseTrainProperties.bogiePosition, baseTrainProperties.isJacobsBogie, soundBaseId, soundConfig);
 							customTrains.add(trainId);
 						}
 
@@ -105,7 +106,7 @@ public class CustomResources implements IResourcePackCreatorProperties, ICustomR
 								final ModelTrainBase model = useLegacy ? new DynamicTrainModelLegacy(jsonModel, jsonProperties, doorAnimationType) : new DynamicTrainModel(jsonModel, jsonProperties, doorAnimationType);
 								final String soundBaseId = useBveSound ? bveSoundBaseId : speedSoundBaseId;
 								final JonTrainSound.JonTrainSoundConfig soundConfig = useBveSound ? null : new JonTrainSound.JonTrainSoundConfig(doorSoundBaseId, speedSoundCount, doorCloseSoundTime, accelSoundAtCoast, constPlaybackSpeed);
-								TrainClientRegistry.register(trainId, newBaseTrainType2.toLowerCase(Locale.ENGLISH), name, description, wikipediaArticle, model, textureId, color, gangwayConnectionId2, trainBarrierId, riderOffset, riderOffset, baseTrainProperties.bogiePosition, baseTrainProperties.isJacobsBogie, soundBaseId, soundConfig);
+								TrainClientRegistry.register(trainId, newBaseTrainType2.toLowerCase(Locale.ENGLISH), name, description, wikipediaArticle, model, textureId, color, gangwayConnectionId2, trainBarrierId, riderOffset, riderOffset, railSurfaceOffset, baseTrainProperties.bogiePosition, baseTrainProperties.isJacobsBogie, soundBaseId, soundConfig);
 								customTrains.add(trainId);
 							}));
 						}

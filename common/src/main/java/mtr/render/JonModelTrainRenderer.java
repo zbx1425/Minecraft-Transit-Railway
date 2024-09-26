@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -84,10 +85,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 		}
 
 		matrices.pushPose();
-		matrices.translate(x, y, z);
-		UtilitiesClient.rotateY(matrices, (float) Math.PI + yaw);
-		UtilitiesClient.rotateX(matrices, (float) Math.PI + (hasPitch ? pitch : 0));
-		UtilitiesClient.rotateZ(matrices, roll);
+		applyTransform(train, x, y, z, yaw, Mth.PI + pitch, roll);
 
 		final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
 
@@ -172,10 +170,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 
 		if (trainProperties.isJacobsBogie) {
 			matrices.pushPose();
-			matrices.translate(x, y, z);
-			UtilitiesClient.rotateY(matrices, (float) Math.PI + yaw);
-			UtilitiesClient.rotateX(matrices, (float) Math.PI + ((pitch < 0 ? train.transportMode.hasPitchAscending : train.transportMode.hasPitchDescending) ? pitch : 0));
-			UtilitiesClient.rotateZ(matrices, roll);
+			applyTransform(train, x, y, z, yaw, Mth.PI + pitch, roll);
 			MODEL_BOGIE.render(matrices, vertexConsumers, light, 0);
 			matrices.popPose();
 		}

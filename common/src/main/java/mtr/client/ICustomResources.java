@@ -24,6 +24,7 @@ public interface ICustomResources {
 	String CUSTOM_TRAINS_DOOR_ANIMATION_TYPE = "door_animation_type";
 	String CUSTOM_TRAINS_RENDER_DOOR_OVERLAY = "render_door_overlay";
 	String CUSTOM_TRAINS_RIDER_OFFSET = "rider_offset";
+	String CUSTOM_TRAINS_RAIL_SURFACE_OFFSET = "rail_surface_offset";
 	String CUSTOM_TRAINS_BVE_SOUND_BASE_ID = "bve_sound_base_id";
 	String CUSTOM_TRAINS_SPEED_SOUND_COUNT = "speed_sound_count";
 	String CUSTOM_TRAINS_SPEED_SOUND_BASE_ID = "speed_sound_base_id";

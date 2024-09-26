@@ -3,6 +3,8 @@ package mtr.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.MTRClient;
 import mtr.client.Config;
+import mtr.client.TrainClientRegistry;
+import mtr.client.TrainProperties;
 import mtr.data.RailwayData;
 import mtr.data.TrainClient;
 import mtr.entity.EntitySeat;
@@ -118,5 +120,16 @@ public abstract class TrainRendererBase {
 		}
 
 		return posAverage;
+	}
+
+	public static void applyTransform(TrainClient train, double x, double y, double z, float yaw, float pitch, float roll) {
+		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(train.trainId);
+		final boolean hasPitch = pitch < 0 ? train.transportMode.hasPitchAscending : train.transportMode.hasPitchDescending;
+		matrices.translate(x, y, z);
+		matrices.translate(0, trainProperties.railSurfaceOffset, 0);
+		UtilitiesClient.rotateY(matrices, (float) Math.PI + yaw);
+		UtilitiesClient.rotateX(matrices, (hasPitch ? pitch : 0));
+		UtilitiesClient.rotateZ(matrices, roll);
+		matrices.translate(0, -trainProperties.railSurfaceOffset, 0);
 	}
 }

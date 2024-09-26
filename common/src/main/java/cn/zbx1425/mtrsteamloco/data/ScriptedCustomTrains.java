@@ -69,7 +69,7 @@ public class ScriptedCustomTrains implements IResourcePackCreatorProperties, ICu
                         mtr.client.TrainClientRegistry.register(trainId, new TrainProperties(
                                 baseTrainType, prevTrainProp.name,
                                 prevTrainProp.description, prevTrainProp.wikipediaArticle, prevTrainProp.color,
-                                prevTrainProp.riderOffset, prevTrainProp.riderOffsetDismounting,
+                                prevTrainProp.riderOffset, prevTrainProp.riderOffsetDismounting, prevTrainProp.railSurfaceOffset,
                                 bogiePosition, isJacobsBogie, hasGangwayConnection,
                                 newRenderer, prevTrainProp.sound
                         ));

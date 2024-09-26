@@ -16,13 +16,14 @@ public class TrainProperties {
 	public final int color;
 	public final float riderOffset;
 	public final float riderOffsetDismounting;
+	public final float railSurfaceOffset;
 	public final float bogiePosition;
 	public final boolean isJacobsBogie;
 	public final boolean hasGangwayConnection;
 	public final TrainRendererBase renderer;
 	public final TrainSoundBase sound;
 
-	public TrainProperties(String baseTrainType, Component name, String description, String wikipediaArticle, int color, float riderOffset, float riderOffsetDismounting, float bogiePosition, boolean isJacobsBogie, boolean hasGangwayConnection, TrainRendererBase renderer, TrainSoundBase sound) {
+	public TrainProperties(String baseTrainType, Component name, String description, String wikipediaArticle, int color, float riderOffset, float riderOffsetDismounting, float railSurfaceOffset, float bogiePosition, boolean isJacobsBogie, boolean hasGangwayConnection, TrainRendererBase renderer, TrainSoundBase sound) {
 		this.baseTrainType = baseTrainType;
 		this.name = name;
 		this.description = description;
@@ -30,6 +31,7 @@ public class TrainProperties {
 		this.color = color;
 		this.riderOffset = riderOffset;
 		this.riderOffsetDismounting = riderOffsetDismounting;
+		this.railSurfaceOffset = railSurfaceOffset;
 		this.bogiePosition = bogiePosition;
 		this.isJacobsBogie = isJacobsBogie;
 		this.hasGangwayConnection = hasGangwayConnection;
@@ -39,7 +41,7 @@ public class TrainProperties {
 
 	public static TrainProperties getBlankProperties() {
 		return new TrainProperties(
-				"", Text.translatable(""), null, null, 0, 0, 0, 0, false, false,
+				"", Text.translatable(""), null, null, 0, 0, 0, -1, 0, false, false,
 				new JonModelTrainRenderer(null, "", "", ""),
 				new JonTrainSound("", new JonTrainSound.JonTrainSoundConfig(null, 0, 0.5F, false))
 		);
