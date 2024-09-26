@@ -78,6 +78,8 @@ public class TrainClient extends Train implements IGui {
 			if (ticksElapsed > 0) trainSound.playAllCarsDoorOpening(world, soundPos, ridingCar);
 		}
 
+		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
+		final float railSurfaceOffset = trainProperties.railSurfaceOffset;
 		final Vec3 offset = vehicleRidingClient.renderPlayerAndGetOffset();
 		final double newX = carX - offset.x;
 		final double newY = carY - offset.y;
@@ -92,9 +94,9 @@ public class TrainClient extends Train implements IGui {
 			final double newPrevCarY = prevCarY - offset.y;
 			final double newPrevCarZ = prevCarZ - offset.z;
 
-			final Vec3 prevPos0 = new Vec3(0, 0, spacing / 2D - 1).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
-			final Vec3 thisPos0 = new Vec3(0, 0, -(spacing / 2D - 1)).xRot(carPitch).yRot(carYaw).add(newX, newY, newZ);
-			final Vec3 connectPos = prevPos0.add(thisPos0).scale(0.5);
+			final Vec3 prevPos0 = withCarTransform(new Vec3(0, railSurfaceOffset, spacing / 2D - 1), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+			final Vec3 thisPos0 = withCarTransform(new Vec3(0, railSurfaceOffset, -(spacing / 2D - 1)), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+			final Vec3 connectPos = prevPos0.add(thisPos0).scale(0.5).add(0, -railSurfaceOffset, 0);
 			final float connectYaw = (float) Mth.atan2(thisPos0.x - prevPos0.x, thisPos0.z - prevPos0.z);
 			final double connectRealSpacing = thisPos0.distanceTo(prevPos0);
 			final float connectPitch = (float) asin((thisPos0.y - prevPos0.y) / connectRealSpacing);
@@ -104,16 +106,16 @@ public class TrainClient extends Train implements IGui {
 				final double xStart = width / 2D + (i == 0 ? -1 : 0.5) * CONNECTION_X_OFFSET;
 				final double zStart = spacing / 2D - (i == 0 ? 1 : 2) * CONNECTION_Z_OFFSET;
 
-				final float SMALL_OFFSET = 0.02f;
-				final Vec3 prevPos1 = new Vec3(xStart, SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
-				final Vec3 prevPos2 = new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
-				final Vec3 prevPos3 = new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
-				final Vec3 prevPos4 = new Vec3(-xStart, SMALL_OFFSET, zStart).xRot(prevCarPitch).yRot(prevCarYaw).add(newPrevCarX, newPrevCarY, newPrevCarZ);
+				final float SMALL_OFFSET = 0.05f;
+				final Vec3 prevPos1 = withCarTransform(new Vec3(xStart, SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos2 = withCarTransform(new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos3 = withCarTransform(new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos4 = withCarTransform(new Vec3(-xStart, SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
 
-				final Vec3 thisPos1 = new Vec3(-xStart, SMALL_OFFSET, -zStart).xRot(carPitch).yRot(carYaw).add(newX, newY, newZ);
-				final Vec3 thisPos2 = new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart).xRot(carPitch).yRot(carYaw).add(newX, newY, newZ);
-				final Vec3 thisPos3 = new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart).xRot(carPitch).yRot(carYaw).add(newX, newY, newZ);
-				final Vec3 thisPos4 = new Vec3(xStart, SMALL_OFFSET, -zStart).xRot(carPitch).yRot(carYaw).add(newX, newY, newZ);
+				final Vec3 thisPos1 = withCarTransform(new Vec3(-xStart, SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos2 = withCarTransform(new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos3 = withCarTransform(new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos4 = withCarTransform(new Vec3(xStart, SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
 
 				if (i == 0) {
 					trainRenderer.renderConnection(prevPos1, prevPos2, prevPos3, prevPos4, thisPos1, thisPos2, thisPos3, thisPos4, connectPos.x, connectPos.y, connectPos.z, connectYaw, connectPitch, connectRoll);
@@ -122,6 +124,10 @@ public class TrainClient extends Train implements IGui {
 				}
 			}
 		}
+	}
+
+	private static Vec3 withCarTransform(Vec3 child, double x, double y, double z, float yaw, float pitch, float roll, float railSurfaceOffset) {
+		return child.add(0, -railSurfaceOffset, 0).zRot(roll).xRot(pitch).yRot(yaw).add(0, railSurfaceOffset, 0).add(x, y, z);
 	}
 
 	@Override
@@ -231,9 +237,9 @@ public class TrainClient extends Train implements IGui {
 		return true;
 	}
 
-	private final LowPassNoise irregX = new LowPassNoise(30, 0.0100);
-	private final LowPassNoise irregY = new LowPassNoise(30, 0.0050);
-	private final LowPassNoise irregR = new LowPassNoise(30, 0.0035);
+	private final LowPassNoise irregX = new LowPassNoise(20, 0.0200);
+	private final LowPassNoise irregY = new LowPassNoise(20, 0.0100);
+	private final LowPassNoise irregR = new LowPassNoise(20, 0.0070);
 
 	@Override
 	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
@@ -252,6 +258,7 @@ public class TrainClient extends Train implements IGui {
 			final float irregRatio = Mth.clamp(speed / (5.56f * 0.05f), 0, 1);
 
 			final float roll = (float)(irregR.getAt(railProgress - bogieFOffset) + irregR.getAt(railProgress - bogieBOffset)) / 2 * irregRatio;
+//			final float roll = (float)Math.toRadians(30);
 
 			double irregY1 = irregY.getAt(railProgress - bogieFOffset) * irregRatio, irregY2 = irregY.getAt(railProgress - bogieBOffset) * irregRatio;
 			final float yaw = (float) Mth.atan2(pos2.x - pos1.x, pos2.z - pos1.z);

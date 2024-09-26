@@ -24,6 +24,7 @@ public class LowPassNoise {
         this();
         this.cutoffFreq = cutoffFreq;
         this.stdDev = stdDev;
+        resetBuffer();
     }
 
     public void tick(double x) {
@@ -53,9 +54,10 @@ public class LowPassNoise {
     }
 
     private void resetBuffer() {
-        for (int i = 0; i < 400; i++) {
-            noiseEma[i] = 0.0;
-            noiseDema[i] = 0.0;
+        noiseEma[0] = 0;
+        noiseDema[0] = 0;
+        for (int i = 1; i < 400; i++) {
+            generateNoise(i - 1, i);
         }
     }
 
