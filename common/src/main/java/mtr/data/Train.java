@@ -60,11 +60,11 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 	private final float railLength;
 
 	public static final float ACCELERATION_DEFAULT = 0.01F; // m/tick^2
-	public static final float MAX_ACCELERATION = 0.05F; // m/tick^2
+	public static final float MAX_ACCELERATION = 0.02F; // m/tick^2
 	public static final float MIN_ACCELERATION = 0.001F; // m/tick^2
 	public static final int DOOR_MOVE_TIME = 64;
 	protected static final int MAX_CHECK_DISTANCE = 32;
-	protected static final int DOOR_DELAY = 20;
+	public static final int DOOR_DELAY = 60;
 
 	private static final String KEY_SPEED = "speed";
 	private static final String KEY_RAIL_PROGRESS = "rail_progress";
@@ -100,7 +100,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		this.distances = distances;
 		this.repeatIndex1 = repeatIndex1;
 		this.repeatIndex2 = repeatIndex2;
-		final float tempAccelerationConstant = RailwayData.round(accelerationConstant, 3);
+		final float tempAccelerationConstant = RailwayData.round(accelerationConstant, 4);
 		this.accelerationConstant = tempAccelerationConstant <= 0 ? ACCELERATION_DEFAULT : tempAccelerationConstant;
 	}
 
@@ -219,7 +219,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		sidingId = packet.readLong();
 		railLength = RailwayData.round(packet.readFloat(), 3);
 		speed = packet.readFloat();
-		final float tempAccelerationConstant = RailwayData.round(packet.readFloat(), 3);
+		final float tempAccelerationConstant = RailwayData.round(packet.readFloat(), 4);
 		accelerationConstant = tempAccelerationConstant <= 0 ? ACCELERATION_DEFAULT : tempAccelerationConstant;
 		railProgress = packet.readDouble();
 		elapsedDwellTicks = packet.readFloat();

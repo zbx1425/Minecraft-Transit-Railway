@@ -47,6 +47,7 @@ public class ConfigFile {
 	public final float mrServiceBrakeReduce = 5; // kPa each time
 
 	public final float doorCloseSoundLength;
+	public final float airHighSoundLength;
 
 	public ConfigFile(String textContent, BveTrainSoundConfig config) {
 		final String[] lines = textContent.split("[\\r\\n]+");
@@ -76,6 +77,7 @@ public class ConfigFile {
 		float regenerationLimit = 0; // m/s
 		float motorOutputAtCoast = 0.4F;
 		float doorCloseSoundLength = 1;
+		float airHighSoundLength = 0;
 
 		for (final String line : lines) {
 			final String trimLine = line.trim().replaceAll("\\s*(;|#|//).+", "");
@@ -107,6 +109,9 @@ public class ConfigFile {
 								break;
 							case "doorclosesoundlength":
 								doorCloseSoundLength = Float.parseFloat(value);
+								break;
+							case "airhighsoundlength":
+								airHighSoundLength = Float.parseFloat(value);
 								break;
 							case "breakerdelay":
 								breakerDelay = Float.parseFloat(value);
@@ -238,5 +243,6 @@ public class ConfigFile {
 		this.regenerationLimit = regenerationLimit;
 		this.motorOutputAtCoast = motorOutputAtCoast;
 		this.doorCloseSoundLength = doorCloseSoundLength;
+		this.airHighSoundLength = airHighSoundLength;
 	}
 }

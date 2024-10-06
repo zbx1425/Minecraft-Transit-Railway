@@ -3,6 +3,7 @@ package mtr.sound.bve;
 import mtr.MTRClient;
 import mtr.client.TrainClientRegistry;
 import mtr.client.TrainProperties;
+import mtr.data.Train;
 import mtr.data.TrainClient;
 import mtr.sound.TrainLoopingSoundInstance;
 import mtr.sound.TrainSoundBase;
@@ -22,7 +23,7 @@ public class BveTrainSound extends TrainSoundBase {
 	private float motorCurrentOutput = 0;
 	private float motorBreakerTimer = -1;
 
-	private int mrPress;
+	private float mrPress;
 	private boolean isCompressorActive;
 	private boolean isCompressorActiveLastElapsed;
 
@@ -37,6 +38,8 @@ public class BveTrainSound extends TrainSoundBase {
 	private final TrainLoopingSoundInstance soundLoopShoe;
 	private final TrainLoopingSoundInstance soundLoopCompressor;
 	private final int[][] bogieRailId;
+
+	private float doorClosedTimer = -1;
 
 	private BveTrainSound(BveTrainSoundConfig config, TrainClient train) {
 		this.config = config;
@@ -183,10 +186,21 @@ public class BveTrainSound extends TrainSoundBase {
 				playLocalSound(world, config.soundCfg.airZero, pos);
 			}
 		} else if (accelLastElapsed <= 0 && accel > 0 && speed < 0.3) {
-			playLocalSound(world, config.soundCfg.airHigh, pos);
+			playLocalSound(world, config.soundCfg.airZero, pos);
 		} else if (accelLastElapsed >= 0 && accel < 0) {
 			mrPress -= config.soundCfg.mrServiceBrakeReduce;
 			playLocalSound(world, config.soundCfg.brakeHandleApply, pos);
+		}
+
+		// Train depart
+		if (train.getDoorValue() > 0) {
+			doorClosedTimer = 0;
+		} else if (doorClosedTimer >= 0) {
+			doorClosedTimer += deltaT;
+			if (doorClosedTimer > Train.DOOR_DELAY / 20f - config.soundCfg.airHighSoundLength) {
+				playLocalSound(world, config.soundCfg.airHigh, pos);
+				doorClosedTimer = -1;
+			}
 		}
 
 		// Emergency brake application after returning to depot
