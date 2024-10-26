@@ -85,7 +85,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 		}
 
 		matrices.pushPose();
-		applyTransform(train, x, y, z, yaw, Mth.PI + pitch, roll);
+		applyTransform(train, x, y, z, yaw, pitch, roll, true);
 
 		final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
 
@@ -170,7 +170,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 
 		if (trainProperties.isJacobsBogie) {
 			matrices.pushPose();
-			applyTransform(train, x, y, z, yaw, Mth.PI + pitch, roll);
+			applyTransform(train, x, y, z, yaw, pitch, roll, true);
 			MODEL_BOGIE.render(matrices, vertexConsumers, light, 0);
 			matrices.popPose();
 		}

@@ -89,7 +89,7 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
             return;
         }
 
-        applyTransform(train, x, y, z, yaw, pitch, roll);
+        applyTransform(train, x, y, z, yaw, pitch, roll, false);
         final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
         Matrix4f drawPose = new Matrix4f(matrices.last().pose());
         if (shouldRender) {
@@ -119,7 +119,7 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
         final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
         if (posAverage == null) return;
         matrices.pushPose();
-        applyTransform(train, x, y, z, yaw, pitch, roll);
+        applyTransform(train, x, y, z, yaw, pitch, roll, false);
         final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
         Matrix4f pose = new Matrix4f(matrices.last().pose());
         synchronized (trainScripting) {

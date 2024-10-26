@@ -122,7 +122,7 @@ public abstract class TrainRendererBase {
 		return posAverage;
 	}
 
-	public static void applyTransform(TrainClient train, double x, double y, double z, float yaw, float pitch, float roll) {
+	public static void applyTransform(TrainClient train, double x, double y, double z, float yaw, float pitch, float roll, boolean isBbModel) {
 		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(train.trainId);
 		final boolean hasPitch = pitch < 0 ? train.transportMode.hasPitchAscending : train.transportMode.hasPitchDescending;
 		matrices.translate(x, y, z);
@@ -131,5 +131,6 @@ public abstract class TrainRendererBase {
 		UtilitiesClient.rotateX(matrices, (hasPitch ? pitch : 0));
 		UtilitiesClient.rotateZ(matrices, roll);
 		matrices.translate(0, -trainProperties.railSurfaceOffset, 0);
+		if (isBbModel) UtilitiesClient.rotateX(matrices, (float) Math.PI);
 	}
 }
