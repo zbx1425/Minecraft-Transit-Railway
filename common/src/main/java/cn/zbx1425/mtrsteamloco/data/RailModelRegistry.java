@@ -107,6 +107,28 @@ public class RailModelRegistry {
             rawModel.applyUVMirror(false, true);
         }
 
+        if (obj.has("translation")) {
+            JsonArray vec = obj.get("translation").getAsJsonArray();
+            rawModel.applyTranslation(vec.get(0).getAsFloat(), vec.get(1).getAsFloat(), vec.get(2).getAsFloat());
+        }
+        if (obj.has("rotation")) {
+            JsonArray vec = obj.get("rotation").getAsJsonArray();
+            rawModel.applyRotation(new Vector3f(1, 0, 0), vec.get(0).getAsFloat());
+            rawModel.applyRotation(new Vector3f(0, 1, 0), vec.get(1).getAsFloat());
+            rawModel.applyRotation(new Vector3f(0, 0, 1), vec.get(2).getAsFloat());
+        }
+        if (obj.has("scale")) {
+            JsonArray vec = obj.get("scale").getAsJsonArray();
+            rawModel.applyScale(vec.get(0).getAsFloat(), vec.get(1).getAsFloat(), vec.get(2).getAsFloat());
+        }
+        if (obj.has("mirror")) {
+            JsonArray vec = obj.get("mirror").getAsJsonArray();
+            rawModel.applyMirror(
+                    vec.get(0).getAsBoolean(), vec.get(1).getAsBoolean(), vec.get(2).getAsBoolean(),
+                    vec.get(0).getAsBoolean(), vec.get(1).getAsBoolean(), vec.get(2).getAsBoolean()
+            );
+        }
+
         rawModel.sourceLocation = ResourceLocation.parse(rawModel.sourceLocation.toString() + "/" + key);
 
         float repeatInterval = obj.has("repeatInterval") ? obj.get("repeatInterval").getAsFloat() : 0.5f;

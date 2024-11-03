@@ -249,6 +249,7 @@ public class TrainClient extends Train implements IGui {
 		if (pos1 != null && pos2 != null) {
 			double centerOffset = index * spacing + spacing / 2.0;
 			centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
+			double railProgress = this.railProgress - 10.0;
 			double bogiePosition = getBogiePosition() == 0 ? spacing / 2.0 : getBogiePosition();
 			double bogieFOffset = centerOffset - bogiePosition;
 			double bogieBOffset = centerOffset + bogiePosition;
