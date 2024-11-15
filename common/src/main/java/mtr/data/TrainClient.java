@@ -237,9 +237,9 @@ public class TrainClient extends Train implements IGui {
 		return true;
 	}
 
-	private final LowPassNoise irregX = new LowPassNoise(20, 0.0200);
-	private final LowPassNoise irregY = new LowPassNoise(20, 0.0100);
-	private final LowPassNoise irregR = new LowPassNoise(20, 0.0070);
+	private final LowPassNoise irregX = new LowPassNoise(40, 0.0200, spacing * trainCars);
+	private final LowPassNoise irregY = new LowPassNoise(40, 0.0100, spacing * trainCars);
+	private final LowPassNoise irregR = new LowPassNoise(40, 0.0080, spacing * trainCars);
 
 	@Override
 	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
