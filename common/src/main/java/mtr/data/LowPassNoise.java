@@ -1,63 +1,80 @@
 package mtr.data;
 
 
-import cn.zbx1425.mtrsteamloco.Main;
 import net.minecraft.util.Mth;
 
 import java.util.Random;
 
 public class LowPassNoise {
 
-    private static final int SAMPLE_PER_METER = 4;
+    public double cutoffFreq = 50.0;
+    public double stdDev = 0.001;
+    private final Random random;
+    private double prevX = 0;
+    private int baseI;
+    private final double[] noiseEma = new double[400];
+    private final double[] noiseDema = new double[400];
 
-    public double stdDev = 0;
-    public double ePow = 0;
-    private final Random random = new Random();
-
-    private int head;
-    private double headDist;
-    private final double[] noiseLoopBuffer;
-
-    public LowPassNoise(double cutoffFreq, double stdDev, double bufferLength) {
-        this.stdDev = stdDev / ((2 * Math.PI) / cutoffFreq);
-        this.ePow = 1 - Math.exp(-1.0 / SAMPLE_PER_METER * ((2 * Math.PI) / cutoffFreq));
-        this.noiseLoopBuffer = new double[(int)((bufferLength + 20) * SAMPLE_PER_METER)];
-        this.headDist = Double.NEGATIVE_INFINITY;
+    public LowPassNoise() {
+        random = new Random();
+        resetBuffer();
     }
 
-    public void tick(double newDist) {
-        if (Math.abs(newDist - headDist) > noiseLoopBuffer.length / 2.0 / SAMPLE_PER_METER) {
-            noiseLoopBuffer[0] = random.nextGaussian() * stdDev;
-            for (int i = 1; i < noiseLoopBuffer.length; i++) {
-                noiseLoopBuffer[i] = noiseLoopBuffer[i - 1] + ePow * (random.nextGaussian() * stdDev - noiseLoopBuffer[i - 1]);
-            }
-            head = 0;
-            headDist = newDist;
+    public LowPassNoise(double cutoffFreq, double stdDev) {
+        this();
+        this.cutoffFreq = cutoffFreq;
+        this.stdDev = stdDev;
+        resetBuffer();
+    }
+
+    public void tick(double x) {
+        double deltaX = x - prevX;
+        prevX = x;
+        int prevBaseI = baseI;
+        baseI = (int)Math.ceil(x * 4.0);
+        if (deltaX == 0.0 || Math.abs(deltaX) >= 100.0) {
+            resetBuffer();
+            return;
         }
-        if (newDist > headDist) {
-            for (; headDist < newDist; headDist += 1.0 / SAMPLE_PER_METER) {
-                double result = noiseLoopBuffer[head] + ePow * (random.nextGaussian() * stdDev - noiseLoopBuffer[head]);
-                head = (head + 1) % noiseLoopBuffer.length;
-                noiseLoopBuffer[head] = result;
+        if (deltaX < 0.0) {
+            int crntBase = (prevBaseI + 1) % 400;
+            for (int i = prevBaseI; i > baseI; i--) {
+                int crntTg = i % 400;
+                generateNoise(crntBase, crntTg);
+                crntBase = crntTg;
             }
-        } else if (newDist < headDist) {
-            for (; headDist > newDist; headDist -= 1.0 / SAMPLE_PER_METER) {
-                double result = noiseLoopBuffer[head] + ePow * (random.nextGaussian() * stdDev - noiseLoopBuffer[head]);
-                head = (head - 1 + noiseLoopBuffer.length) % noiseLoopBuffer.length;
-                // Insert new value at tail, not head
-                noiseLoopBuffer[(head + 1) % noiseLoopBuffer.length] = result;
+        } else {
+            int crntBase = prevBaseI % 400;
+            for (int j = prevBaseI + 1; j <= baseI; j++) {
+                int crntTg = j % 400;
+                generateNoise(crntBase, crntTg);
+                crntBase = crntTg;
             }
         }
     }
 
-    public double getAt(double dist) {
-        double offset = headDist - dist;
-        int prevEntry = (head - (int)(offset * SAMPLE_PER_METER) + noiseLoopBuffer.length * 2) % noiseLoopBuffer.length;
-        int nextEntry = (prevEntry + 1) % noiseLoopBuffer.length;
-        if (prevEntry < 0 || nextEntry < 0) {
-            return 0;
+    private void resetBuffer() {
+        noiseEma[0] = 0;
+        noiseDema[0] = 0;
+        for (int i = 1; i < 400; i++) {
+            generateNoise(i - 1, i);
         }
-        double k = Mth.frac(offset * SAMPLE_PER_METER);
-        return (1.0 - k) * noiseLoopBuffer[prevEntry] + k * noiseLoopBuffer[nextEntry];
+    }
+
+    private void generateNoise(int baseI, int tgI) {
+        double omega = Mth.TWO_PI / cutoffFreq;
+        double k = 1.0 - Math.exp(-omega / 4.0);
+        double normalNoise = stdDev * Math.sqrt(-2.0 * Math.log(random.nextDouble())) * Mth.cos(Mth.TWO_PI * random.nextFloat());
+        noiseEma[tgI] = noiseEma[baseI] + (normalNoise / omega - noiseEma[baseI]) * k;
+        noiseDema[tgI] = noiseDema[baseI] + (noiseEma[tgI] / omega - noiseDema[baseI]) * k;
+    }
+
+    public double getAt(double x) {
+        double reqX = x * 4.0;
+        int reqXFloor = (int)Math.floor(reqX);
+        double interpolateRatio = reqX - (double)reqXFloor;
+        int prevEntry = (reqXFloor + 400) % 400;
+        int nextEntry = (reqXFloor + 400 + 1) % 400;
+        return (1.0 - interpolateRatio) * noiseDema[prevEntry] + interpolateRatio * noiseDema[nextEntry];
     }
 }
