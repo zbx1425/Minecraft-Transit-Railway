@@ -4,8 +4,10 @@ import io.netty.buffer.Unpooled;
 import mtr.KeyMappings;
 import mtr.mappings.Text;
 import mtr.mappings.UtilitiesClient;
+import mtr.model.ModelLift1;
 import mtr.render.RenderTrains;
 import mtr.screen.LiftSelectionScreen;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -15,10 +17,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class LiftClient extends Lift {
 
 	private final VehicleRidingClient vehicleRidingClient = new VehicleRidingClient(ridingEntities, PACKET_UPDATE_LIFT_PASSENGER_POSITION);
+
+	private ModelLift1 liftModel;
 
 	public LiftClient(FriendlyByteBuf packet) {
 		super(packet);
@@ -55,6 +60,13 @@ public class LiftClient extends Lift {
 		}
 	}
 
+	public ModelLift1 getModel() {
+		if (liftModel == null) {
+			liftModel = new ModelLift1(liftHeight, liftWidth, liftDepth, isDoubleSided);
+		}
+		return liftModel;
+	}
+
 	public void copyFromLift(LiftClient lift) {
 		liftHeight = lift.liftHeight;
 		liftWidth = lift.liftWidth;
@@ -82,6 +94,7 @@ public class LiftClient extends Lift {
 		floors.addAll(lift.floors);
 
 		liftInstructions.copyFrom(lift.liftInstructions);
+		liftModel = null;
 	}
 
 	public void setExtraData(Consumer<FriendlyByteBuf> sendPacket) {
