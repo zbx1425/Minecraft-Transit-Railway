@@ -44,7 +44,8 @@ public class TrainClientRegistry {
 	}
 
 	private static void register(TrainType defaultTrainType, String wikipediaArticle, ModelTrainBase model, String textureId, int color, float riderOffset, float riderOffsetDismounting) {
-		register(defaultTrainType.toString(), defaultTrainType.baseTrainType, null, null, wikipediaArticle, model, textureId, color, "", "", riderOffset, riderOffsetDismounting, -1, 0, false, null, new JonTrainSound.JonTrainSoundConfig(null, 0, 0.5F, false));
+		register(defaultTrainType.toString(), defaultTrainType.baseTrainType, null, null, wikipediaArticle, model, textureId, color, "", "", riderOffset, riderOffsetDismounting,
+				TrainType.getTransportMode(defaultTrainType.baseTrainType) == TransportMode.CABLE_CAR ? 5 : -1, 0, false, null, new JonTrainSound.JonTrainSoundConfig(null, 0, 0.5F, false));
 	}
 
 	public static void reset() {
