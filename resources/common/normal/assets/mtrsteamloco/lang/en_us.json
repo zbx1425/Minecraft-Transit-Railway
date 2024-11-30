@@ -4,6 +4,7 @@
     "block.mtrsteamloco.departure_bell": "Train Departure Bell",
     "block.mtrsteamloco.statistic_turnstile": "Visitor Statistic Turnstile",
     "block.mtrsteamloco.feedback_box": "Feedback Box",
+    "block.mtrsteamloco.one_way_gate_1": "One Way Gate",
     "block.mtrsteamloco.eye_candy": "Decoration Object",
 
     "item.mtrsteamloco.bridge_creator_1": "Bridge Creator",
@@ -40,6 +41,7 @@
     "gui.mtrsteamloco.statistic_turnstile_deactivated": "Statistic deactivated",
     "gui.mtrsteamloco.statistic_view": "Visitors: %d, Visits: %d",
     "gui.mtrsteamloco.feedback_success": "Your feedback has been received, and can be viewed at: ",
+    "gui.mtrsteamloco.one_way_gate.wrong_way_pass": "Cannot open from this side!",
 
     "gui.mtrsteamloco.error.title": "Error in NTE resource loading process",
     "gui.mtrsteamloco.error.explain": "If you are a player, just click the Cancel button. If you are a resource pack author, you can check the error message.\nIt's most likely to be from an error in a resource pack, but it can also be caused by a bug in another mod utilizing NTE or NTE itself.",
