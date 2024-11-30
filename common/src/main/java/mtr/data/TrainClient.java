@@ -1,5 +1,6 @@
 package mtr.data;
 
+import cn.zbx1425.mtrsteamloco.ClientConfig;
 import mtr.MTRClient;
 import mtr.client.*;
 import mtr.render.RenderDrivingOverlay;
@@ -237,9 +238,9 @@ public class TrainClient extends Train implements IGui {
 		return true;
 	}
 
-	private final LowPassNoise irregX = new LowPassNoise(20, 0.0200);
-	private final LowPassNoise irregY = new LowPassNoise(20, 0.0100);
-	private final LowPassNoise irregR = new LowPassNoise(20, 0.0070);
+	private final PerlinNoise1D irregX = new PerlinNoise1D(1 / 8f, 3, 0.0200);
+	private final PerlinNoise1D irregY = new PerlinNoise1D(1 / 8f, 3, 0.0100);
+	private final PerlinNoise1D irregR = new PerlinNoise1D(1 / 8f, 3, 0.0100);
 
 	@Override
 	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
@@ -256,7 +257,8 @@ public class TrainClient extends Train implements IGui {
 			if (getIsJacobsBogie() && index != 0) bogieFOffset = centerOffset - spacing / 2.0;
 			if (getIsJacobsBogie() && index != trainCars - 1) bogieBOffset = centerOffset + spacing / 2.0;
 
-			final float irregRatio = Mth.clamp(speed / (5.56f * 0.05f), 0, 1);
+			final float irregRatio = ClientConfig.hideRidingTrain ? 0
+					: Mth.clamp(speed / (5.56f * 0.05f), 0, 1);
 
 			final float roll = (float)(irregR.getAt(railProgress - bogieFOffset) + irregR.getAt(railProgress - bogieBOffset)) / 2 * irregRatio;
 //			final float roll = (float)Math.toRadians(30);
