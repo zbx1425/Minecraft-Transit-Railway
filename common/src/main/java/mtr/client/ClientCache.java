@@ -213,21 +213,15 @@ public class ClientCache extends DataCache implements IGui {
 			if (route.circularState == Route.CircularState.NONE) {
 				return platformIdToStation.get(route.getLastPlatformId()).name;
 			} else {
-				boolean isVia = false;
-				String text = "";
-
-				for (int i = currentStationIndex + 1; i < route.platformIds.size() - 1; i++) {
-					if (stationIdToRoutes.get(platformIdToStation.get(route.platformIds.get(i).platformId).id).size() > 1) {
-						text = platformIdToStation.get(route.platformIds.get(i).platformId).name;
-						isVia = true;
-						break;
-					}
-				}
-
-				if (!isVia) {
+				boolean isVia;
+				String text;
+				if (currentStationIndex < route.platformIds.size() - 2) {
+					text = platformIdToStation.get(route.platformIds.get(currentStationIndex + 1).platformId).name;
+					isVia = true;
+				} else {
 					text = platformIdToStation.get(route.getLastPlatformId()).name;
+					isVia = false;
 				}
-
 				final String translationString = String.format("%s_%s", route.circularState == Route.CircularState.CLOCKWISE ? "clockwise" : "anticlockwise", isVia ? "via" : "to");
 				return circularMarker + IGui.insertTranslation("gui.mtr." + translationString + "_cjk", "gui.mtr." + translationString, 1, text);
 			}
