@@ -147,7 +147,7 @@ public class RailRenderDispatcher {
         Frustum cullingFrustum = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getCullingFrustum();
         ShaderProp shaderProp = new ShaderProp().setViewMatrix(viewMatrix);
 
-        int maxRailDistance = MTRClient.isReplayMod() ? 64 * 16 : UtilitiesClient.getRenderDistance() * 16;
+        int maxRailDistance = MTRClient.isReplayMod() ? 64 * 16 : (UtilitiesClient.getRenderDistance() + 1) * 16;
         boolean isOutsideRenderDistance = false;
         for (Iterator<RailChunkBase> it = railChunkList.iterator(); it.hasNext(); ) {
             RailChunkBase chunk = it.next();
@@ -228,10 +228,12 @@ public class RailRenderDispatcher {
     }
 
     public void drawBoundingBoxes(PoseStack matrixStack, VertexConsumer buffer) {
+#if DEBUG
         for (RailChunkBase chunk : railChunkList) {
             boolean isChunkEven = chunk.isEven();
             LevelRenderer.renderLineBox(matrixStack, buffer, chunk.boundingBox,
                     1.0f, isChunkEven ? 1.0f : 0.0f, isChunkEven ? 0.0f : 1.0f, 1.0f);
         }
+#endif
     }
 }

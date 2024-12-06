@@ -73,7 +73,6 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 	private final Map<Long, List<ScheduleEntry>> schedulesForPlatform = new HashMap<>();
 	private final Map<Long, Map<BlockPos, TrainDelay>> trainDelays = new HashMap<>();
 
-	private static final int RAIL_UPDATE_DISTANCE = 128;
 	private static final int PLAYER_MOVE_UPDATE_THRESHOLD = 16;
 	private static final int SCHEDULE_UPDATE_TICKS = 60;
 
@@ -268,16 +267,18 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		return compoundTag;
 	}
 
-	public void simulateTrains() {
+	public void simulateTrains(ServerLevel serverLevel) {
 		final List<? extends Player> players = world.players();
 		players.forEach(player -> {
 			final BlockPos playerBlockPos = player.blockPosition();
 			final Vec3 playerPos = player.position();
 
+			int railUpdateDistance = (serverLevel.getServer().getPlayerList().getViewDistance() + 1) * 16;
+
 			if (!playerLastUpdatedPositions.containsKey(player) || playerLastUpdatedPositions.get(player).distManhattan(playerBlockPos) > PLAYER_MOVE_UPDATE_THRESHOLD) {
 				final Map<BlockPos, Map<BlockPos, Rail>> railsToAdd = new HashMap<>();
 				rails.forEach((startPos, blockPosRailMap) -> blockPosRailMap.forEach((endPos, rail) -> {
-					if (new AABB(startPos.getX(), startPos.getY(), startPos.getZ(), endPos.getX(), endPos.getY(), endPos.getZ()).inflate(RAIL_UPDATE_DISTANCE).contains(playerPos)) {
+					if (new AABB(startPos.getX(), startPos.getY(), startPos.getZ(), endPos.getX(), endPos.getY(), endPos.getZ()).inflate(railUpdateDistance).contains(playerPos)) {
 						if (!railsToAdd.containsKey(startPos)) {
 							railsToAdd.put(startPos, new HashMap<>());
 						}
@@ -344,9 +345,11 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 				return station != null && station.inArea(playerBlockPos.getX(), playerBlockPos.getZ());
 			}).map(platform -> platform.id).collect(Collectors.toSet());
 
+			int railUpdateDistance = (serverLevel.getServer().getPlayerList().getViewDistance() + 1) * 16;
+
 			final Set<UUID> railsToAdd = new HashSet<>();
 			rails.forEach((startPos, blockPosRailMap) -> blockPosRailMap.forEach((endPos, rail) -> {
-				if (new AABB(startPos.getX(), startPos.getY(), startPos.getZ(), endPos.getX(), endPos.getY(), endPos.getZ()).inflate(RAIL_UPDATE_DISTANCE).contains(playerPos)) {
+				if (new AABB(startPos.getX(), startPos.getY(), startPos.getZ(), endPos.getX(), endPos.getY(), endPos.getZ()).inflate(railUpdateDistance).contains(playerPos)) {
 					railsToAdd.add(PathData.getRailProduct(startPos, endPos));
 				}
 			}));

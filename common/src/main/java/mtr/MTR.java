@@ -486,7 +486,7 @@ public class MTR implements IPacket {
 			minecraftServer.getAllLevels().forEach(serverWorld -> {
 				final RailwayData railwayData = RailwayData.getInstance(serverWorld);
 				if (railwayData != null) {
-					railwayData.simulateTrains();
+					railwayData.simulateTrains(serverWorld);
 				}
 			});
 
