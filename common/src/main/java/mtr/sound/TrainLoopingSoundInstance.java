@@ -33,15 +33,23 @@ public class TrainLoopingSoundInstance extends TickableSoundInstanceMapper {
 		z = pos.getZ();
 
 		final SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-		if (soundManager != null && !train.isRemoved && volume > 0 && !soundManager.isActive(this)) {
-			looping = true;
-			soundManager.play(this);
-		}
-	}
+        if (soundManager.isActive(this)) {
+            if (volume <= 0) {
+                soundManager.stop(this);
+            }
+        } else {
+            if (!train.isRemoved && volume > 0) {
+                looping = true;
+                soundManager.play(this);
+            }
+        }
+    }
 
 	@Override
 	public void tick() {
 		if (train.isRemoved) {
+			final SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+			soundManager.stop(this);
 			stop();
 		}
 	}
@@ -55,4 +63,5 @@ public class TrainLoopingSoundInstance extends TickableSoundInstanceMapper {
 	public boolean canPlaySound() {
 		return true;
 	}
+
 }

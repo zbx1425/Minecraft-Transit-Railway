@@ -84,6 +84,10 @@ public class BveTrainSound extends TrainSoundBase {
 		return new BveTrainSound(config, train);
 	}
 
+	private float deltaTForAccel;
+	private float prevSpeed;
+	private float accel;
+
 	@Override
 	public void playNearestCar(Level world, BlockPos pos, int carIndex) {
 		if (train == null) {
@@ -91,8 +95,12 @@ public class BveTrainSound extends TrainSoundBase {
 		}
 
 		final float deltaT = MTRClient.getLastFrameDuration() / 20;
+		deltaTForAccel += deltaT;
 		final float speed = train.getSpeed() * 20;
-		final float accel = train.speedChange() / deltaT; // TODO sounds weird when coasting or braking
+		if (deltaTForAccel > 0.1) {
+			accel = (speed - prevSpeed) / deltaTForAccel;
+			prevSpeed = speed;
+		}
 		final float speedKph = speed * 3.6F;
 
 		// Rolling noise
@@ -151,7 +159,8 @@ public class BveTrainSound extends TrainSoundBase {
 			if (soundLoopMotor[i] == null) {
 				continue;
 			}
-			soundLoopMotor[i].setData(config.motorData.getVolume(i, speedKph, motorCurrentOutput) * config.soundCfg.motorVolumeMultiply, config.motorData.getPitch(i, speedKph, motorCurrentOutput), pos);
+			soundLoopMotor[i].setData(config.motorData.getVolume(i, speedKph, motorCurrentOutput) * config.soundCfg.motorVolumeMultiply,
+					config.motorData.getPitch(i, speedKph, motorCurrentOutput), pos);
 		}
 
 		// TODO Play flange sounds
