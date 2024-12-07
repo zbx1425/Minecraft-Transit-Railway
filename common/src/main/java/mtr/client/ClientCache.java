@@ -173,7 +173,7 @@ public class ClientCache extends DataCache implements IGui {
 	public String[] requestLiftFloorText(BlockPos pos) {
 		// TODO cache this
 		final Level world = Minecraft.getInstance().level;
-		final String[] text = {"", ""};
+		final String[] text = {"", "", ""};
 		if (world != null && pos != null) {
 			final BlockEntity blockEntity = world.getBlockEntity(pos);
 			if (blockEntity instanceof BlockLiftTrackFloor.TileEntityLiftTrackFloor) {
@@ -182,6 +182,18 @@ public class ClientCache extends DataCache implements IGui {
 			}
 		}
 		return text;
+	}
+
+	public boolean requestLiftFloorDisableCarCall(BlockPos pos) {
+		// TODO cache this
+		final Level world = Minecraft.getInstance().level;
+		if (world != null && pos != null) {
+			final BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity instanceof BlockLiftTrackFloor.TileEntityLiftTrackFloor) {
+				return ((BlockLiftTrackFloor.TileEntityLiftTrackFloor) blockEntity).getDisableCarCall();
+			}
+		}
+		return false;
 	}
 
 	public Set<Station> getConnectingStationsIncludingThisOne(Station station) {

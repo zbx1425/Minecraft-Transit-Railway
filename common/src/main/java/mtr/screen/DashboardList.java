@@ -55,6 +55,8 @@ public class DashboardList implements IGui {
 
 	private static final int TOP_OFFSET = SQUARE_SIZE + TEXT_FIELD_PADDING;
 
+	public static final long ID_DISABLED = -1;
+
 	public <T> DashboardList(BiConsumer<NameColorDataBase, Integer> onFind, BiConsumer<NameColorDataBase, Integer> onDrawArea, BiConsumer<NameColorDataBase, Integer> onEdit, Runnable onSort, BiConsumer<NameColorDataBase, Integer> onAdd, BiConsumer<NameColorDataBase, Integer> onDelete, Supplier<List<T>> getList, Supplier<String> getSearch, Consumer<String> setSearch) {
 		this(onFind, onDrawArea, onEdit, onSort, onAdd, onDelete, getList, getSearch, setSearch, true);
 	}
@@ -191,14 +193,20 @@ public class DashboardList implements IGui {
 			final int dataSize = dataFiltered.size();
 			final int itemsToShow = itemsToShow();
 			final boolean hasSortFiltered = hasSort && dataSize == dataSorted.size();
+
 			if (hoverIndex >= 0 && hoverIndex + page * itemsToShow < dataSize) {
-				buttonFind.visible = hasFind;
-				buttonDrawArea.visible = hasDrawArea;
-				buttonEdit.visible = hasEdit;
-				buttonUp.visible = hasSortFiltered;
-				buttonDown.visible = hasSortFiltered;
-				buttonAdd.visible = hasAdd;
-				buttonDelete.visible = hasDelete;
+				final List<Integer> sortedKeys = new ArrayList<>(dataFiltered.keySet());
+				Collections.sort(sortedKeys);
+				final NameColorDataBase data = dataFiltered.get(sortedKeys.get(hoverIndex + itemsToShow * page));
+				final boolean isItemEnabled = data.id != ID_DISABLED;
+
+				buttonFind.visible = hasFind && isItemEnabled;
+				buttonDrawArea.visible = hasDrawArea && isItemEnabled;
+				buttonEdit.visible = hasEdit && isItemEnabled;
+				buttonUp.visible = hasSortFiltered && isItemEnabled;
+				buttonDown.visible = hasSortFiltered && isItemEnabled;
+				buttonAdd.visible = hasAdd && isItemEnabled;
+				buttonDelete.visible = hasDelete && isItemEnabled;
 
 				buttonUp.active = hoverIndex + itemsToShow * page > 0;
 				buttonDown.active = hoverIndex + itemsToShow * page < dataSize - 1;

@@ -58,10 +58,12 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 		private String floorNumber = "1";
 		private String floorDescription = "";
 		private boolean shouldDing;
+		private boolean disableCarCall;
 
 		private static final String KEY_FLOOR_NUMBER = "floor_number";
 		private static final String KEY_FLOOR_DESCRIPTION = "floor_description";
 		private static final String KEY_SHOULD_DING = "should_ding";
+		private static final String KEY_DISABLE_CAR_CALL = "disable_car_call";
 
 		public TileEntityLiftTrackFloor(BlockPos pos, BlockState state) {
 			super(BlockEntityTypes.LIFT_TRACK_FLOOR_1_TILE_ENTITY.get(), pos, state);
@@ -72,6 +74,7 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 			floorNumber = compoundTag.getString(KEY_FLOOR_NUMBER);
 			floorDescription = compoundTag.getString(KEY_FLOOR_DESCRIPTION);
 			shouldDing = compoundTag.getBoolean(KEY_SHOULD_DING);
+			disableCarCall = compoundTag.getBoolean(KEY_DISABLE_CAR_CALL);
 		}
 
 		@Override
@@ -79,12 +82,14 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 			compoundTag.putString(KEY_FLOOR_NUMBER, floorNumber);
 			compoundTag.putString(KEY_FLOOR_DESCRIPTION, floorDescription);
 			compoundTag.putBoolean(KEY_SHOULD_DING, shouldDing);
+			compoundTag.putBoolean(KEY_DISABLE_CAR_CALL, disableCarCall);
 		}
 
-		public void setData(String floorNumber, String floorDescription, boolean shouldDing) {
+		public void setData(String floorNumber, String floorDescription, boolean shouldDing, boolean disableCarCall) {
 			this.floorNumber = floorNumber;
 			this.floorDescription = floorDescription;
 			this.shouldDing = shouldDing;
+			this.disableCarCall = disableCarCall;
 			setChanged();
 			syncData();
 		}
@@ -100,5 +105,7 @@ public class BlockLiftTrackFloor extends BlockLiftTrack implements EntityBlockMa
 		public boolean getShouldDing() {
 			return shouldDing;
 		}
+
+		public boolean getDisableCarCall() { return disableCarCall; }
 	}
 }

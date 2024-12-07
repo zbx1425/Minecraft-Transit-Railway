@@ -290,10 +290,11 @@ public class PacketTrainDataGuiServer extends PacketTrainDataBase {
 		final String floorNumber = packet.readUtf(SerializedDataBase.PACKET_STRING_READ_LENGTH);
 		final String floorDescription = packet.readUtf(SerializedDataBase.PACKET_STRING_READ_LENGTH);
 		final boolean shouldDing = packet.readBoolean();
+		final boolean disableCarCall = packet.readBoolean();
 		minecraftServer.execute(() -> {
 			final BlockEntity entity = player.level().getBlockEntity(pos);
 			if (entity instanceof BlockLiftTrackFloor.TileEntityLiftTrackFloor) {
-				setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setData(floorNumber, floorDescription, shouldDing), (BlockLiftTrackFloor.TileEntityLiftTrackFloor) entity);
+				setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setData(floorNumber, floorDescription, shouldDing, disableCarCall), (BlockLiftTrackFloor.TileEntityLiftTrackFloor) entity);
 			}
 		});
 	}

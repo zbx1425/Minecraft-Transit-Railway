@@ -20,6 +20,7 @@ public class LiftSelectionScreen extends ScreenMapper implements IGui {
 	private final DashboardList selectionList;
 	private final List<BlockPos> floorLevels = new ArrayList<>();
 	private final List<String> floorDescriptions = new ArrayList<>();
+	private final List<Boolean> floorCallEnabled = new ArrayList<>();
 	private final LiftClient lift;
 
 	public LiftSelectionScreen(LiftClient lift) {
@@ -28,6 +29,7 @@ public class LiftSelectionScreen extends ScreenMapper implements IGui {
 		lift.iterateFloors(floor -> {
 			floorLevels.add(floor);
 			floorDescriptions.add(IGui.formatStationName(String.join("|", ClientData.DATA_CACHE.requestLiftFloorText(floor))));
+			floorCallEnabled.add(!ClientData.DATA_CACHE.requestLiftFloorDisableCarCall(floor));
 		});
 		selectionList = new DashboardList(this::onPress, null, null, null, null, null, null, () -> "", text -> {
 		});
@@ -48,7 +50,12 @@ public class LiftSelectionScreen extends ScreenMapper implements IGui {
 		selectionList.tick();
 		final List<NameColorDataBase> list = new ArrayList<>();
 		for (int i = floorLevels.size() - 1; i >= 0; i--) {
-			list.add(new DataConverter(floorDescriptions.get(i), lift.liftInstructions.containsInstruction(floorLevels.get(i).getY()) ? RenderTrains.LIFT_LIGHT_COLOR : ARGB_BLACK));
+			if (floorCallEnabled.get(i)) {
+				list.add(new DataConverter(floorDescriptions.get(i),
+						lift.liftInstructions.containsInstruction(floorLevels.get(i).getY()) ? RenderTrains.LIFT_LIGHT_COLOR : ARGB_BLACK));
+			} else {
+				list.add(new DataConverter(DashboardList.ID_DISABLED, floorDescriptions.get(i), 0xFF444444));
+			}
 		}
 		selectionList.setData(list, true, false, false, false, false, false);
 	}
@@ -84,6 +91,7 @@ public class LiftSelectionScreen extends ScreenMapper implements IGui {
 
 	private void onPress(NameColorDataBase data, int index) {
 		if (lift != null) {
+			if (!floorCallEnabled.get(floorLevels.size() - index - 1)) return;
 			PacketTrainDataGuiClient.sendPressLiftButtonC2S(lift.id, floorLevels.get(floorLevels.size() - index - 1).getY());
 		}
 		onClose();

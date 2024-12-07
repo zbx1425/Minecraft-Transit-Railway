@@ -298,12 +298,13 @@ public class PacketTrainDataGuiClient extends PacketTrainDataBase {
 		RegistryClient.sendToServer(PACKET_UPDATE_TRAIN_SENSOR, packet);
 	}
 
-	public static void sendLiftTrackFloorC2S(BlockPos pos, String floorNumber, String floorDescription, boolean shouldDing) {
+	public static void sendLiftTrackFloorC2S(BlockPos pos, String floorNumber, String floorDescription, boolean shouldDing, boolean disableCarCall) {
 		final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
 		packet.writeBlockPos(pos);
 		packet.writeUtf(floorNumber);
 		packet.writeUtf(floorDescription);
 		packet.writeBoolean(shouldDing);
+		packet.writeBoolean(disableCarCall);
 		RegistryClient.sendToServer(PACKET_UPDATE_LIFT_TRACK_FLOOR, packet);
 	}
 
