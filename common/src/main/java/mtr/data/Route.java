@@ -57,7 +57,7 @@ public final class Route extends NameColorDataBase implements IGui {
 		messagePackHelper.iterateArrayValue(KEY_CUSTOM_DESTINATIONS, customDestination -> customDestinations.add(customDestination.asStringValue().asString()));
 
 		for (int i = 0; i < Math.min(platformIds.size(), customDestinations.size()); i++) {
-			platformIds.get(i).customDestination = customDestinations.get(i);
+			platformIds.get(i).customDestination = MultipartName.parse(customDestinations.get(i));
 		}
 
 		routeType = EnumHelper.valueOf(RouteType.NORMAL, messagePackHelper.getString(KEY_ROUTE_TYPE));
@@ -93,7 +93,7 @@ public final class Route extends NameColorDataBase implements IGui {
 		final int platformCount = packet.readInt();
 		for (int i = 0; i < platformCount; i++) {
 			final RoutePlatform routePlatform = new RoutePlatform(packet.readLong());
-			routePlatform.customDestination = packet.readUtf(PACKET_STRING_READ_LENGTH);
+			routePlatform.customDestination = new MultipartName(packet);
 			platformIds.add(routePlatform);
 		}
 
@@ -116,7 +116,7 @@ public final class Route extends NameColorDataBase implements IGui {
 
 		messagePacker.packString(KEY_CUSTOM_DESTINATIONS).packArrayHeader(platformIds.size());
 		for (final RoutePlatform routePlatform : platformIds) {
-			messagePacker.packString(routePlatform.customDestination);
+			messagePacker.packString(routePlatform.customDestination.toString());
 		}
 
 		messagePacker.packString(KEY_ROUTE_TYPE).packString(routeType.toString());
@@ -138,7 +138,7 @@ public final class Route extends NameColorDataBase implements IGui {
 		packet.writeInt(platformIds.size());
 		platformIds.forEach(routePlatform -> {
 			packet.writeLong(routePlatform.platformId);
-			packet.writeUtf(routePlatform.customDestination);
+			routePlatform.customDestination.writePacket(packet);
 		});
 
 		packet.writeUtf(routeType.toString());
@@ -157,7 +157,7 @@ public final class Route extends NameColorDataBase implements IGui {
 				final int platformCount = packet.readInt();
 				for (int i = 0; i < platformCount; i++) {
 					final RoutePlatform routePlatform = new RoutePlatform(packet.readLong());
-					routePlatform.customDestination = packet.readUtf(PACKET_STRING_READ_LENGTH);
+					routePlatform.customDestination = new MultipartName(packet);
 					platformIds.add(routePlatform);
 				}
 				break;
@@ -190,7 +190,7 @@ public final class Route extends NameColorDataBase implements IGui {
 		packet.writeInt(platformIds.size());
 		platformIds.forEach(routePlatform -> {
 			packet.writeLong(routePlatform.platformId);
-			packet.writeUtf(routePlatform.customDestination);
+			routePlatform.customDestination.writePacket(packet);
 		});
 		sendPacket.accept(packet);
 	}
@@ -232,10 +232,10 @@ public final class Route extends NameColorDataBase implements IGui {
 		return platformIds.isEmpty() ? 0 : platformIds.get(platformIds.size() - 1).platformId;
 	}
 
-	public String getDestination(int index) {
+	public String getDestination(int index, MultipartName.Usage usage) {
 		for (int i = Math.min(platformIds.size() - 1, index); i >= 0; i--) {
-			final String customDestination = platformIds.get(i).customDestination;
-			if (Route.destinationIsReset(customDestination)) {
+			final String customDestination = platformIds.get(i).customDestination.get(usage);
+			if (destinationIsReset(customDestination)) {
 				return null;
 			} else if (!customDestination.isEmpty()) {
 				return customDestination;
@@ -250,12 +250,12 @@ public final class Route extends NameColorDataBase implements IGui {
 
 	public static class RoutePlatform {
 
-		public String customDestination;
+		public MultipartName customDestination;
 		public final long platformId;
 
 		public RoutePlatform(long platformId) {
 			this.platformId = platformId;
-			customDestination = "";
+			customDestination = MultipartName.EMPTY;
 		}
 	}
 

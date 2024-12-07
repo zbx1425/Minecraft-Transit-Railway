@@ -81,7 +81,7 @@ public abstract class ModelTrainBase extends EntityModel<Entity> implements IGui
 				final Station thisStation = train == null ? null : train.getThisStation();
 				final Station nextStation = train == null ? null : train.getNextStation();
 				final Station lastStation = train == null ? null : train.getLastStation();
-				renderTextDisplays(matrices, vertexConsumers, Minecraft.getInstance().font, immediate, thisRoute, nextRoute, thisStation, nextStation, lastStation, thisRoute == null ? null : thisRoute.getDestination(train.getCurrentStationIndex()), currentCar, trainCars, atPlatform, train == null ? tempScrollingTexts : train.scrollingTexts);
+				renderTextDisplays(matrices, vertexConsumers, Minecraft.getInstance().font, immediate, thisRoute, nextRoute, thisStation, nextStation, lastStation, thisRoute == null ? null : thisRoute.getDestination(train.getCurrentStationIndex(), MultipartName.Usage.TRAIN_DEST), currentCar, trainCars, atPlatform, train == null ? tempScrollingTexts : train.scrollingTexts);
 				immediate.endBatch();
 			}
 		}

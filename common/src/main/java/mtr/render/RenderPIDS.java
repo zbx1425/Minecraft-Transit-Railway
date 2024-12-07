@@ -175,7 +175,7 @@ public class RenderPIDS<T extends BlockEntityMapper> extends BlockEntityRenderer
 				final boolean isCJK;
 				// Check if there is a custom message (to determine CJK translations)
 				if (j < scheduleList.size() && !hideArrival[j] && route != null) {
-					final String[] destinationSplit = ClientData.DATA_CACHE.getFormattedRouteDestination(route, currentSchedule.currentStationIndex, "").split("\\|");
+					final String[] destinationSplit = ClientData.DATA_CACHE.getFormattedRouteDestination(route, currentSchedule.currentStationIndex, "", MultipartName.Usage.PIDS_DEST).split("\\|");
 					final boolean isLightRailRoute = route.isLightRailRoute;
 					final String[] routeNumberSplit = route.lightRailRouteNumber.split("\\|");
 					final String checkString;
@@ -212,7 +212,7 @@ public class RenderPIDS<T extends BlockEntityMapper> extends BlockEntityRenderer
 
 					// Check if arrival number exists
 					if (arrivalNum < scheduleList.size() && !hideArrival[arrivalNum] && route != null) {
-						final String[] destinationSplit = ClientData.DATA_CACHE.getFormattedRouteDestination(route, currentSchedule.currentStationIndex, "").split("\\|");
+						final String[] destinationSplit = ClientData.DATA_CACHE.getFormattedRouteDestination(route, currentSchedule.currentStationIndex, "", MultipartName.Usage.PIDS_DEST).split("\\|");
 						final boolean isLightRailRoute = route.isLightRailRoute;
 						final String[] routeNumberSplit = route.lightRailRouteNumber.split("\\|");
 

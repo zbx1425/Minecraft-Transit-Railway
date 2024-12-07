@@ -52,7 +52,7 @@ public class ArrivalsServletHandler extends HttpServlet {
 								final JsonObject scheduleObject = new JsonObject();
 								scheduleObject.addProperty("arrival", scheduleEntry.arrivalMillis);
 								scheduleObject.addProperty("name", route.name);
-								String destination = route.getDestination(scheduleEntry.currentStationIndex);
+								String destination = route.getDestination(scheduleEntry.currentStationIndex, MultipartName.Usage.PIDS_DEST);
 								if (destination == null) {
 									final Station station = railwayData.dataCache.platformIdToStation.get(route.getLastPlatformId());
 									destination = station == null ? "" : station.name;

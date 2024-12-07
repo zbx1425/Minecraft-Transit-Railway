@@ -215,9 +215,9 @@ public class ClientCache extends DataCache implements IGui {
 		return routeMap;
 	}
 
-	public String getFormattedRouteDestination(Route route, int currentStationIndex, String circularMarker) {
+	public String getFormattedRouteDestination(Route route, int currentStationIndex, String circularMarker, MultipartName.Usage usage) {
 		try {
-			final String customDestination = route.getDestination(currentStationIndex);
+			final String customDestination = route.getDestination(currentStationIndex, usage);
 			if (customDestination != null) {
 				return customDestination;
 			}

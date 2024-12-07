@@ -76,7 +76,7 @@ public class TrainWrapper {
             int routeStationIndex = currentRoutePlatforms.size();
             Station thisStation = dataCache.platformIdToStation.get((thisRoute.platformIds.get(routeStationIndex)).platformId);
             Platform thisPlatform = dataCache.platformIdMap.get((thisRoute.platformIds.get(routeStationIndex)).platformId);
-            String customDestination = thisRoute.getDestination(routeStationIndex);
+            String customDestination = thisRoute.getDestination(routeStationIndex, MultipartName.Usage.TRAIN_DEST);
             double distance = ((TrainAccessor)train).getDistances().get(pathIndex);
             boolean reverseAtThisPlatform = (currentRoutePlatforms.size() + 1 >= thisRoute.platformIds.size() && reverseAtPlatform);
             Station lastStation = ClientData.DATA_CACHE.platformIdToStation.get(thisRoute.getLastPlatformId());

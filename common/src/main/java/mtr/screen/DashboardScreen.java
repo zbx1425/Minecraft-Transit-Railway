@@ -194,7 +194,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 							if (platform == null) {
 								return null;
 							} else {
-								final String customDestinationPrefix = platformId.customDestination.isEmpty() ? "" : Route.destinationIsReset(platformId.customDestination) ? "\"" : "*";
+								final String customDestinationPrefix = platformId.customDestination.isEmpty() ? "" : "*";
 								final Station station = ClientData.DATA_CACHE.platformIdToStation.get(platform.id);
 								if (station != null) {
 									return new DataConverter(String.format("%s%s (%s)", customDestinationPrefix, station.name, platform.name), station.color);
@@ -380,7 +380,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 	private void startEditingRouteDestination(int index) {
 		editingRoutePlatformIndex = index;
 		if (isValidRoutePlatformIndex()) {
-			textFieldCustomDestination.setValue(editingRoute.platformIds.get(index).customDestination);
+			textFieldCustomDestination.setValue(editingRoute.platformIds.get(index).customDestination.toString());
 		}
 		toggleButtons();
 	}
@@ -441,7 +441,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 
 	private void onDoneEditingRouteDestination() {
 		if (isValidRoutePlatformIndex()) {
-			editingRoute.platformIds.get(editingRoutePlatformIndex).customDestination = textFieldCustomDestination.getValue();
+			editingRoute.platformIds.get(editingRoutePlatformIndex).customDestination = MultipartName.parse(textFieldCustomDestination.getValue());
 			editingRoute.setPlatformIds(packet -> PacketTrainDataGuiClient.sendUpdate(PACKET_UPDATE_ROUTE, packet));
 		}
 		startEditingRoute(editingRoute, isNew);
