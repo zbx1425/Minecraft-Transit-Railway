@@ -39,11 +39,13 @@ public class TrainProperties {
 		this.sound = sound;
 	}
 
+	public static final TrainProperties BLANK_PROPERTIES = new TrainProperties(
+			"", Text.translatable(""), null, null, 0, 0, 0, -1, 0, false, false,
+			new JonModelTrainRenderer(null, "", "", ""),
+			new JonTrainSound("", new JonTrainSound.JonTrainSoundConfig(null, 0, 0.5F, false))
+	);
+
 	public static TrainProperties getBlankProperties() {
-		return new TrainProperties(
-				"", Text.translatable(""), null, null, 0, 0, 0, -1, 0, false, false,
-				new JonModelTrainRenderer(null, "", "", ""),
-				new JonTrainSound("", new JonTrainSound.JonTrainSoundConfig(null, 0, 0.5F, false))
-		);
+		return BLANK_PROPERTIES;
 	}
 }

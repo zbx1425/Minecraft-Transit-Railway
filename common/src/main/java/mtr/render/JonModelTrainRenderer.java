@@ -50,14 +50,14 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 
 	private JonModelTrainRenderer(ModelTrainBase model, String textureId, String gangwayConnectionId, String trainBarrierId, TrainClient train) {
 		this.model = model;
-		this.textureId = resolvePath(textureId);
-		this.gangwayConnectionId = resolvePath(gangwayConnectionId);
-		this.trainBarrierId = resolvePath(trainBarrierId);
+		this.textureId = textureId;
+		this.gangwayConnectionId = gangwayConnectionId;
+		this.trainBarrierId = trainBarrierId;
 		this.train = train;
 	}
 
 	public JonModelTrainRenderer(ModelTrainBase model, String textureId, String gangwayConnectionId, String trainBarrierId) {
-		this(model, textureId, gangwayConnectionId, trainBarrierId, null);
+		this(model, resolvePath(textureId), resolvePath(gangwayConnectionId), resolvePath(trainBarrierId), null);
 	}
 
 	@Override
