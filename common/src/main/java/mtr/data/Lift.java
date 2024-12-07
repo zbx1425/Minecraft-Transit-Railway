@@ -318,6 +318,9 @@ public abstract class Lift extends NameColorDataBase implements IPacket {
 					currentPositionY += speed * liftDirection.speedMultiplier * ticksElapsed;
 				}
 			});
+
+			frontCanOpen = false;
+			backCanOpen = false;
 		} else {
 			if (!doorOpen && doorValue > 0 || doorOpen && doorValue < DOOR_MAX * 2) {
 				if (doorOpen) {
