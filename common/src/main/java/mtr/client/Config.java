@@ -25,7 +25,7 @@ public class Config {
 	private static boolean useDynamicFPS = true;
 	private static int trackTextureOffset;
 	private static int dynamicTextureResolution = 2;
-	private static int trainRenderDistanceRatio = 7;
+	private static int trainRenderDistanceRatio = 12;
 
 	public static final List<Patreon> PATREON_LIST = new ArrayList<>();
 	public static final int TRACK_OFFSET_COUNT = 32;
