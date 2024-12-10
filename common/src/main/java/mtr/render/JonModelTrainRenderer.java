@@ -79,7 +79,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 			return;
 		}
 
-		final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
+		final BlockPos posAverage = applyAverageTransform(x, y, z);
 		if (posAverage == null) {
 			return;
 		}
@@ -143,7 +143,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 
 	@Override
 	public void renderConnection(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch, float roll) {
-		final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
+		final BlockPos posAverage = applyAverageTransform(x, y, z);
 		if (posAverage == null) {
 			return;
 		}
@@ -184,7 +184,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 			return;
 		}
 
-		final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
+		final BlockPos posAverage = applyAverageTransform(x, y, z);
 		if (posAverage == null) {
 			return;
 		}

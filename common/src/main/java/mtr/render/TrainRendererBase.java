@@ -34,14 +34,8 @@ public abstract class TrainRendererBase {
 
 	protected static boolean isTranslucentBatch;
 
-	private static Entity cameraEntity;
-	private static boolean hasEntity;
-	private static double entityX;
-	private static double entityY;
-	private static double entityZ;
 	private static EntityRenderDispatcher entityRenderDispatcher;
 	private static LocalPlayer player;
-	private static Vec3 playerEyePosition;
 
 	public abstract TrainRendererBase createTrainInstance(TrainClient train);
 
@@ -51,8 +45,8 @@ public abstract class TrainRendererBase {
 
 	public abstract void renderBarrier(Vec3 prevPos1, Vec3 prevPos2, Vec3 prevPos3, Vec3 prevPos4, Vec3 thisPos1, Vec3 thisPos2, Vec3 thisPos3, Vec3 thisPos4, double x, double y, double z, float yaw, float pitch, float roll);
 
-	public static void renderRidingPlayer(Vec3 viewOffset, UUID playerId, Vec3 playerPositionOffset) {
-		final BlockPos posAverage = applyAverageTransform(viewOffset, playerPositionOffset.x, playerPositionOffset.y, playerPositionOffset.z);
+	public static void renderRidingPlayer(UUID playerId, Vec3 playerPositionOffset) {
+		final BlockPos posAverage = applyAverageTransform(playerPositionOffset.x, playerPositionOffset.y, playerPositionOffset.z);
 		if (posAverage == null) {
 			return;
 		}
@@ -77,48 +71,18 @@ public abstract class TrainRendererBase {
 		lastFrameDuration = MTRClient.getLastFrameDuration();
 		TrainRendererBase.matrices = matrices;
 		TrainRendererBase.vertexConsumers = vertexConsumers;
-		cameraEntity = client.cameraEntity;
-		hasEntity = entity != null;
-		entityX = hasEntity ? Mth.lerp(tickDelta, entity.xOld, entity.getX()) : 0;
-		entityY = hasEntity ? Mth.lerp(tickDelta, entity.yOld, entity.getY()) : 0;
-		entityZ = hasEntity ? Mth.lerp(tickDelta, entity.zOld, entity.getZ()) : 0;
-		playerEyePosition = player == null ? Vec3.ZERO : player.getEyePosition(client.getTimer().getGameTimeDeltaTicks());
 	}
 
 	public static void setBatch(boolean isTranslucentBatch) {
 		TrainRendererBase.isTranslucentBatch = isTranslucentBatch;
 	}
 
-	public static BlockPos applyAverageTransform(Vec3 viewOffset, double x, double y, double z) {
-		final boolean noOffset = viewOffset == null;
-		final Vec3 cameraPos = cameraEntity == null ? null : cameraEntity.position();
-		final BlockPos posAverage = RailwayData.newBlockPos(x + (noOffset || cameraPos == null ? 0 : cameraPos.x), y + (noOffset || cameraPos == null ? 0 : cameraPos.y), z + (noOffset || cameraPos == null ? 0 : cameraPos.z));
-
+	public static BlockPos applyAverageTransform(double x, double y, double z) {
+		final BlockPos posAverage = RailwayData.newBlockPos(x, y, z);
 		if (RenderTrains.shouldNotRender(posAverage, UtilitiesClient.getRenderDistance() * (Config.trainRenderDistanceRatio() + 1), null)) {
 			return null;
 		}
-
 		matrices.pushPose();
-		if (viewOffset != null) {
-			final double offsetX;
-			final double offsetY;
-			final double offsetZ;
-			if (MTRClient.isVivecraft() && hasEntity) {
-				offsetX = entityX;
-				offsetY = entityY;
-				offsetZ = entityZ;
-			} else {
-				final Vec3 cameraOffset = camera.isDetached() ? playerEyePosition : camera.getPosition();
-				offsetX = cameraOffset.x;
-				offsetY = cameraOffset.y;
-				offsetZ = cameraOffset.z;
-			}
-			final float cameraYaw = camera.getYRot();
-			matrices.translate(offsetX, offsetY, offsetZ);
-			UtilitiesClient.rotateYDegrees(matrices, Utilities.getYaw(player) - cameraYaw + (Math.abs(Utilities.getYaw(player) - cameraYaw) > 90 ? 180 : 0));
-			matrices.translate(-viewOffset.x, -viewOffset.y, -viewOffset.z);
-		}
-
 		return posAverage;
 	}
 

@@ -7,7 +7,6 @@ import mtr.mappings.UtilitiesClient;
 import mtr.model.ModelLift1;
 import mtr.render.RenderTrains;
 import mtr.screen.LiftSelectionScreen;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -17,7 +16,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class LiftClient extends Lift {
 
@@ -44,10 +42,10 @@ public class LiftClient extends Lift {
 	}
 
 	public void render(Level world, RenderLift renderLift, float ticksElapsed) {
-		final Vec3 offset = vehicleRidingClient.renderPlayerAndGetOffset();
-		final double newX = currentPositionX + liftOffsetX / 2F - offset.x;
-		final double newY = currentPositionY + liftOffsetY - offset.y;
-		final double newZ = currentPositionZ + liftOffsetZ / 2F - offset.z;
+		vehicleRidingClient.renderPlayers();
+		final double newX = currentPositionX + liftOffsetX / 2F;
+		final double newY = currentPositionY + liftOffsetY;
+		final double newZ = currentPositionZ + liftOffsetZ / 2F;
 		renderLift.renderLift(newX, newY, newZ, frontCanOpen ? Math.min(doorValue / DOOR_MAX, 1) : 0, backCanOpen ? Math.min(doorValue / DOOR_MAX, 1) : 0);
 
 		final Minecraft minecraftClient = Minecraft.getInstance();
@@ -126,10 +124,6 @@ public class LiftClient extends Lift {
 
 	public void iterateFloors(Consumer<BlockPos> consumer) {
 		floors.forEach(consumer);
-	}
-
-	public Vec3 getViewOffset() {
-		return vehicleRidingClient.getViewOffset();
 	}
 
 	@FunctionalInterface

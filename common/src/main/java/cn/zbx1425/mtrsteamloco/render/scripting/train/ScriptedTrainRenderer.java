@@ -59,12 +59,8 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
 
         if (isTranslucentBatch) return;
 
-        final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
+        final BlockPos posAverage = applyAverageTransform(x, y, z);
         Vector3f carPos = new Vector3f((float)x, (float)y, (float)z);
-        Vec3 offset = train.vehicleRidingClient.getVehicleOffset();
-        if (offset != null) {
-            carPos.add((float)offset.x, (float)offset.y, (float)offset.z);
-        }
         final boolean hasPitch = pitch < 0 ? train.transportMode.hasPitchAscending : train.transportMode.hasPitchDescending;
         Matrix4f worldPose = new Matrix4f();
         worldPose.translate(carPos.x(), carPos.y(), carPos.z());
@@ -116,7 +112,7 @@ public class ScriptedTrainRenderer extends TrainRendererBase {
 
         if (isTranslucentBatch) return;
 
-        final BlockPos posAverage = applyAverageTransform(train.getViewOffset(), x, y, z);
+        final BlockPos posAverage = applyAverageTransform(x, y, z);
         if (posAverage == null) return;
         matrices.pushPose();
         applyTransform(train, x, y, z, yaw, pitch, roll, false);

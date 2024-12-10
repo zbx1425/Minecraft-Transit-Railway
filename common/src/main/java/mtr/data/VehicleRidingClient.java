@@ -16,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -32,16 +33,13 @@ public class VehicleRidingClient {
 	private int interval;
 	private int previousInterval;
 
-	private final List<Double> offset = new ArrayList<>();
-	private final Map<UUID, Float> percentagesX = new HashMap<>();
-	private final Map<UUID, Float> percentagesZ = new HashMap<>();
-	private final Map<UUID, Float> newPercentagesX = new HashMap<>();
-	private final Map<UUID, Float> newPercentagesZ = new HashMap<>();
+	private final Map<UUID, Vector3f> riderRatioPos = new HashMap<>();
+	private final Map<UUID, Vector3f> riderRatioPosNew = new HashMap<>();
 	private final Map<UUID, Vec3> riderPositions = new HashMap<>();
 	private final Set<UUID> ridingEntities;
 	private final ResourceLocation packetId;
 
-	private static final float VEHICLE_WALKING_SPEED_MULTIPLIER = 0.25F;
+	private static final float VEHICLE_WALKING_SPEED_MULTIPLIER = 0.125F;
 	private static final int VEHICLE_PERCENTAGE_UPDATE_INTERVAL = 20;
 	private static final boolean DEBUG_SKIP_RENDER_TRAIN_AND_PLAYERS = false;
 
@@ -50,32 +48,18 @@ public class VehicleRidingClient {
 		this.packetId = packetId;
 	}
 
-	public Vec3 renderPlayerAndGetOffset() {
+	public void renderPlayers() {
 		if (DEBUG_SKIP_RENDER_TRAIN_AND_PLAYERS) {
 			final Player player = Minecraft.getInstance().player;
 			if (player != null && ridingEntities.contains(player.getUUID())) {
-				return new Vec3(0, Integer.MIN_VALUE, 0);
+				return;
 			}
 		}
 
-		final boolean noOffset = offset.isEmpty();
-		riderPositions.forEach((uuid, position) -> {
-			if (noOffset) {
-				TrainRendererBase.renderRidingPlayer(getViewOffset(), uuid, position);
-			} else {
-				TrainRendererBase.renderRidingPlayer(getViewOffset(), uuid, position.subtract(offset.get(0), offset.get(1), offset.get(2)));
-			}
-		});
-
-		if (noOffset) {
-			return Vec3.ZERO;
-		} else {
-			return new Vec3(offset.get(0), offset.get(1), offset.get(2));
-		}
+		riderPositions.forEach(TrainRendererBase::renderRidingPlayer);
 	}
 
 	public void movePlayer(Consumer<UUID> ridingEntityCallback) {
-		offset.clear();
 		riderPositions.clear();
 
 		final LocalPlayer clientPlayer = Minecraft.getInstance().player;
@@ -84,13 +68,9 @@ public class VehicleRidingClient {
 		}
 
 		ridingEntities.forEach(uuid -> {
-			if (!percentagesX.containsKey(uuid) || !newPercentagesX.containsKey(uuid)) {
-				percentagesX.put(uuid, 0.5F);
-				newPercentagesX.put(uuid, 0.5F);
-			}
-			if (!percentagesZ.containsKey(uuid) || !newPercentagesZ.containsKey(uuid)) {
-				percentagesZ.put(uuid, 0.5F);
-				newPercentagesZ.put(uuid, 0.5F);
+			if (!riderRatioPos.containsKey(uuid) || !riderRatioPosNew.containsKey(uuid)) {
+				riderRatioPos.put(uuid, new Vector3f(0.5f, 0, 0.5f));
+				riderRatioPosNew.put(uuid, new Vector3f(0.5f, 0, 0.5f));
 			}
 
 			ridingEntityCallback.accept(uuid);
@@ -104,9 +84,9 @@ public class VehicleRidingClient {
 		}
 
 		final boolean isClientPlayer = uuid.equals(clientPlayer.getUUID());
-		final double percentageX = getValueFromPercentage(percentagesX.get(uuid), width);
+		final double percentageX = getValueFromPercentage(riderRatioPos.get(uuid).x, width);
 		final float riderOffsetNew = doorLeftOpen && percentageX < 0 || doorRightOpen && percentageX > 1 ? riderOffsetDismounting : riderOffset;
-		final Vec3 playerOffset = new Vec3(percentageX, riderOffsetNew, getValueFromPercentage(Mth.frac(percentagesZ.get(uuid)), length)).xRot((pitch < 0 ? hasPitchAscending : hasPitchDescending) ? pitch : 0).yRot(yaw);
+		final Vec3 playerOffset = new Vec3(percentageX, riderOffsetNew, getValueFromPercentage(Mth.frac(riderRatioPos.get(uuid).z), length)).xRot((pitch < 0 ? hasPitchAscending : hasPitchDescending) ? pitch : 0).yRot(yaw);
 		ClientData.updatePlayerRidingOffset(uuid);
 		riderPositions.put(uuid, playerOffset.add(x, y, z));
 
@@ -125,7 +105,7 @@ public class VehicleRidingClient {
 					movePlayer = true;
 				}
 
-				final float tempPercentageX = percentagesX.get(uuid);
+				final double tempPercentageX = riderRatioPos.get(uuid).x;
 				final boolean doorOpen = doorLeftOpen && tempPercentageX < 0 || doorRightOpen && tempPercentageX > 1;
 				final boolean movedFar = Math.abs(lastSentX - moveX) > 2 || Math.abs(lastSentY - moveY) > 2 || Math.abs(lastSentZ - moveZ) > 2;
 
@@ -151,22 +131,14 @@ public class VehicleRidingClient {
 
 			clientPlayerCallback.run();
 
-			if (shouldSetOffset) {
-				if (shouldSetYaw) {
-					float angleDifference = (float) Math.toDegrees(clientPrevYaw - yaw);
-					if (angleDifference > 180) {
-						angleDifference -= 360;
-					} else if (angleDifference < -180) {
-						angleDifference += 360;
-					}
-					Utilities.incrementYaw(clientPlayer, angleDifference);
+			if (shouldSetYaw) {
+				float angleDifference = (float) Math.toDegrees(clientPrevYaw - yaw);
+				if (angleDifference > 180) {
+					angleDifference -= 360;
+				} else if (angleDifference < -180) {
+					angleDifference += 360;
 				}
-				offset.add(x);
-				offset.add(y);
-				offset.add(z);
-				offset.add(playerOffset.x);
-				offset.add(playerOffset.y + (MTRClient.isVivecraft() ? 0 : clientPlayer.getEyeHeight()));
-				offset.add(playerOffset.z);
+				Utilities.incrementYaw(clientPlayer, angleDifference);
 			}
 
 			clientPrevYaw = yaw;
@@ -185,8 +157,8 @@ public class VehicleRidingClient {
 
 		if (uuid.equals(clientPlayer.getUUID())) {
 			final Vec3 movement = new Vec3(Math.abs(clientPlayer.xxa) > 0.5 ? Math.copySign(speedMultiplier, clientPlayer.xxa) : 0, 0, Math.abs(clientPlayer.zza) > 0.5 ? Math.copySign(speedMultiplier, clientPlayer.zza) : 0).yRot((float) -Math.toRadians(Utilities.getYaw(clientPlayer)) - yaw);
-			final float tempPercentageX = percentagesX.get(uuid) + (float) movement.x / width;
-			final float tempPercentageZ = percentagesZ.get(uuid) + (length == 0 ? 0 : (float) movement.z / (float) length);
+			final float tempPercentageX = riderRatioPos.get(uuid).x + (float) movement.x / width;
+			final float tempPercentageZ = riderRatioPos.get(uuid).z + (length == 0 ? 0 : (float) movement.z / (float) length);
 			newPercentageX = Mth.clamp(tempPercentageX, doorLeftOpen ? -3 : 0, doorRightOpen ? 4 : 1);
 			newPercentageZ = Mth.clamp(tempPercentageZ, (noGangwayConnection ? percentageOffset + 0.05F : 0) + 0.01F, (noGangwayConnection ? percentageOffset + 0.95F : maxPercentage) - 0.01F);
 
@@ -201,20 +173,19 @@ public class VehicleRidingClient {
 				oldPercentageZ = newPercentageZ;
 			}
 		} else {
-			final double distanceX = getValueFromPercentage(newPercentagesX.get(uuid), width) - getValueFromPercentage(percentagesX.get(uuid), width);
-			final double distanceZ = getValueFromPercentage(newPercentagesZ.get(uuid), length) - getValueFromPercentage(percentagesZ.get(uuid), length);
+			final double distanceX = getValueFromPercentage(riderRatioPosNew.get(uuid).x, width) - getValueFromPercentage(riderRatioPos.get(uuid).x, width);
+			final double distanceZ = getValueFromPercentage(riderRatioPosNew.get(uuid).z, length) - getValueFromPercentage(riderRatioPos.get(uuid).z, length);
 			final double manhattanDistance = Math.abs(distanceX + distanceZ);
 			if (manhattanDistance == 0 || distanceX * distanceX + distanceZ * distanceZ < speedMultiplier * speedMultiplier) {
-				newPercentageX = newPercentagesX.get(uuid);
-				newPercentageZ = newPercentagesZ.get(uuid);
+				newPercentageX = riderRatioPosNew.get(uuid).x;
+				newPercentageZ = riderRatioPosNew.get(uuid).z;
 			} else {
-				newPercentageX = percentagesX.get(uuid) + (float) (distanceX / manhattanDistance * speedMultiplier / width);
-				newPercentageZ = percentagesZ.get(uuid) + (float) (length == 0 ? 0 : distanceZ / manhattanDistance * speedMultiplier / length);
+				newPercentageX = riderRatioPos.get(uuid).x + (float) (distanceX / manhattanDistance * speedMultiplier / width);
+				newPercentageZ = riderRatioPos.get(uuid).z + (float) (length == 0 ? 0 : distanceZ / manhattanDistance * speedMultiplier / length);
 			}
 		}
 
-		percentagesX.put(uuid, newPercentageX);
-		percentagesZ.put(uuid, newPercentageZ);
+		riderRatioPos.get(uuid).set(newPercentageX, 0, newPercentageZ);
 	}
 
 	public void begin() {
@@ -227,27 +198,16 @@ public class VehicleRidingClient {
 
 	public void startRiding(UUID uuid, float percentageX, float percentageZ) {
 		ridingEntities.add(uuid);
-		percentagesX.put(uuid, percentageX);
-		percentagesZ.put(uuid, percentageZ);
-		newPercentagesX.put(uuid, percentageX);
-		newPercentagesZ.put(uuid, percentageZ);
+		riderRatioPos.put(uuid, new Vector3f(percentageX, 0, percentageZ));
+		riderRatioPosNew.put(uuid, new Vector3f(percentageX, 0, percentageZ));
 	}
 
 	public void updateRiderPercentages(UUID uuid, float percentageX, float percentageZ) {
-		newPercentagesX.put(uuid, percentageX);
-		newPercentagesZ.put(uuid, percentageZ);
+		riderRatioPosNew.get(uuid).set(percentageX, 0, percentageZ);
 	}
 
 	public float getPercentageZ(UUID uuid) {
-		return percentagesZ.get(uuid);
-	}
-
-	public Vec3 getVehicleOffset() {
-		return offset.isEmpty() ? null : new Vec3(offset.get(0), offset.get(1), offset.get(2));
-	}
-
-	public Vec3 getViewOffset() {
-		return offset.isEmpty() ? null : new Vec3(offset.get(3), offset.get(4), offset.get(5));
+		return riderRatioPos.get(uuid).z;
 	}
 
 	private static double getValueFromPercentage(double percentage, double total) {

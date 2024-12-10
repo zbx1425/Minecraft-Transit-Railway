@@ -90,22 +90,15 @@ public class TrainClient extends Train implements IGui {
 
 		final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
 		final float railSurfaceOffset = trainProperties.railSurfaceOffset;
-		final Vec3 offset = vehicleRidingClient.renderPlayerAndGetOffset();
-		final double newX = carX - offset.x;
-		final double newY = carY - offset.y;
-		final double newZ = carZ - offset.z;
+		vehicleRidingClient.renderPlayers();
 
 		doorOpening = doorValue > oldDoorValue;
-		trainRenderer.renderCar(ridingCar, newX, newY, newZ, carYaw, carPitch, carRoll, doorLeftOpen, doorRightOpen);
-		trainTranslucentRenders.add(() -> trainRenderer.renderCar(ridingCar, newX, newY, newZ, carYaw, carPitch, carRoll, doorLeftOpen, doorRightOpen));
+		trainRenderer.renderCar(ridingCar, carX, carY, carZ, carYaw, carPitch, carRoll, doorLeftOpen, doorRightOpen);
+		trainTranslucentRenders.add(() -> trainRenderer.renderCar(ridingCar, carX, carY, carZ, carYaw, carPitch, carRoll, doorLeftOpen, doorRightOpen));
 
 		if (ridingCar > 0) {
-			final double newPrevCarX = prevCarX - offset.x;
-			final double newPrevCarY = prevCarY - offset.y;
-			final double newPrevCarZ = prevCarZ - offset.z;
-
-			final Vec3 prevPos0 = withCarTransform(new Vec3(0, railSurfaceOffset, spacing / 2D - 1), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
-			final Vec3 thisPos0 = withCarTransform(new Vec3(0, railSurfaceOffset, -(spacing / 2D - 1)), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+			final Vec3 prevPos0 = withCarTransform(new Vec3(0, railSurfaceOffset, spacing / 2D - 1), prevCarX, prevCarY, prevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+			final Vec3 thisPos0 = withCarTransform(new Vec3(0, railSurfaceOffset, -(spacing / 2D - 1)), carX, carY, carZ, carYaw, carPitch, carRoll, railSurfaceOffset);
 			final Vec3 connectPos = prevPos0.add(thisPos0).scale(0.5).add(0, -railSurfaceOffset, 0);
 			final float connectYaw = (float) Mth.atan2(thisPos0.x - prevPos0.x, thisPos0.z - prevPos0.z);
 			final double connectRealSpacing = thisPos0.distanceTo(prevPos0);
@@ -117,15 +110,15 @@ public class TrainClient extends Train implements IGui {
 				final double zStart = spacing / 2D - (i == 0 ? 1 : 2) * CONNECTION_Z_OFFSET;
 
 				final float SMALL_OFFSET = 0.05f;
-				final Vec3 prevPos1 = withCarTransform(new Vec3(xStart, SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
-				final Vec3 prevPos2 = withCarTransform(new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
-				final Vec3 prevPos3 = withCarTransform(new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
-				final Vec3 prevPos4 = withCarTransform(new Vec3(-xStart, SMALL_OFFSET, zStart), newPrevCarX, newPrevCarY, newPrevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos1 = withCarTransform(new Vec3(xStart, SMALL_OFFSET, zStart), prevCarX, prevCarY, prevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos2 = withCarTransform(new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart), prevCarX, prevCarY, prevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos3 = withCarTransform(new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, zStart), prevCarX, prevCarY, prevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
+				final Vec3 prevPos4 = withCarTransform(new Vec3(-xStart, SMALL_OFFSET, zStart), prevCarX, prevCarY, prevCarZ, prevCarYaw, prevCarPitch, prevCarRoll, railSurfaceOffset);
 
-				final Vec3 thisPos1 = withCarTransform(new Vec3(-xStart, SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
-				final Vec3 thisPos2 = withCarTransform(new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
-				final Vec3 thisPos3 = withCarTransform(new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
-				final Vec3 thisPos4 = withCarTransform(new Vec3(xStart, SMALL_OFFSET, -zStart), newX, newY, newZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos1 = withCarTransform(new Vec3(-xStart, SMALL_OFFSET, -zStart), carX, carY, carZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos2 = withCarTransform(new Vec3(-xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart), carX, carY, carZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos3 = withCarTransform(new Vec3(xStart, CONNECTION_HEIGHT + SMALL_OFFSET, -zStart), carX, carY, carZ, carYaw, carPitch, carRoll, railSurfaceOffset);
+				final Vec3 thisPos4 = withCarTransform(new Vec3(xStart, SMALL_OFFSET, -zStart), carX, carY, carZ, carYaw, carPitch, carRoll, railSurfaceOffset);
 
 				if (i == 0) {
 					trainRenderer.renderConnection(prevPos1, prevPos2, prevPos3, prevPos4, thisPos1, thisPos2, thisPos3, thisPos4, connectPos.x, connectPos.y, connectPos.z, connectYaw, connectPitch, connectRoll);
@@ -434,10 +427,6 @@ public class TrainClient extends Train implements IGui {
 	public void renderTranslucent() {
 		trainTranslucentRenders.forEach(Runnable::run);
 		trainTranslucentRenders.clear();
-	}
-
-	public Vec3 getViewOffset() {
-		return vehicleRidingClient.getViewOffset();
 	}
 
 	public int getCurrentStationIndex() {

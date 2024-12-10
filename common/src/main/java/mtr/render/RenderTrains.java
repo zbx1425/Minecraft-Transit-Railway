@@ -248,7 +248,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 		}
 
 		ClientData.LIFTS.forEach(lift -> lift.render(world, (x, y, z, frontDoorValue, backDoorValue) -> {
-			final BlockPos posAverage = TrainRendererBase.applyAverageTransform(lift.getViewOffset(), x, y, z);
+			final BlockPos posAverage = TrainRendererBase.applyAverageTransform(x, y, z);
 			if (posAverage == null) {
 				return;
 			}
