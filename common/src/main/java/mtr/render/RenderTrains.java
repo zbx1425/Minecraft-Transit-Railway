@@ -1,7 +1,6 @@
 package mtr.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import mtr.MTRClient;
 import mtr.block.BlockNode;
@@ -16,7 +15,6 @@ import mtr.mappings.EntityRendererMapper;
 import mtr.mappings.Text;
 import mtr.mappings.Utilities;
 import mtr.mappings.UtilitiesClient;
-import mtr.model.ModelLift1;
 import mtr.path.PathData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -47,7 +45,9 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 	public static int maxTrainRenderDistance;
 	public static ResourcePackCreatorProperties creatorProperties = new ResourcePackCreatorProperties();
 
-	private static float lastRenderedTick;
+	private static float lastSimulatedTick;
+	private static float newLastFrameDuration;
+
 	private static int prevPlatformCount;
 	private static int prevSidingCount;
 	private static UUID renderedUuid;
@@ -99,56 +99,15 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 		return null;
 	}
 
-	public static void render(EntitySeat entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
+	public static void simulateTrains() {
 		final Minecraft client = Minecraft.getInstance();
-		final boolean backupRendering = entity == null;
-
-		if (!backupRendering && MTRClient.isPehkui()) {
-			return;
-		}
-
-		final boolean alreadyRendered = renderedUuid != null && (backupRendering || entity.getUUID() != renderedUuid);
-
-		if (backupRendering) {
-			renderedUuid = null;
-		}
-
 		final LocalPlayer player = client.player;
 		final Level world = client.level;
-
-		if (alreadyRendered || player == null || world == null) {
-			return;
-		}
-
-		if (!backupRendering) {
-			renderedUuid = entity.getUUID();
-		}
-
-		final int renderDistanceChunks = UtilitiesClient.getRenderDistance();
+		if (world == null) return;
 		final float lastFrameDuration = MTRClient.getLastFrameDuration();
-		final float newLastFrameDuration = client.isPaused() || lastRenderedTick == MTRClient.getGameTick() ? 0 : lastFrameDuration;
+		newLastFrameDuration = client.isPaused() || lastSimulatedTick == MTRClient.getGameTick() ? 0 : lastFrameDuration;
 		final boolean useAnnouncements = Config.useTTSAnnouncements() || Config.showAnnouncementMessages();
 
-		if (Config.useDynamicFPS()) {
-			if (lastFrameDuration > 0.5) {
-				maxTrainRenderDistance = Math.max(maxTrainRenderDistance - (maxTrainRenderDistance - DETAIL_RADIUS) / 2, DETAIL_RADIUS);
-			} else if (lastFrameDuration < 0.4) {
-				maxTrainRenderDistance = Math.min(maxTrainRenderDistance + 1, renderDistanceChunks * (Config.trainRenderDistanceRatio() + 1));
-			}
-		} else {
-			maxTrainRenderDistance = renderDistanceChunks * (Config.trainRenderDistanceRatio() + 1);
-		}
-
-		if (!backupRendering) {
-			matrices.popPose();
-			matrices.pushPose();
-			final Vec3 cameraPosition = client.gameRenderer.getMainCamera().getPosition();
-			matrices.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-		}
-		matrices.pushPose();
-
-		TrainRendererBase.setupStaticInfo(matrices, vertexConsumers, entity, tickDelta);
-		TrainRendererBase.setBatch(false);
 		ClientData.TRAINS.forEach(train -> train.simulateTrain(world, newLastFrameDuration, (speed, stopIndex, routeIds) -> {
 			final Route thisRoute = train.getThisRoute();
 			final Station thisStation = train.getThisStation();
@@ -230,6 +189,57 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 				IDrawing.narrateOrAnnounce(IGui.insertTranslation("gui.mtr.light_rail_route_announcement_cjk", "gui.mtr.light_rail_route_announcement", thisRoute.lightRailRouteNumber, 1, lastStation.name));
 			}
 		}));
+	}
+
+	public static void render(EntitySeat entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
+		final Minecraft client = Minecraft.getInstance();
+		final boolean backupRendering = entity == null;
+
+		if (!backupRendering && MTRClient.isPehkui()) {
+			return;
+		}
+
+		final boolean alreadyRendered = renderedUuid != null && (backupRendering || entity.getUUID() != renderedUuid);
+
+		if (backupRendering) {
+			renderedUuid = null;
+		}
+
+		final LocalPlayer player = client.player;
+		final Level world = client.level;
+
+		if (alreadyRendered || player == null || world == null) {
+			return;
+		}
+
+		if (!backupRendering) {
+			renderedUuid = entity.getUUID();
+		}
+
+		final int renderDistanceChunks = UtilitiesClient.getRenderDistance();
+//		final float lastFrameDuration = MTRClient.getLastFrameDuration();
+
+//		if (Config.useDynamicFPS()) {
+//			if (lastFrameDuration > 0.5) {
+//				maxTrainRenderDistance = Math.max(maxTrainRenderDistance - (maxTrainRenderDistance - DETAIL_RADIUS) / 2, DETAIL_RADIUS);
+//			} else if (lastFrameDuration < 0.4) {
+//				maxTrainRenderDistance = Math.min(maxTrainRenderDistance + 1, renderDistanceChunks * (Config.trainRenderDistanceRatio() + 1));
+//			}
+//		} else {
+		maxTrainRenderDistance = renderDistanceChunks * (Config.trainRenderDistanceRatio() + 1);
+//		}
+
+		if (!backupRendering) {
+			matrices.popPose();
+			matrices.pushPose();
+			final Vec3 cameraPosition = client.gameRenderer.getMainCamera().getPosition();
+			matrices.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+		}
+		matrices.pushPose();
+
+		TrainRendererBase.setupStaticInfo(matrices, vertexConsumers, entity, tickDelta);
+		TrainRendererBase.setBatch(false);
+		ClientData.TRAINS.forEach(train -> train.renderTrain(world, newLastFrameDuration));
 		if (!Config.hideTranslucentParts()) {
 			TrainRendererBase.setBatch(true);
 			ClientData.TRAINS.forEach(TrainClient::renderTranslucent);
@@ -319,7 +329,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 
 		matrices.popPose();
 
-		if (lastRenderedTick != MTRClient.getGameTick()) {
+		if (lastSimulatedTick != MTRClient.getGameTick()) {
 			for (int i = 0; i < TOTAL_RENDER_STAGES; i++) {
 				for (int j = 0; j < QueuedRenderLayer.values().length; j++) {
 					CURRENT_RENDERS.get(i).get(j).clear();
@@ -360,7 +370,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 		prevPlatformCount = ClientData.PLATFORMS.size();
 		prevSidingCount = ClientData.SIDINGS.size();
 		ClientData.DATA_CACHE.clearDataIfNeeded();
-		lastRenderedTick = MTRClient.getGameTick();
+		lastSimulatedTick = MTRClient.getGameTick();
 	}
 
 	public static boolean shouldNotRender(BlockPos pos, int maxDistance, Direction facing) {

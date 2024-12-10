@@ -409,6 +409,8 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		return path.get(nextStoppingIndex).dwellTime * 10;
 	}
 
+	protected Vec3[] keyPointsPositions;
+
 	protected final void simulateTrain(Level world, float ticksElapsed, Depot depot) {
 		if (world == null) {
 			return;
@@ -530,21 +532,8 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 			}
 
 			if (!path.isEmpty()) {
-				final Vec3[] positions = new Vec3[trainCars * 2];
-				for (int i = 0; i < trainCars; i++) {
-					double centerOffset = i * spacing + spacing / 2.0;
-					centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
-					double bogiePosition = (getBogiePosition() == 0 || getIsJacobsBogie()) ? (spacing - 1) / 2.0 : getBogiePosition();
-					double kr = reversed ? -1 : 1;
-					double bogieFOffset = centerOffset - kr * bogiePosition;
-					double bogieBOffset = centerOffset + kr * bogiePosition;
-//					if (getIsJacobsBogie() && i != 0) bogieFOffset = centerOffset - kr * spacing / 2.0;
-//					if (getIsJacobsBogie() && i != trainCars - 1) bogieBOffset = centerOffset + kr * spacing / 2.0;
-					positions[i * 2] = getRoutePosition(bogieFOffset);
-					positions[i * 2 + 1] = getRoutePosition(bogieBOffset);
-				}
-
-				if (handlePositions(world, positions, ticksElapsed)) {
+				keyPointsPositions = getPositions();
+				if (handlePositions(world, keyPointsPositions, ticksElapsed)) {
 					final double[] prevX = {0};
 					final double[] prevY = {0};
 					final double[] prevZ = {0};
@@ -554,7 +543,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 					for (int i = 0; i < trainCars; i++) {
 						final int ridingCar = i;
-						calculateCar(world, positions, i, totalDwellTicks, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
+						calculateCar(world, keyPointsPositions, i, totalDwellTicks, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
 							simulateCar(
 									world, ridingCar, ticksElapsed,
 									x, y, z,
@@ -595,6 +584,23 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, 0, realSpacing, doorLeftOpen, doorRightOpen);
 		}
+	}
+
+	protected Vec3[] getPositions() {
+		final Vec3[] positions = new Vec3[trainCars * 2];
+		for (int i = 0; i < trainCars; i++) {
+			double centerOffset = i * spacing + spacing / 2.0;
+			centerOffset = reversed ? trainCars * spacing - centerOffset : centerOffset;
+			double bogiePosition = (getBogiePosition() == 0 || getIsJacobsBogie()) ? (spacing - 1) / 2.0 : getBogiePosition();
+			double kr = reversed ? -1 : 1;
+			double bogieFOffset = centerOffset - kr * bogiePosition;
+			double bogieBOffset = centerOffset + kr * bogiePosition;
+//					if (getIsJacobsBogie() && i != 0) bogieFOffset = centerOffset - kr * spacing / 2.0;
+//					if (getIsJacobsBogie() && i != trainCars - 1) bogieBOffset = centerOffset + kr * spacing / 2.0;
+			positions[i * 2] = getRoutePosition(bogieFOffset);
+			positions[i * 2 + 1] = getRoutePosition(bogieBOffset);
+		}
+		return positions;
 	}
 
 	protected void startUp(Level world, int trainCars, int trainSpacing, boolean isOppositeRail) {

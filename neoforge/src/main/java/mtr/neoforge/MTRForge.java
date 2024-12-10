@@ -66,7 +66,6 @@ public class MTRForge {
 		eventBus.register(MTRModEventBus.class);
 		eventBus.register(ForgeUtilities.RegisterCreativeTabs.class);
 		if (FMLEnvironment.dist.isClient()) {
-			ForgeUtilities.renderTickAction(MTRClient::incrementGameTick);
 			ForgeUtilities.registerEntityRenderer(EntityTypes.SEAT::get, RenderTrains::new);
 			ForgeUtilities.renderGameOverlayAction((guiGraphics) -> RenderDrivingOverlay.render((GuiGraphics) guiGraphics));
 			NeoForge.EVENT_BUS.register(ForgeUtilities.Events.class);

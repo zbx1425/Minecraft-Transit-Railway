@@ -3,7 +3,6 @@ package mtr.neoforge.mappings;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import mtr.neoforge.DeferredRegisterHolder;
-import mtr.neoforge.MTRForge;
 import mtr.render.RenderTrains;
 import mtr.screen.ResourcePackCreatorScreen;
 import net.minecraft.client.KeyMapping;
@@ -26,13 +25,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -140,6 +134,12 @@ public class ForgeUtilities {
 				PoseStack matrices = event.getPoseStack();
 				ResourcePackCreatorScreen.render(matrices);
 			}
+		}
+
+		@SubscribeEvent
+		public static void onRenderFrame(RenderFrameEvent.Pre event) {
+			mtr.MTRClient.incrementGameTick();
+			mtr.render.RenderTrains.simulateTrains();
 		}
 	}
 

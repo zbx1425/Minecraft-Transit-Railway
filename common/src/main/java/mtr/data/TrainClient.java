@@ -68,6 +68,15 @@ public class TrainClient extends Train implements IGui {
 			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch, float prevCarRoll,
 			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
 	) {
+	}
+
+	protected void renderCar(
+			Level world, int ridingCar, float ticksElapsed,
+			double carX, double carY, double carZ, float carYaw, float carPitch, float carRoll,
+			double prevCarX, double prevCarY, double prevCarZ, float prevCarYaw, float prevCarPitch, float prevCarRoll,
+			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
+	) {
+
 		final LocalPlayer clientPlayer = Minecraft.getInstance().player;
 		if (clientPlayer == null) {
 			return;
@@ -127,6 +136,91 @@ public class TrainClient extends Train implements IGui {
 		}
 	}
 
+	public void renderTrain(Level world, float ticksElapsed) {
+		if (world == null) {
+			return;
+		}
+
+		try {
+			final int totalDwellTicks = getTotalDwellTicks();
+			if (!path.isEmpty()) {
+				if (handlePositions(world, keyPointsPositions, ticksElapsed)) {
+					final double[] prevX = {0};
+					final double[] prevY = {0};
+					final double[] prevZ = {0};
+					final float[] prevYaw = {0};
+					final float[] prevPitch = {0};
+					final float[] prevRoll = {0};
+
+					for (int i = 0; i < trainCars; i++) {
+						final int ridingCar = i;
+						calculateCar(world, keyPointsPositions, i, totalDwellTicks, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
+							renderCar(
+									world, ridingCar, ticksElapsed,
+									x, y, z,
+									yaw, pitch, roll,
+									prevX[0], prevY[0], prevZ[0],
+									prevYaw[0], prevPitch[0], prevRoll[0],
+									doorLeftOpen, doorRightOpen, realSpacing
+							);
+							prevX[0] = x;
+							prevY[0] = y;
+							prevZ[0] = z;
+							prevYaw[0] = yaw;
+							prevPitch[0] = pitch;
+							prevRoll[0] = roll;
+						});
+					}
+
+					final Entity camera = Minecraft.getInstance().cameraEntity;
+					final Vec3 cameraPos = camera == null ? Vec3.ZERO : camera.position();
+					Vec3 nearestPoint = keyPointsPositions[0];
+					double nearestDistance = Double.POSITIVE_INFINITY;
+					int nearestCar = 0;
+					for (int i = 0; i < trainCars; i++) {
+						Vec3 v = keyPointsPositions[i * 2 + 1].subtract(keyPointsPositions[i * 2]);
+						Vec3 w = cameraPos.subtract(keyPointsPositions[i * 2]);
+
+						double c1 = w.dot(v);
+						if ( c1 <= 0 ) {
+							final double checkDistance = keyPointsPositions[i * 2].distanceToSqr(cameraPos);
+							if (checkDistance < nearestDistance) {
+								nearestCar = i;
+								nearestDistance = checkDistance;
+								nearestPoint = keyPointsPositions[i * 2];
+							}
+							continue;
+						}
+
+						double c2 = v.dot(v);
+						if ( c2 <= c1 ) {
+							final double checkDistance = keyPointsPositions[i * 2 + 1].distanceToSqr(cameraPos);
+							if (checkDistance < nearestDistance) {
+								nearestCar = i;
+								nearestDistance = checkDistance;
+								nearestPoint = keyPointsPositions[i * 2 + 1];
+							}
+							continue;
+						}
+
+						double b = c1 / c2;
+						Vec3 Pb = keyPointsPositions[i * 2].add(v.scale(b));
+						final double checkDistance = Pb.distanceToSqr(cameraPos);
+						if (checkDistance < nearestDistance) {
+							nearestCar = i;
+							nearestDistance = checkDistance;
+							nearestPoint = Pb;
+						}
+					}
+					final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
+					if (ticksElapsed > 0) trainSound.playNearestCar(world, soundPos, nearestCar);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static Vec3 withCarTransform(Vec3 child, double x, double y, double z, float yaw, float pitch, float roll, float railSurfaceOffset) {
 		return child.add(0, -railSurfaceOffset, 0).zRot(roll).xRot(pitch).yRot(yaw).add(0, railSurfaceOffset, 0).add(x, y, z);
 	}
@@ -164,7 +258,7 @@ public class TrainClient extends Train implements IGui {
 
 			final TrainProperties trainProperties = TrainClientRegistry.getTrainProperties(trainId);
 			vehicleRidingClient.movePlayer(uuid -> {
-				final CalculateCarCallback calculateCarCallback = (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> vehicleRidingClient.setOffsets(uuid, x, y, z, yaw, pitch, transportMode.maxLength == 1 ? spacing : realSpacingRender, width, doorLeftOpenRender, doorRightOpenRender, transportMode.hasPitchAscending, transportMode.hasPitchDescending, trainProperties.riderOffset, trainProperties.riderOffsetDismounting, speed > 0, doorValue == 0, () -> {
+				final CalculateCarCallback calculateCarCallback = (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> vehicleRidingClient.setOffsets(uuid, x, y, z, yaw, pitch, transportMode.maxLength == 1 ? spacing : realSpacingRender, width, doorLeftOpenRender, doorRightOpenRender, transportMode.hasPitchAscending, transportMode.hasPitchDescending, trainProperties.riderOffset, trainProperties.riderOffsetDismounting, false, doorValue == 0, () -> {
 					final boolean isShifting = clientPlayer.isShiftKeyDown();
 					if (Config.shiftToToggleSitting() && !MTRClient.isVivecraft()) {
 						if (isShifting && !previousShifting) {
@@ -191,49 +285,6 @@ public class TrainClient extends Train implements IGui {
 
 		vehicleRidingClient.end();
 		justMounted = false;
-
-		final Entity camera = client.cameraEntity;
-		final Vec3 cameraPos = camera == null ? Vec3.ZERO : camera.position();
-		Vec3 nearestPoint = positions[0];
-		double nearestDistance = Double.POSITIVE_INFINITY;
-		int nearestCar = 0;
-		for (int i = 0; i < trainCars; i++) {
-			Vec3 v = positions[i * 2 + 1].subtract(positions[i * 2]);
-			Vec3 w = cameraPos.subtract(positions[i * 2]);
-
-			double c1 = w.dot(v);
-			if ( c1 <= 0 ) {
-				final double checkDistance = positions[i * 2].distanceToSqr(cameraPos);
-				if (checkDistance < nearestDistance) {
-					nearestCar = i;
-					nearestDistance = checkDistance;
-					nearestPoint = positions[i * 2];
-				}
-				continue;
-			}
-
-			double c2 = v.dot(v);
-			if ( c2 <= c1 ) {
-				final double checkDistance = positions[i * 2 + 1].distanceToSqr(cameraPos);
-				if (checkDistance < nearestDistance) {
-					nearestCar = i;
-					nearestDistance = checkDistance;
-					nearestPoint = positions[i * 2 + 1];
-				}
-				continue;
-			}
-
-			double b = c1 / c2;
-			Vec3 Pb = positions[i * 2].add(v.scale(b));
-			final double checkDistance = Pb.distanceToSqr(cameraPos);
-			if (checkDistance < nearestDistance) {
-				nearestCar = i;
-				nearestDistance = checkDistance;
-				nearestPoint = Pb;
-			}
-		}
-		final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
-		if (ticksElapsed > 0) trainSound.playNearestCar(world, soundPos, nearestCar);
 
 		return true;
 	}
