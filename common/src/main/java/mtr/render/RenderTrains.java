@@ -99,7 +99,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 		return null;
 	}
 
-	public static void simulateTrains() {
+	public static void simulate() {
 		final Minecraft client = Minecraft.getInstance();
 		final LocalPlayer player = client.player;
 		final Level world = client.level;
@@ -189,6 +189,8 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 				IDrawing.narrateOrAnnounce(IGui.insertTranslation("gui.mtr.light_rail_route_announcement_cjk", "gui.mtr.light_rail_route_announcement", thisRoute.lightRailRouteNumber, 1, lastStation.name));
 			}
 		}));
+
+		ClientData.LIFTS.forEach(lift -> lift.tickClient(world, newLastFrameDuration));
 	}
 
 	public static void render(EntitySeat entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
@@ -245,7 +247,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 			ClientData.TRAINS.forEach(TrainClient::renderTranslucent);
 		}
 
-		ClientData.LIFTS.forEach(lift -> lift.tickClient(world, (x, y, z, frontDoorValue, backDoorValue) -> {
+		ClientData.LIFTS.forEach(lift -> lift.render(world, (x, y, z, frontDoorValue, backDoorValue) -> {
 			final BlockPos posAverage = TrainRendererBase.applyAverageTransform(lift.getViewOffset(), x, y, z);
 			if (posAverage == null) {
 				return;
