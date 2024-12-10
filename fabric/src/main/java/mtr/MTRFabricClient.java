@@ -1,6 +1,7 @@
 package mtr;
 
 import cn.zbx1425.mtrsteamloco.MainClient;
+import cn.zbx1425.mtrsteamloco.NTEClientCommand;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.client.CustomResources;
 import mtr.client.ICustomResources;
@@ -8,6 +9,8 @@ import mtr.render.RenderDrivingOverlay;
 import mtr.render.RenderTrains;
 import mtr.screen.ResourcePackCreatorScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -24,6 +27,9 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 		MTRClient.init();
 		MTRClient.initItemModelPredicate();
 		MainClient.init();
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			NTEClientCommand.register(dispatcher, ClientCommandManager::literal);
+		});
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
 			final PoseStack matrices = context.matrixStack();
 			matrices.pushPose();

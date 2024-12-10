@@ -397,6 +397,12 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 		}
 	}
 
+	public void unmountPlayer(Player player) {
+		trains.forEach(train -> {
+			train.ridingEntities.remove(player.getUUID());
+		});
+	}
+
 	public boolean isValidVehicle(int spacing) {
 		return Math.max(2, railLength) >= spacing;
 	}

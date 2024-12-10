@@ -1,8 +1,10 @@
 package mtr.data;
 
 import cn.zbx1425.mtrsteamloco.ClientConfig;
+import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
 import mtr.MTRClient;
 import mtr.client.*;
+import mtr.mappings.Text;
 import mtr.render.RenderDrivingOverlay;
 import mtr.render.TrainRendererBase;
 import mtr.sound.TrainSoundBase;
@@ -263,6 +265,9 @@ public class TrainClient extends Train implements IGui {
 				});
 
 				final int currentRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
+				if (isPlayerRiding(Minecraft.getInstance().player) && this == TrainVirtualDrive.activeTrain) {
+					Minecraft.getInstance().player.displayClientMessage(Text.literal("On VD Train!"), true);
+				}
 				calculateCar(world, positions, currentRidingCar, 0, (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
 					vehicleRidingClient.moveSelf(id, uuid, realSpacingRender, width, yaw, currentRidingCar, trainCars, doorLeftOpenRender, doorRightOpenRender, !trainProperties.hasGangwayConnection, ticksElapsed);
 

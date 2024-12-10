@@ -1,5 +1,6 @@
 package mtr.client;
 
+import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
 import mtr.KeyMappings;
 import mtr.MTRClient;
 import mtr.data.*;
@@ -125,7 +126,7 @@ public final class ClientData {
 
 		client.execute(() -> {
 			TRAINS.forEach(trainClient -> {
-				if (!trainIdsToKeep.contains(trainClient.id)) {
+				if (!trainIdsToKeep.contains(trainClient.id) && trainClient != TrainVirtualDrive.activeTrain) {
 					trainClient.isRemoved = true;
 				}
 			});

@@ -57,7 +57,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 	protected final int repeatIndex2;
 	protected final Set<UUID> ridingEntities = new HashSet<>();
 
-	private final float railLength;
+	protected final float railLength;
 
 	public static final float ACCELERATION_DEFAULT = 0.01F; // m/tick^2
 	public static final float MAX_ACCELERATION = 0.02F; // m/tick^2

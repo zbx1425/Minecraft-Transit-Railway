@@ -202,8 +202,20 @@ public class VehicleRidingClient {
 		riderRatioPosNew.put(uuid, new Vector3f(percentageX, 0, percentageZ));
 	}
 
+	public void stopRiding(UUID uuid) {
+		// Normally shouldn't use this (Updated from server side)
+		ridingEntities.remove(uuid);
+		riderRatioPos.remove(uuid);
+		riderRatioPosNew.remove(uuid);
+		riderPositions.remove(uuid);
+	}
+
 	public void updateRiderPercentages(UUID uuid, float percentageX, float percentageZ) {
 		riderRatioPosNew.get(uuid).set(percentageX, 0, percentageZ);
+	}
+
+	public float getPercentageX(UUID uuid) {
+		return riderRatioPos.get(uuid).x;
 	}
 
 	public float getPercentageZ(UUID uuid) {

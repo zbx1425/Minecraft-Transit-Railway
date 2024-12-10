@@ -3,6 +3,7 @@ package cn.zbx1425.mtrsteamloco.neoforge;
 import cn.zbx1425.mtrsteamloco.ClientConfig;
 import cn.zbx1425.mtrsteamloco.Main;
 import cn.zbx1425.mtrsteamloco.MainClient;
+import cn.zbx1425.mtrsteamloco.NTEClientCommand;
 import cn.zbx1425.mtrsteamloco.gui.ConfigScreen;
 import cn.zbx1425.mtrsteamloco.render.RenderUtil;
 import mtr.mappings.Text;
@@ -44,29 +45,7 @@ public class ClientProxy {
 
         @SubscribeEvent
         public static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
-            event.getDispatcher().register(
-                    Commands.literal("mtrnte")
-                            .then(Commands.literal("config")
-                                    .executes(context -> {
-                                        Minecraft.getInstance().tell(() -> {
-                                            Minecraft.getInstance().setScreen(ConfigScreen.createScreen(Minecraft.getInstance().screen));
-                                        });
-                                        return 1;
-                                    }))
-                            .then(Commands.literal("hideriding")
-                                    .executes(context -> {
-                                        ClientConfig.hideRidingTrain = !ClientConfig.hideRidingTrain;
-                                        return 1;
-                                    }))
-                            .then(Commands.literal("stat")
-                                    .executes(context -> {
-                                        Minecraft.getInstance().tell(() -> {
-                                            String info = RenderUtil.getRenderStatusMessage();
-                                            Minecraft.getInstance().player.sendSystemMessage(Text.literal(info));
-                                        });
-                                        return 1;
-                                    }))
-            );
+            NTEClientCommand.register(event.getDispatcher(), Commands::literal);
         }
     }
 }

@@ -84,6 +84,8 @@ public class Main {
 					PacketUpdateRail::receiveUpdateC2S);
 			mtr.Registry.registerNetworkReceiver(PacketUpdateHoldingItem.PACKET_UPDATE_HOLDING_ITEM,
 					PacketUpdateHoldingItem::receiveUpdateC2S);
+			mtr.Registry.registerNetworkReceiver(PacketVirtualDrive.PACKET_VIRTUAL_DRIVE,
+					PacketVirtualDrive::receiveVirtualDriveC2S);
 
 			mtr.Registry.registerNetworkPacket(PacketVersionCheck.PACKET_VERSION_CHECK);
 			mtr.Registry.registerNetworkPacket(PacketScreen.PACKET_SHOW_SCREEN);

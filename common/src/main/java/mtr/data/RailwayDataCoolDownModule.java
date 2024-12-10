@@ -21,6 +21,8 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 	private final Map<Player, Integer> playerSeatCoolDowns = new HashMap<>();
 	private final Map<Player, Integer> playerShiftCoolDowns = new HashMap<>();
 
+	private final Set<Player> playerInVirtualDrive = new HashSet<>();
+
 	public static final int SHIFT_ACTIVATE_TICKS = 30;
 
 	public RailwayDataCoolDownModule(RailwayData railwayData, Level world, Map<BlockPos, Map<BlockPos, Rail>> rails) {
@@ -56,6 +58,10 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 			}
 		});
 
+		playerInVirtualDrive.forEach(player -> {
+			playerRidingCoolDown.put(player, 2);
+		});
+
 		final Set<Player> playersToRemove = new HashSet<>();
 		playerRidingCoolDown.forEach((player, coolDown) -> {
 			if (coolDown <= 0) {
@@ -80,6 +86,7 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 		playerSeats.remove(player);
 		playerSeatCoolDowns.remove(player);
 		playerShiftCoolDowns.remove(player);
+		playerInVirtualDrive.remove(player);
 	}
 
 	public void updatePlayerRiding(Player player, long routeId) {
@@ -92,6 +99,7 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 			playerRidingCoolDown.put(player, 2);
 			playerRidingRoute.put(player, routeId);
 		} else {
+			playerInVirtualDrive.remove(player);
 			((ServerPlayer) player).gameMode.getGameModeForPlayer().updatePlayerAbilities(Utilities.getAbilities(player));
 		}
 		Registry.setInTeleportationState(player, isRiding);
@@ -103,6 +111,20 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 
 	public boolean canRide(Player player) {
 		return !playerRidingCoolDown.containsKey(player);
+	}
+
+	public void updatePlayerInVirtualDrive(Player player, boolean isRiding) {
+		player.fallDistance = 0;
+		player.setNoGravity(isRiding);
+		player.noPhysics = isRiding;
+		if (isRiding) {
+			Utilities.getAbilities(player).mayfly = true;
+			playerInVirtualDrive.add(player);
+		} else {
+			playerInVirtualDrive.remove(player);
+			((ServerPlayer) player).gameMode.getGameModeForPlayer().updatePlayerAbilities(Utilities.getAbilities(player));
+		}
+		Registry.setInTeleportationState(player, isRiding);
 	}
 
 	public Route getRidingRoute(Player player) {
