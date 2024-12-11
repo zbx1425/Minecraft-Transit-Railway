@@ -1,5 +1,6 @@
 package mtr.sound.bve;
 
+import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
 import mtr.MTRClient;
 import mtr.client.TrainClientRegistry;
 import mtr.client.TrainProperties;
@@ -109,8 +110,10 @@ public class BveTrainSound extends TrainSoundBase {
 		}
 
 		// Simulation of circuit breaker in traction controller
-		float motorTarget = Math.signum(accel);
-		if (motorTarget == 0 && speed != 0) {
+		float motorTarget = train instanceof TrainVirtualDrive vdTrain
+				? Math.signum(vdTrain.vdNotch)
+				: Math.signum(accel);
+		if (motorTarget == 0 && speed != 0 && !(train instanceof TrainVirtualDrive)) {
 			motorTarget = config.soundCfg.motorOutputAtCoast;
 		}
 		if (motorTarget < 0 && speed < config.soundCfg.regenerationLimit) {
