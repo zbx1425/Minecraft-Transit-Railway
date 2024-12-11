@@ -95,49 +95,6 @@ tasks.register("setupFiles") {
 //		ant.move(file: it, todir: "forge/src/main/java/mtr/mappings")
 //	}
 
-	delete fileTree("common/src/main/resources/assets/mtr/sounds")
-	delete fileTree("common/src/main/resources/assets/mtr/textures")
-	delete fileTree("common/src/main/resources/assets/mtr/website")
-	delete fileTree("common/src/main/resources/assets/mtr/sounds.json")
-	delete fileTree("common/src/main/resources/data/mtr/loot_tables")
-	delete fileTree("common/src/main/resources/data/mtr/recipes")
-	delete fileTree("fabric/src/main/resources")
-	delete fileTree("neoforge/src/main/resources")
-	copy {
-		outputs.upToDateWhen { false }
-		from "resources/common/lifts"
-		into "common/src/main/resources"
-	}
-	if (rootProject.variation == "normal") {
-		copy {
-			outputs.upToDateWhen { false }
-			from "resources/common/normal"
-			into "common/src/main/resources"
-		}
-	}
-	if (rootProject.variation == "normal" || rootProject.variation == "server") {
-		copy {
-			outputs.upToDateWhen { false }
-			from "resources/common/normal/data"
-			into "common/src/main/resources/data"
-		}
-		copy {
-			outputs.upToDateWhen { false }
-			from "resources/common/normal/assets/mtr/website"
-			into "common/src/main/resources/assets/mtr/website"
-		}
-	}
-	copy {
-		outputs.upToDateWhen { false }
-		from "resources/fabric/" + (rootProject.variation == "lifts" ? "lifts" : "normal")
-		into "fabric/src/main/resources"
-	}
-	copy {
-		outputs.upToDateWhen { false }
-		from "resources/forge/" + (rootProject.variation == "lifts" ? "lifts" : "normal")
-		into "neoforge/src/main/resources"
-	}
-
 /*
 	download.run {
 		src "https://crowdin.com/backend/download/project/minecraft-transit-railway.zip"
