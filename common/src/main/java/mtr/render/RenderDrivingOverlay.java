@@ -1,5 +1,6 @@
 package mtr.render;
 
+import cn.zbx1425.mtrsteamloco.gui.VirtualDrivingOverlay;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mtr.data.*;
@@ -23,6 +24,9 @@ public class RenderDrivingOverlay implements IGui {
 	private static final int HOT_BAR_HEIGHT = 22;
 
 	public static void render(GuiGraphics guiGraphics) {
+
+		VirtualDrivingOverlay.render(guiGraphics, Minecraft.getInstance().getTimer());
+
 		if (coolDown > 0) {
 			coolDown--;
 		} else {

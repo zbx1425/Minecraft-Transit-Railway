@@ -2,15 +2,11 @@ package cn.zbx1425.mtrsteamloco;
 
 import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
 import cn.zbx1425.mtrsteamloco.gui.ConfigScreen;
-import cn.zbx1425.mtrsteamloco.network.PacketVirtualDrive;
 import cn.zbx1425.mtrsteamloco.render.RenderUtil;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import mtr.mappings.Text;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 
 import java.util.function.Function;
 

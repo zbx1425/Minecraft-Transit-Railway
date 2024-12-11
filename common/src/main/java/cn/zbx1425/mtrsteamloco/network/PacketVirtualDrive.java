@@ -28,6 +28,9 @@ public class PacketVirtualDrive {
             if (isDriving) {
                 RailwayData.getInstance(player.level()).railwayDataCoolDownModule
                         .updatePlayerInVirtualDrive(player, true);
+                // Unmount the player from the train they're currently riding
+                // Mounting cooldown is still applied by playerInVirtualDrive
+                // And thus the player wouldn't get mounted onto another real train
                 for (Siding siding : RailwayData.getInstance(player.level()).sidings) {
                     siding.unmountPlayer(player);
                 }

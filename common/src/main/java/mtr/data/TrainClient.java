@@ -136,6 +136,16 @@ public class TrainClient extends Train implements IGui {
 			return;
 		}
 
+		// Hide trains near TrainVirtualDrive
+		if (TrainVirtualDrive.activeTrain != null && TrainVirtualDrive.activeTrain != this) {
+			for (int i = getIndex(railProgress - spacing * trainCars, true);
+				 i < path.size() && distances.get(i) < railProgress + 300; i++) {
+				if (TrainVirtualDrive.activeTrain.railAheadLookup.contains(path.get(i).startingPos.asLong())) {
+					return;
+				}
+			}
+		}
+
 		try {
 			final int totalDwellTicks = getTotalDwellTicks();
 			if (!path.isEmpty()) {
@@ -266,7 +276,7 @@ public class TrainClient extends Train implements IGui {
 
 				final int currentRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
 				if (isPlayerRiding(Minecraft.getInstance().player) && this == TrainVirtualDrive.activeTrain) {
-					Minecraft.getInstance().player.displayClientMessage(Text.literal("On VD Train!"), true);
+					Minecraft.getInstance().player.displayClientMessage(Text.literal("ATP Manual"), true);
 				}
 				calculateCar(world, positions, currentRidingCar, 0, (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
 					vehicleRidingClient.moveSelf(id, uuid, realSpacingRender, width, yaw, currentRidingCar, trainCars, doorLeftOpenRender, doorRightOpenRender, !trainProperties.hasGangwayConnection, ticksElapsed);

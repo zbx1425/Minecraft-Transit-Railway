@@ -278,6 +278,7 @@ public class MTRClient implements IPacket {
 		if (!Keys.LIFTS_ONLY) {
 			RegistryClient.registerKeyBinding(KeyMappings.TRAIN_ACCELERATE);
 			RegistryClient.registerKeyBinding(KeyMappings.TRAIN_BRAKE);
+			RegistryClient.registerKeyBinding(KeyMappings.TRAIN_NEUTRAL);
 			RegistryClient.registerKeyBinding(KeyMappings.TRAIN_TOGGLE_DOORS);
 			RegistryClient.registerKeyBinding(KeyMappings.DEBUG_1_NEGATIVE);
 			RegistryClient.registerKeyBinding(KeyMappings.DEBUG_2_NEGATIVE);

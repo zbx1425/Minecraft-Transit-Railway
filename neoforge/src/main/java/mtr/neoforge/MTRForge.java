@@ -67,7 +67,9 @@ public class MTRForge {
 		eventBus.register(ForgeUtilities.RegisterCreativeTabs.class);
 		if (FMLEnvironment.dist.isClient()) {
 			ForgeUtilities.registerEntityRenderer(EntityTypes.SEAT::get, RenderTrains::new);
-			ForgeUtilities.renderGameOverlayAction((guiGraphics) -> RenderDrivingOverlay.render((GuiGraphics) guiGraphics));
+			ForgeUtilities.renderGameOverlayAction((guiGraphics) -> {
+				RenderDrivingOverlay.render((GuiGraphics) guiGraphics);
+			});
 			NeoForge.EVENT_BUS.register(ForgeUtilities.Events.class);
 			eventBus.register(ForgeUtilities.ClientsideEvents.class);
 
