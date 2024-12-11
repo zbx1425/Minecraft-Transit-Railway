@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 public class VirtualDrivingOverlay {
@@ -104,12 +105,14 @@ public class VirtualDrivingOverlay {
         guiGraphics.pose().popPose();
         BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
         RenderSystem.disableBlend();
+
         // Speed Text
         Font font = Minecraft.getInstance().font;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0);
         float speedTextScale = (50 / 730f * GAUGE_SIZE) / font.lineHeight;
         guiGraphics.pose().scale(speedTextScale, speedTextScale, 1);
+        guiGraphics.pose().translate(0, 0.5f, 0);
         int speedKph = (int)Math.ceil(train.getSpeed() * 20 * 3.6F);
         if (speedKph >= 100) {
             guiGraphics.drawCenteredString(font, Integer.toString(speedKph), 0, -font.lineHeight / 2, 0xFFFFFFFF);
@@ -120,6 +123,55 @@ public class VirtualDrivingOverlay {
             guiGraphics.drawString(font, Integer.toString(speedKph), 0, -font.lineHeight / 2, 0xFFFFFFFF);
         }
         guiGraphics.pose().popPose();
+
+        if (train.atpTargetSpeed >= 0) {
+            // Target speed text
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(PADDING + (32 / 256f) * GAUGE_SIZE,
+                    guiGraphics.guiHeight() - GAUGE_SIZE - PADDING + (44 / 256f) * GAUGE_SIZE, 0);
+            float targetSpeedTextScale = (13 / 256f * GAUGE_SIZE) / font.lineHeight;
+            guiGraphics.pose().scale(targetSpeedTextScale, targetSpeedTextScale, 1);
+            int targetSpeedKph = (int) Math.round(train.atpTargetSpeed * 20 * 3.6F);
+            guiGraphics.drawString(font, Integer.toString(targetSpeedKph), -font.width(Integer.toString(targetSpeedKph)), 0, 0xFFFFFFFF);
+            guiGraphics.pose().popPose();
+
+            // Target speed bar
+            double targetDistance = Mth.clamp(train.atpTargetDistance - train.getRailProgress(), 1, 750);
+            float targetBarHeight = (float) (Math.log10(targetDistance) * 40 / 256f * GAUGE_SIZE);
+            if (targetDistance > 1) {
+                float x1 = PADDING + (36 / 256f) * GAUGE_SIZE + (8 / 350f) * GAUGE_SIZE;
+                float x2 = x1 + (10 / 350f) * GAUGE_SIZE;
+                float y2 = guiGraphics.guiHeight() - GAUGE_SIZE - PADDING + (184 / 256f) * GAUGE_SIZE;
+                float y1 = y2 - targetBarHeight;
+                int targetColor = 0xFF008000;
+                if (targetDistance < 150) {
+                    if (targetSpeedKph == 0) {
+                        targetColor = 0xFFFF0000;
+                    } else if (targetSpeedKph < 60) {
+                        targetColor = 0xFFFFA500;
+                    }
+                } else if (targetDistance < 300) {
+                    if (targetSpeedKph < 25) {
+                        targetColor = 0xFFFFA500;
+                    }
+                }
+                guiGraphics.fill((int) x1 + 1, (int) y1 + 1, (int) x2 + 1, (int) y2 + 1, 0x88222222);
+                guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, targetColor);
+            }
+        }
+
+        // Target status
+        {
+        float x1 = PADDING;
+        float x2 = x1 + (40 / 256f) * GAUGE_SIZE;
+        float y1 = guiGraphics.guiHeight() - GAUGE_SIZE - PADDING - (10 / 256f) * GAUGE_SIZE;
+        float y2 = y1 + (40 / 256f) * GAUGE_SIZE;
+        if (train.atpEmergencyBrake) {
+            guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, 0xFFFF0000);
+        } else if (train.vdSpeed > train.atpYellowSpeed + (0.1f / 20 / 3.6f)) {
+            guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, 0xFFFFA500);
+        }
+        }
 
         String notchText = train.vdNotch == 0 ? "N"
                 : (train.vdNotch < 0
