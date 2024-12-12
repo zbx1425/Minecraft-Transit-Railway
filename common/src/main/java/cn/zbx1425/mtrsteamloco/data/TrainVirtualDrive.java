@@ -49,6 +49,7 @@ public class TrainVirtualDrive extends TrainClient {
     private int doorOpenedAtPlatformIndex = 0;
 
     public LongArrayList railAheadLookup = new LongArrayList();
+    private DelayedValue actualNotch = new DelayedValue(0.5);
 
     public int powerNotches = 5;
     public int brakeNotches = 7;
@@ -62,19 +63,27 @@ public class TrainVirtualDrive extends TrainClient {
         nextStoppingIndex = path.size() - 1;
         super.simulateTrain(world, ticksElapsed, speedCallback, announcementCallback, lightRailAnnouncementCallback);
 
-        float accelDueToFriction = (-0.1f / 400 / 3.6f) * ticksElapsed;
+        float accelDueToFriction = (-0.2f / 400 / 3.6f) * ticksElapsed;
+        float sinPitch = (float)(keyPointsPositions[0].y - keyPointsPositions[keyPointsPositions.length - 1].y)
+                / (spacing * trainCars - ((spacing - 1) / 2f - getBogiePosition()) * 2f);
+        float accelDueToPitch = (-sinPitch * 9.8f / 400) * ticksElapsed;
+        float passiveAccel = accelDueToFriction + accelDueToPitch;
+        float commandNotch;
         if (atpEmergencyBrake) {
-            vdSpeed = Mth.clamp(vdSpeed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + accelDueToFriction, 0, vdMaxSpeed);
+            commandNotch = -2;
             if (vdSpeed <= 0 && vdNotch < 0) atpEmergencyBrake = false;
         } else {
-            if (vdNotch < 0) {
-                vdSpeed = Mth.clamp(vdSpeed + getPercentNotch() * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + accelDueToFriction, 0, vdMaxSpeed);
-            } else if (vdNotch > 0) {
-                vdSpeed = Mth.clamp(vdSpeed + getPercentNotch() * accelerationConstant * ticksElapsed + accelDueToFriction, 0, vdMaxSpeed);
-            } else {
-                // Simulate friction
-                vdSpeed = Mth.clamp(vdSpeed + accelDueToFriction, 0, vdMaxSpeed);
-            }
+            commandNotch = getPercentNotch();
+        }
+        float actualNotch = this.actualNotch.setAndGet(commandNotch, ticksElapsed);
+        if (actualNotch < -1) {
+            vdSpeed = Mth.clamp(vdSpeed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+        } else if (actualNotch < 0) {
+            vdSpeed = Mth.clamp(vdSpeed + actualNotch * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+        } else if (actualNotch > 0) {
+            vdSpeed = Mth.clamp(vdSpeed + actualNotch * accelerationConstant * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+        } else {
+            vdSpeed = Mth.clamp(vdSpeed + passiveAccel, 0, vdMaxSpeed);
         }
         if (doorValue > 0 || doorTarget) {
             vdSpeed = 0;
@@ -212,7 +221,7 @@ public class TrainVirtualDrive extends TrainClient {
         if (activeTrain != null) {
             PacketVirtualDrive.sendVirtualDriveC2S(false);
             activeTrain.isRemoved = true;
-            Minecraft.getInstance().execute(() -> {
+            Minecraft.getInstance().tell(() -> {
                 ClientData.TRAINS.remove(activeTrain);
             });
             activeTrain = null;
