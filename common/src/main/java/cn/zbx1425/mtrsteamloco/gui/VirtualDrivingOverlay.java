@@ -14,8 +14,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
@@ -23,6 +25,10 @@ public class VirtualDrivingOverlay {
 
     private static float keyCooldown = 0;
     private static KeyMapping lastKey = null;
+
+    private static int lastTargetState;
+    private static float atpBuzzerTriggerTime = 0;
+    private static SoundEvent ATP_BUZZER_SOUND = SoundEvent.createVariableRangeEvent(Main.id("drive.atp_buzzer"));
 
     public static void render(GuiGraphics guiGraphics, DeltaTracker deltaT) {
         if (TrainVirtualDrive.activeTrain == null) return;
@@ -162,15 +168,24 @@ public class VirtualDrivingOverlay {
 
         // Target status
         {
-        float x1 = PADDING;
-        float x2 = x1 + (40 / 256f) * GAUGE_SIZE;
-        float y1 = guiGraphics.guiHeight() - GAUGE_SIZE - PADDING - (10 / 256f) * GAUGE_SIZE;
-        float y2 = y1 + (40 / 256f) * GAUGE_SIZE;
-        if (train.atpEmergencyBrake) {
-            guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, 0xFFFF0000);
-        } else if (train.vdSpeed > train.atpYellowSpeed + (0.1f / 20 / 3.6f)) {
-            guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, 0xFFFFA500);
-        }
+            float x1 = PADDING;
+            float x2 = x1 + (40 / 256f) * GAUGE_SIZE;
+            float y1 = guiGraphics.guiHeight() - GAUGE_SIZE - PADDING - (10 / 256f) * GAUGE_SIZE;
+            float y2 = y1 + (40 / 256f) * GAUGE_SIZE;
+            int targetState = train.atpEmergencyBrake ? 2
+                    : (train.vdSpeed > train.atpYellowSpeed + (0.1f / 20 / 3.6f) ? 1 : 0);
+            if (targetState > 0) {
+                guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, targetState == 2 ? 0xFFFF0000 : 0xFFFFA500);
+            }
+            if (targetState != lastTargetState) {
+                if (targetState > lastTargetState) {
+                    if (MTRClient.getGameTick() - atpBuzzerTriggerTime > 20) {
+                        atpBuzzerTriggerTime = MTRClient.getGameTick();
+                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(ATP_BUZZER_SOUND, 1.0F));
+                    }
+                }
+                lastTargetState = targetState;
+            }
         }
 
         String notchText = train.vdNotch == 0 ? "N"

@@ -2,7 +2,6 @@ package cn.zbx1425.mtrsteamloco.data;
 
 import cn.zbx1425.mtrsteamloco.network.PacketVirtualDrive;
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import mtr.client.ClientData;
 import mtr.data.TrainClient;
@@ -65,7 +64,7 @@ public class TrainVirtualDrive extends TrainClient {
 
         float accelDueToFriction = (-0.1f / 400 / 3.6f) * ticksElapsed;
         if (atpEmergencyBrake) {
-            vdSpeed = Mth.clamp(vdSpeed - 1.1f * accelerationConstant * ticksElapsed + accelDueToFriction, 0, vdMaxSpeed);
+            vdSpeed = Mth.clamp(vdSpeed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + accelDueToFriction, 0, vdMaxSpeed);
             if (vdSpeed <= 0 && vdNotch < 0) atpEmergencyBrake = false;
         } else {
             if (vdNotch < 0) {
