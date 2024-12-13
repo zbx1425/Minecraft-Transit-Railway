@@ -1,9 +1,10 @@
-package cn.zbx1425.mtrsteamloco.data;
+package cn.zbx1425.mtrsteamloco.game;
 
 import cn.zbx1425.mtrsteamloco.network.PacketVirtualDrive;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import mtr.client.ClientData;
+import mtr.data.RailwayDataCoolDownModule;
 import mtr.data.TrainClient;
 import mtr.mappings.Text;
 import mtr.path.PathData;
@@ -64,7 +65,9 @@ public class TrainVirtualDrive extends TrainClient {
         manualNotch = 114514; // Magic number to bypass base class manual driving logic
         nextStoppingIndex = path.size() - 1;
         super.simulateTrain(world, ticksElapsed, speedCallback, announcementCallback, lightRailAnnouncementCallback);
-        if (!isOnRoute) {
+        if (!isOnRoute
+            || Math.abs(vehicleRidingClient.getPercentageX(Minecraft.getInstance().player.getUUID())) > 1.1
+            || ClientData.getShiftHoldingTicks() >= RailwayDataCoolDownModule.SHIFT_ACTIVATE_TICKS) {
             stopDriving();
             return;
         }
@@ -140,6 +143,7 @@ public class TrainVirtualDrive extends TrainClient {
         atpRedSpeed = vdMaxSpeed;
         atpTargetSpeed = vdMaxSpeed;
         float targetPatternSpeed = vdMaxSpeed;
+        float effectiveLimit = vdMaxSpeed;
         atpTargetDistance = distances.getLast();
         double lookAheadDistance = Math.max(300, Math.pow(speed, 2) / (2 * accelerationConstant));
         for (int i = getIndex(railProgress - spacing * trainCars, true);
@@ -150,8 +154,7 @@ public class TrainVirtualDrive extends TrainClient {
                 // Persisting speed limit
                 atpYellowSpeed = Math.min(atpYellowSpeed, pathSeg.rail.railType.maxBlocksPerTick);
                 atpRedSpeed = Math.min(atpRedSpeed, pathSeg.rail.railType.maxBlocksPerTick + 5 / 3.6f / 20);
-                // Prevent selecting a speed not lower than current limit as a unnecessary target
-                targetPatternSpeed = Math.min(targetPatternSpeed, pathSeg.rail.railType.maxBlocksPerTick);
+                effectiveLimit = Math.min(effectiveLimit, pathSeg.rail.railType.maxBlocksPerTick);
             }
             if (pathSeg.dwellTime > 0 && i != doorOpenedAtPlatformIndex) {
                 // Stop point pattern
@@ -187,7 +190,7 @@ public class TrainVirtualDrive extends TrainClient {
                     if (yellowPatternSpeed < atpYellowSpeed) {
                         atpYellowSpeed = yellowPatternSpeed;
                     }
-                    if (yellowPatternSpeed < targetPatternSpeed) {
+                    if (pathSeg.rail.railType.maxBlocksPerTick < effectiveLimit && yellowPatternSpeed < targetPatternSpeed) {
                         targetPatternSpeed = yellowPatternSpeed;
                         atpTargetSpeed = pathSeg.rail.railType.maxBlocksPerTick;
                         atpTargetDistance = distances.get(i - 1);
@@ -213,9 +216,11 @@ public class TrainVirtualDrive extends TrainClient {
 
     public static TrainVirtualDrive activeTrain;
 
-    public static void startDrivingRidingTrain() {
+    /** @return Whether the player is riding a train and the virtual driving is started
+     */
+    public static boolean startDrivingRidingTrain() {
         Player player = Minecraft.getInstance().player;
-        if (player == null) return;
+        if (player == null) return false;
         for (TrainClient train : ClientData.TRAINS) {
             if (train.isPlayerRiding(player)) {
                 stopDriving();
@@ -232,9 +237,10 @@ public class TrainVirtualDrive extends TrainClient {
                 Minecraft.getInstance().execute(() -> {
                     ClientData.TRAINS.add(activeTrain);
                 });
-                break;
+                return true;
             }
         }
+        return false;
     }
 
     public static void stopDriving() {

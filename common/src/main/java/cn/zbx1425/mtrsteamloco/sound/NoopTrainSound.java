@@ -28,4 +28,9 @@ public class NoopTrainSound extends TrainSoundBase {
     public void playAllCarsDoorOpening(Level level, BlockPos blockPos, int i) {
 
     }
+
+    @Override
+    public void stopAll() {
+
+    }
 }

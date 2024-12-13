@@ -89,9 +89,12 @@ public class Main {
 
 			mtr.Registry.registerNetworkPacket(PacketVersionCheck.PACKET_VERSION_CHECK);
 			mtr.Registry.registerNetworkPacket(PacketScreen.PACKET_SHOW_SCREEN);
+			mtr.Registry.registerNetworkPacket(PacketVirtualDrivingPlayers.PACKET_VIRTUAL_DRIVING_PLAYERS);
 
 			mtr.Registry.registerPlayerJoinEvent(PacketVersionCheck::sendVersionCheckS2C);
 		}
+
+		Registry.registerPlayerJoinEvent(PacketVirtualDrivingPlayers::sendVirtualDrivingPlayersS2C);
 	}
 
 	@FunctionalInterface

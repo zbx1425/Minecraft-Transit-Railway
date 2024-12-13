@@ -54,7 +54,10 @@ public abstract class TrainRendererBase {
 		final Player renderPlayer = world.getPlayerByUUID(playerId);
 		if (renderPlayer != null && (!playerId.equals(player.getUUID()) || camera.isDetached())) {
 			// Maybe this can stop the player from appearing moving and cape from flapping
-			renderPlayer.walkDist = renderPlayer.walkDistO;
+			renderPlayer.walkDistO = renderPlayer.walkDist;
+			renderPlayer.xCloak = renderPlayer.xCloakO = renderPlayer.xo;
+			renderPlayer.yCloak = renderPlayer.yCloakO = renderPlayer.yo;
+			renderPlayer.zCloak = renderPlayer.zCloakO = renderPlayer.zo;
 			renderPlayer.walkAnimation.setSpeed(0);
 
 			entityRenderDispatcher.render(renderPlayer, playerPositionOffset.x, playerPositionOffset.y, playerPositionOffset.z, 0, 1, matrices, vertexConsumers, 0xF000F0);

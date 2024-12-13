@@ -38,6 +38,9 @@ public class PacketVirtualDrive {
                 RailwayData.getInstance(player.level()).railwayDataCoolDownModule
                         .updatePlayerInVirtualDrive(player, false);
             }
+            for (ServerPlayer target : player.serverLevel().players()) {
+                PacketVirtualDrivingPlayers.sendVirtualDrivingPlayersS2C(target);
+            }
         });
     }
 }

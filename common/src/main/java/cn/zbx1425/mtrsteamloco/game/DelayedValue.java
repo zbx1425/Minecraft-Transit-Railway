@@ -1,4 +1,4 @@
-package cn.zbx1425.mtrsteamloco.data;
+package cn.zbx1425.mtrsteamloco.game;
 
 import it.unimi.dsi.fastutil.floats.FloatArrayFIFOQueue;
 

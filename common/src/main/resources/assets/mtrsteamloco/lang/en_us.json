@@ -69,5 +69,7 @@
     "gui.mtrsteamloco.config.client.preloadbbmodel.description": "This optimizes the rendering efficiency for custom trains with BBMODEL, especially for detailed models.\nHowever it increases RAM usage, and on some computers it was reported to make little or even negative contributions.",
     "gui.mtrsteamloco.config.client.scriptdebugoverlay": "Show Script Debug Overlay",
 
-    "gui.mtrsteamloco.mtr_version_low": "Please upgrade MTR: NTE %s requires MTR %s or above, while a lower version %s is installed."
+    "gui.mtrsteamloco.mtr_version_low": "Please upgrade MTR: NTE %s requires MTR %s or above, while a lower version %s is installed.",
+
+    "commands.mtrsteamloco.virtdrive.not_riding": "You are not riding a train. Please use this command while riding a train."
 }

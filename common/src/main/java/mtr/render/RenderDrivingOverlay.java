@@ -1,6 +1,6 @@
 package mtr.render;
 
-import cn.zbx1425.mtrsteamloco.gui.VirtualDrivingOverlay;
+import cn.zbx1425.mtrsteamloco.gui.VirtualDriveOverlay;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mtr.data.*;
@@ -25,7 +25,7 @@ public class RenderDrivingOverlay implements IGui {
 
 	public static void render(GuiGraphics guiGraphics) {
 
-		VirtualDrivingOverlay.render(guiGraphics, Minecraft.getInstance().getTimer());
+		VirtualDriveOverlay.render(guiGraphics, Minecraft.getInstance().getTimer());
 
 		if (coolDown > 0) {
 			coolDown--;

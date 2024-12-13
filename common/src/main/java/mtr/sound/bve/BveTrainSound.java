@@ -1,6 +1,6 @@
 package mtr.sound.bve;
 
-import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
+import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
 import mtr.MTRClient;
 import mtr.client.TrainClientRegistry;
 import mtr.client.TrainProperties;
@@ -289,6 +289,30 @@ public class BveTrainSound extends TrainSoundBase {
 		}
 
 		playLocalSound(world, soundEvent, pos);
+	}
+
+	@Override
+	public void stopAll() {
+		if (soundLoopRun != null) {
+			soundLoopRun.stopWithoutDispose();
+		}
+		if (soundLoopFlange != null) {
+			soundLoopFlange.stopWithoutDispose();
+		}
+		if (soundLoopNoise != null) {
+			soundLoopNoise.stopWithoutDispose();
+		}
+		if (soundLoopShoe != null) {
+			soundLoopShoe.stopWithoutDispose();
+		}
+		if (soundLoopCompressor != null) {
+			soundLoopCompressor.stopWithoutDispose();
+		}
+		for (TrainLoopingSoundInstance soundLoop : soundLoopMotor) {
+			if (soundLoop != null) {
+				soundLoop.stopWithoutDispose();
+			}
+		}
 	}
 
 	private static void playLocalSound(Level world, SoundEvent event, BlockPos pos, float gain, float pitch) {

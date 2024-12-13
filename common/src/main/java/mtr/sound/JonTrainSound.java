@@ -90,6 +90,11 @@ public class JonTrainSound extends TrainSoundBase {
 		}
 	}
 
+	@Override
+	public void stopAll() {
+
+	}
+
 	public static class JonTrainSoundConfig {
 
 		public final String doorSoundBaseId;

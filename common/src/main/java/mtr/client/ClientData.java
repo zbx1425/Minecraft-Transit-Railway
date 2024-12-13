@@ -1,6 +1,7 @@
 package mtr.client;
 
-import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
+import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
+import cn.zbx1425.mtrsteamloco.game.VirtualDriveClientData;
 import mtr.KeyMappings;
 import mtr.MTRClient;
 import mtr.data.*;
@@ -295,7 +296,7 @@ public final class ClientData {
 	}
 
 	public static boolean isRiding(UUID uuid) {
-		return PLAYER_RIDING_COOL_DOWN.containsKey(uuid);
+		return PLAYER_RIDING_COOL_DOWN.containsKey(uuid) || VirtualDriveClientData.drivingPlayers.contains(uuid);
 	}
 
 	public static boolean hasPermission() {

@@ -45,6 +45,10 @@ public class TrainLoopingSoundInstance extends TickableSoundInstanceMapper {
         }
     }
 
+	public void stopWithoutDispose() {
+		Minecraft.getInstance().getSoundManager().stop(this);
+	}
+
 	@Override
 	public void tick() {
 		if (train.isRemoved) {

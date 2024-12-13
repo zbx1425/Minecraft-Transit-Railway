@@ -1,6 +1,6 @@
 package mtr.render;
 
-import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
+import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import mtr.MTRClient;
@@ -116,7 +116,7 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 			final Station lastStation = train.getLastStation();
 
 			if (showShiftProgressBar() && (!train.isCurrentlyManual() || !Train.isHoldingKey(player))) {
-				if (speed > 5 || thisRoute == null || thisStation == null || lastStation == null) {
+				if (train.getDoorValue() == 0 || thisRoute == null || thisStation == null || lastStation == null) {
 					if (!(train instanceof TrainVirtualDrive)) { // TODO something more elegant
 						player.displayClientMessage(Text.translatable("gui.mtr.vehicle_speed", RailwayData.round(speed, 1), RailwayData.round(speed * 3.6F, 1)), true);
 					}

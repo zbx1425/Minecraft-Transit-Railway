@@ -1,7 +1,7 @@
 package cn.zbx1425.mtrsteamloco.gui;
 
 import cn.zbx1425.mtrsteamloco.Main;
-import cn.zbx1425.mtrsteamloco.data.TrainVirtualDrive;
+import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
@@ -24,7 +24,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
-public class VirtualDrivingOverlay {
+public class VirtualDriveOverlay {
 
     private static float keyCooldown = 0;
     private static KeyMapping lastKey = null;

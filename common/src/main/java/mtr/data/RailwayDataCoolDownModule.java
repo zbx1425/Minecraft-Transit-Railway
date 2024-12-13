@@ -21,7 +21,7 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 	private final Map<Player, Integer> playerSeatCoolDowns = new HashMap<>();
 	private final Map<Player, Integer> playerShiftCoolDowns = new HashMap<>();
 
-	private final Set<Player> playerInVirtualDrive = new HashSet<>();
+	public final Set<Player> playerInVirtualDrive = new HashSet<>();
 
 	public static final int SHIFT_ACTIVATE_TICKS = 30;
 

@@ -56,5 +56,6 @@
     "gui.mtrsteamloco.config.client.preloadbbmodel": "BBMODEL 预加载优化",
     "gui.mtrsteamloco.config.client.preloadbbmodel.description": "这项优化提升使用 BBMODEL 的自定义列车的渲染效率，对于精细的模型尤其有提升。\n但是它增加内存用量，且据报在一些设备上优化效果不佳或甚至负优化。",
     "gui.mtrsteamloco.config.client.scriptdebugoverlay": "显示 JS 调试信息",
-    "gui.mtrsteamloco.mtr_version_low": "请更新 MTR: NTE %s 需要 MTR %s 及以上版本, 而现安装的 %s 版本较低。"
+    "gui.mtrsteamloco.mtr_version_low": "请更新 MTR: NTE %s 需要 MTR %s 及以上版本, 而现安装的 %s 版本较低。",
+    "commands.mtrsteamloco.virtdrive.not_riding": "您不在列车上。请先乘坐列车再运行此命令。"
 }
