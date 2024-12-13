@@ -36,7 +36,6 @@ Keys.java
 BlockEntityExtension.java
 RandomSource.java
 UnknownPacketMixin.java
-**/lang/*.json
 !en_us.json
 fabric/server
 neoforge/server
