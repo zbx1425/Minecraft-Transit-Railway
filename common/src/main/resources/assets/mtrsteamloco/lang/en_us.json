@@ -43,6 +43,11 @@
     "gui.mtrsteamloco.feedback_success": "Your feedback has been received, and can be viewed at: ",
     "gui.mtrsteamloco.one_way_gate.wrong_way_pass": "Cannot open from this side!",
 
+    "gui.mtrsteamloco.drive.not_in_cab": "Walk into the cab to drive the train.",
+    "gui.mtrsteamloco.drive.change_end": "Please walk to the other end of the train.",
+    "gui.mtrsteamloco.drive.stop_position": "Stop Position: %s",
+    "gui.mtrsteamloco.drive.atp_eb": "ATP Emergency Brake",
+
     "gui.mtrsteamloco.error.title": "Error in NTE resource loading process",
     "gui.mtrsteamloco.error.explain": "If you are a player, just click the Cancel button. If you are a resource pack author, you can check the error message.\nIt's most likely to be from an error in a resource pack, but it can also be caused by a bug in another mod utilizing NTE or NTE itself.",
 

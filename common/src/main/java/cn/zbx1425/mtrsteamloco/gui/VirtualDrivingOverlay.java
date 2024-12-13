@@ -8,11 +8,13 @@ import com.mojang.math.Axis;
 import mtr.KeyMappings;
 import mtr.MTRClient;
 import mtr.data.RailwayData;
+import mtr.mappings.Text;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -28,11 +30,24 @@ public class VirtualDrivingOverlay {
 
     private static int lastTargetState;
     private static float atpBuzzerTriggerTime = 0;
-    private static SoundEvent ATP_BUZZER_SOUND = SoundEvent.createVariableRangeEvent(Main.id("drive.atp_buzzer"));
+    private static final SoundEvent ATP_BUZZER_SOUND = SoundEvent.createVariableRangeEvent(Main.id("drive.atp_buzzer"));
 
     public static void render(GuiGraphics guiGraphics, DeltaTracker deltaT) {
         if (TrainVirtualDrive.activeTrain == null) return;
         TrainVirtualDrive train = TrainVirtualDrive.activeTrain;
+
+        final int GAUGE_SIZE = 96;
+        final int PADDING = 24;
+        Font font = Minecraft.getInstance().font;
+
+        final LocalPlayer player = Minecraft.getInstance().player;
+        final int currentRidingCar = Mth.clamp(
+                (int) Math.floor(train.vehicleRidingClient.getPercentageZ(player.getUUID())),
+                0, train.trainCars - 1);
+        if (currentRidingCar != (train.isReversed() ? train.trainCars - 1 : 0)) {
+            guiGraphics.drawString(font, Text.translatable("gui.mtrsteamloco.drive.not_in_cab"), PADDING, guiGraphics.guiHeight() - PADDING - 10, 0xFFFFA500);
+            return;
+        }
 
         anyKeyDown = false;
         if (isKeyDownWithRepeat(KeyMappings.TRAIN_BRAKE, deltaT)) {
@@ -51,8 +66,6 @@ public class VirtualDrivingOverlay {
         }
 
         // HMI painting
-        final int GAUGE_SIZE = 96;
-        final int PADDING = 20;
         ResourceLocation hmiTex = Main.id("textures/gui/drive_hmi.png");
         RenderSystem.setShaderTexture(0, hmiTex);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
@@ -113,7 +126,6 @@ public class VirtualDrivingOverlay {
         RenderSystem.disableBlend();
 
         // Speed Text
-        Font font = Minecraft.getInstance().font;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0);
         float speedTextScale = (50 / 730f * GAUGE_SIZE) / font.lineHeight;
@@ -173,7 +185,7 @@ public class VirtualDrivingOverlay {
             float y1 = guiGraphics.guiHeight() - GAUGE_SIZE - PADDING - (10 / 256f) * GAUGE_SIZE;
             float y2 = y1 + (40 / 256f) * GAUGE_SIZE;
             int targetState = train.atpEmergencyBrake ? 2
-                    : (train.vdSpeed > train.atpYellowSpeed + (0.1f / 20 / 3.6f) ? 1 : 0);
+                    : (train.getSpeed() > train.atpYellowSpeed + (0.1f / 20 / 3.6f) ? 1 : 0);
             if (targetState > 0) {
                 guiGraphics.fill((int) x1, (int) y1, (int) x2, (int) y2, targetState == 2 ? 0xFFFF0000 : 0xFFFFA500);
             }
@@ -188,30 +200,37 @@ public class VirtualDrivingOverlay {
             }
         }
 
+        // Current notch
+        String reverserText = train.vdReverser == 0 ? "N"
+                : (train.vdReverser < 0 ? "R" : "F");
+        int reverserColor = train.vdReverser == 0 ? 0xFF008844
+                : (train.vdReverser < 0 ? 0xFFFFA500 : 0xFF888888);
         String notchText = train.vdNotch == 0 ? "N"
                 : (train.vdNotch < 0
                     ? "B" + Math.round(-train.getPercentNotch() * 100)
                     : "P" + Math.round(train.getPercentNotch() * 100));
-        double distance = train.nextPlatformRailProgress - train.vdRailProgress;
-        String distanceText = (distance > -5 && distance < 5)
-                ? Math.round(distance * 100) + " cm"
-                : Math.round(distance) + " m";
-        Component[] infoLines = {
-//            Component.literal(train.getDoorValue() > 0 ? "Doors: Open" : "Doors: Closed"),
-//            Component.literal("Stop Distance: " + distanceText),
-//            Component.literal("ATP R Speed: " + RailwayData.round(train.atpRedSpeed * 20 * 3.6F, 1) + " km/h"),
-//            Component.literal("ATP Y Speed: " + RailwayData.round(train.atpYellowSpeed * 20 * 3.6F, 1) + " km/h"),
-//            Component.literal(""),
-//            Component.literal("Speed: " + RailwayData.round(train.vdSpeed * 20 * 3.6F, 1) + " km/h"),
-            Component.literal(notchText)
-        };
-        // Draw at bottom left corner
+        int notchColor = train.vdNotch == 0 ? 0xFF888888
+                : (train.vdNotch < 0 ? 0xFFFFA500 : 0xFF4287F5);
+        guiGraphics.drawString(font, Component.literal(reverserText), PADDING, guiGraphics.guiHeight() - PADDING - 10, reverserColor);
+        guiGraphics.drawString(font, Component.literal(notchText), PADDING + 12, guiGraphics.guiHeight() - PADDING - 10, notchColor);
+
+        // Various other info
         int lineHeight = 10;
+        int y = guiGraphics.guiHeight() - PADDING - GAUGE_SIZE - 10 - lineHeight;
         int x = 20;
-        int y = guiGraphics.guiHeight() - 20 - lineHeight * infoLines.length;
-        for (Component line : infoLines) {
-            guiGraphics.drawString(font, line, x, y, 0xFFFFFF);
-            y += lineHeight;
+        // Stop accuracy
+        double distance = train.nextPlatformRailProgress - train.getRailProgress();
+        if (Math.abs(distance) < 10 && train.getSpeed() <= 0) {
+            String distanceText = (distance > -5 && distance < 5)
+                    ? Math.round(distance * 100) + " cm"
+                    : Math.round(distance) + " m";
+            guiGraphics.drawString(font, Component.translatable("gui.mtrsteamloco.drive.stop_position", distanceText), x, y, 0xFF1CED85);
+            y -= lineHeight;
+        }
+        // ATP status
+        if (train.atpEmergencyBrake) {
+            guiGraphics.drawString(font, Component.translatable("gui.mtrsteamloco.drive.atp_eb"), x, y, 0xFFFF0000);
+            y -= lineHeight;
         }
     }
 

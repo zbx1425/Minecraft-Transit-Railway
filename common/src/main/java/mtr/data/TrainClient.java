@@ -275,9 +275,6 @@ public class TrainClient extends Train implements IGui {
 				});
 
 				final int currentRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
-				if (isPlayerRiding(Minecraft.getInstance().player) && this == TrainVirtualDrive.activeTrain) {
-					Minecraft.getInstance().player.displayClientMessage(Text.literal("ATP Manual"), true);
-				}
 				calculateCar(world, positions, currentRidingCar, 0, (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
 					vehicleRidingClient.moveSelf(id, uuid, realSpacingRender, width, yaw, currentRidingCar, trainCars, doorLeftOpenRender, doorRightOpenRender, !trainProperties.hasGangwayConnection, ticksElapsed);
 

@@ -493,7 +493,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 							manualNotch = -3;
 						} else {
 							if (isCurrentlyManual) {
-								if (manualNotch >= -2) {
+								if (manualNotch >= -2 && manualNotch <= 2) {
 									final RailType railType = convertMaxManualSpeed(maxManualSpeed);
 									speed = Mth.clamp(speed + manualNotch * newAcceleration / 2, 0, railType == null ? RailType.IRON.maxBlocksPerTick : railType.maxBlocksPerTick);
 								}

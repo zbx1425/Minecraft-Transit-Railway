@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import mtr.client.ClientData;
 import mtr.data.TrainClient;
+import mtr.mappings.Text;
 import mtr.path.PathData;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -34,9 +35,8 @@ public class TrainVirtualDrive extends TrainClient {
         vdMaxSpeed += 20 / 20f / 3.6f;
     }
 
-    public double vdRailProgress;
-    public float vdSpeed;
     public int vdNotch = 0;
+    public int vdReverser = 1;
     public float vdMaxSpeed;
 
     public int nextPlatformIndex;
@@ -56,48 +56,72 @@ public class TrainVirtualDrive extends TrainClient {
     public float yellowSpeedBrakeRatio = 0.7f;
     public float redSpeedBrakeRatio = 0.9f;
 
+    public double PROG_TOLERANCE = 5;
+
     @Override
     public void simulateTrain(Level world, float ticksElapsed, SpeedCallback speedCallback, AnnouncementCallback announcementCallback, AnnouncementCallback lightRailAnnouncementCallback) {
         isCurrentlyManual = true;
-        manualNotch = 0;
+        manualNotch = 114514; // Magic number to bypass base class manual driving logic
         nextStoppingIndex = path.size() - 1;
         super.simulateTrain(world, ticksElapsed, speedCallback, announcementCallback, lightRailAnnouncementCallback);
+        if (!isOnRoute) {
+            stopDriving();
+            return;
+        }
+
+        if (speed <= 0) {
+            // Repeat
+            int headIndex = getIndex(railProgress + PROG_TOLERANCE, false);
+            if (isRepeat() && headIndex >= repeatIndex2 && distances.size() > repeatIndex1) {
+                if (path.get(repeatIndex2).isOppositeRail(path.get(repeatIndex1))) {
+                    railProgress = distances.get(repeatIndex1 - 1) + trainCars * spacing;
+                    reversed = !reversed;
+                    Minecraft.getInstance().player.displayClientMessage(Text.translatable("gui.mtrsteamloco.drive.change_end"), false);
+                } else {
+                    railProgress = distances.get(repeatIndex1);
+                }
+            }
+            // Turn back
+            int tailIndex = getIndex(railProgress - spacing * trainCars + PROG_TOLERANCE, false);
+            if (path.size() > tailIndex + 1 && Math.abs(railProgress - distances.get(tailIndex)) < PROG_TOLERANCE
+                && path.get(tailIndex).isOppositeRail(path.get(tailIndex + 1))) {
+                railProgress = distances.get(tailIndex) + trainCars * spacing + 0.1; // 0.1 to avoid red speed at 0
+                reversed = !reversed;
+                Minecraft.getInstance().player.displayClientMessage(Text.translatable("gui.mtrsteamloco.drive.change_end"), false);
+            }
+        }
 
         float accelDueToFriction = (-0.2f / 400 / 3.6f) * ticksElapsed;
         float sinPitch = (float)(keyPointsPositions[0].y - keyPointsPositions[keyPointsPositions.length - 1].y)
-                / (spacing * trainCars - ((spacing - 1) / 2f - getBogiePosition()) * 2f);
-        float accelDueToPitch = (-sinPitch * 9.8f / 400) * ticksElapsed;
+                / (spacing * trainCars - ((spacing - 1) / 2f - getBogiePosition()) * 2f) * (reversed ? 1 : -1);
+        float accelDueToPitch = (sinPitch * 9.8f / 400) * ticksElapsed;
         float passiveAccel = accelDueToFriction + accelDueToPitch;
         float commandNotch;
         if (atpEmergencyBrake) {
             commandNotch = -2;
-            if (vdSpeed <= 0 && vdNotch < 0) atpEmergencyBrake = false;
+            if (speed <= 0 && vdNotch < 0) atpEmergencyBrake = false;
         } else {
             commandNotch = getPercentNotch();
         }
         float actualNotch = this.actualNotch.setAndGet(commandNotch, ticksElapsed);
         if (actualNotch < -1) {
-            vdSpeed = Mth.clamp(vdSpeed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
         } else if (actualNotch < 0) {
-            vdSpeed = Mth.clamp(vdSpeed + actualNotch * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed + actualNotch * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
         } else if (actualNotch > 0) {
-            vdSpeed = Mth.clamp(vdSpeed + actualNotch * accelerationConstant * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed + actualNotch * accelerationConstant * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
         } else {
-            vdSpeed = Mth.clamp(vdSpeed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed + passiveAccel, 0, vdMaxSpeed);
         }
         if (doorValue > 0 || doorTarget) {
-            vdSpeed = 0;
-        }
-        vdRailProgress += vdSpeed * ticksElapsed;
-        if (vdRailProgress >= distances.getLast() - (railLength - trainCars * spacing) / 2) {
-            stopDriving();
+            speed = 0;
         }
 
         // Update next platform
-        if (distances.get(nextPlatformIndex) < vdRailProgress - 10) {
+        if (distances.get(nextPlatformIndex) < railProgress - 10) {
             for (int i = nextPlatformIndex; i < path.size(); i++) {
                 if (path.get(i).dwellTime > 0) {
-                    if (distances.get(i) >= vdRailProgress - 10) {
+                    if (distances.get(i) >= railProgress - 10) {
                         nextPlatformIndex = i;
                         nextPlatformRailProgress = distances.get(i);
                         break;
@@ -118,12 +142,12 @@ public class TrainVirtualDrive extends TrainClient {
         atpTargetDistance = distances.getLast();
         double speedLimitLiftDistance = distances.getLast();
         float patternSpeedAtLiftDistance = vdMaxSpeed;
-        double lookAheadDistance = Math.max(300, Math.pow(vdSpeed, 2) / (2 * accelerationConstant));
-        for (int i = getIndex(vdRailProgress - spacing * trainCars, true);
-            i < path.size() && distances.get(i) < vdRailProgress + lookAheadDistance; i++) {
+        double lookAheadDistance = Math.max(300, Math.pow(speed, 2) / (2 * accelerationConstant));
+        for (int i = getIndex(railProgress - spacing * trainCars, true);
+            i < path.size() && distances.get(i) < railProgress + lookAheadDistance; i++) {
             PathData pathSeg = path.get(i);
             railAheadLookup.add(pathSeg.startingPos.asLong());
-            if (i > 0 && distances.get(i - 1) < vdRailProgress && distances.get(i) > vdRailProgress - spacing * trainCars) {
+            if (i > 0 && distances.get(i - 1) < railProgress && distances.get(i) > railProgress - spacing * trainCars) {
                 // Persisting speed limit
                 atpYellowSpeed = Math.min(atpYellowSpeed, pathSeg.rail.railType.maxBlocksPerTick);
                 atpRedSpeed = Math.min(atpRedSpeed, pathSeg.rail.railType.maxBlocksPerTick + 5 / 3.6f / 20);
@@ -131,14 +155,14 @@ public class TrainVirtualDrive extends TrainClient {
             }
             if (pathSeg.dwellTime > 0 && i != doorOpenedAtPlatformIndex) {
                 // Stop point pattern
-                if (distances.get(i) > vdRailProgress) {
-                    float patternSpeed = (float)Math.sqrt(2 * accelerationConstant * (distances.get(i) - vdRailProgress));
+                if (distances.get(i) > railProgress) {
+                    float patternSpeed = (float)Math.sqrt(2 * accelerationConstant * (distances.get(i) - railProgress));
                     if (patternSpeed < atpYellowSpeed) {
                         atpYellowSpeed = patternSpeed;
                         atpTargetSpeed = 0;
                         atpTargetDistance = distances.get(i);
                     }
-                } else if (distances.get(i) > vdRailProgress - 10) {
+                } else if (distances.get(i) > railProgress - 10) {
                     atpYellowSpeed = 0;
                 }
                 if (distances.get(i) > speedLimitLiftDistance) {
@@ -147,13 +171,18 @@ public class TrainVirtualDrive extends TrainClient {
                 } else if (distances.get(i) > speedLimitLiftDistance - 10) {
                     patternSpeedAtLiftDistance = 0;
                 }
-                if (Math.abs(distances.get(i) - vdRailProgress) < 5 && (doorTarget || doorValue > 0)) {
+                if (Math.abs(distances.get(i) - railProgress) < 5 && (doorTarget || doorValue > 0)) {
                     doorOpenedAtPlatformIndex = i;
                 }
+                // Turn back rail
+                if (i + 1 < path.size() && pathSeg.isOppositeRail(path.get(i + 1))) {
+                    atpRedSpeed = Math.min(atpRedSpeed,
+                            (float)Math.sqrt(2 * accelerationConstant / yellowSpeedBrakeRatio * redSpeedBrakeRatio * (distances.get(i) - railProgress)));
+                }
             } else {
-                if (i > 0 && distances.get(i - 1) > vdRailProgress) {
+                if (i > 0 && distances.get(i - 1) > railProgress) {
                     // Decelerate to start of speed limit
-                    float yellowPatternSpeed = (float) Math.sqrt(2 * accelerationConstant * (distances.get(i - 1) - vdRailProgress)
+                    float yellowPatternSpeed = (float) Math.sqrt(2 * accelerationConstant * (distances.get(i - 1) - railProgress)
                                     + Math.pow(pathSeg.rail.railType.maxBlocksPerTick, 2));
                     if (yellowPatternSpeed < atpYellowSpeed) {
                         atpYellowSpeed = yellowPatternSpeed;
@@ -161,7 +190,7 @@ public class TrainVirtualDrive extends TrainClient {
                         atpTargetDistance = distances.get(i - 1);
                     }
                     atpRedSpeed = Math.min(atpRedSpeed,
-                            (float)Math.sqrt(2 * accelerationConstant / yellowSpeedBrakeRatio * redSpeedBrakeRatio * (distances.get(i - 1) - vdRailProgress)
+                            (float)Math.sqrt(2 * accelerationConstant / yellowSpeedBrakeRatio * redSpeedBrakeRatio * (distances.get(i - 1) - railProgress)
                                     + Math.pow(pathSeg.rail.railType.maxBlocksPerTick + 5 / 3.6f / 20, 2)));
                 }
                 if (i > 0 && distances.get(i - 1) > speedLimitLiftDistance) {
@@ -183,12 +212,9 @@ public class TrainVirtualDrive extends TrainClient {
             atpRedSpeed = 0;
             atpTargetSpeed = -1;
         }
-        if (vdSpeed > atpRedSpeed) {
+        if (speed > atpRedSpeed) {
             atpEmergencyBrake = true;
         }
-
-        railProgress = vdRailProgress;
-        speed = vdSpeed;
     }
 
     public static TrainVirtualDrive activeTrain;
@@ -200,8 +226,8 @@ public class TrainVirtualDrive extends TrainClient {
             if (train.isPlayerRiding(player)) {
                 stopDriving();
                 activeTrain = new TrainVirtualDrive(train);
-                activeTrain.vdRailProgress = train.getRailProgress();
-                activeTrain.vdSpeed = train.getSpeed();
+                activeTrain.railProgress = train.getRailProgress();
+                activeTrain.speed = train.getSpeed();
                 activeTrain.vehicleRidingClient.startRiding(
                         player.getUUID(),
                         train.vehicleRidingClient.getPercentageX(player.getUUID()),
@@ -223,8 +249,8 @@ public class TrainVirtualDrive extends TrainClient {
             activeTrain.isRemoved = true;
             Minecraft.getInstance().tell(() -> {
                 ClientData.TRAINS.remove(activeTrain);
+                activeTrain = null;
             });
-            activeTrain = null;
         }
     }
 
@@ -239,5 +265,22 @@ public class TrainVirtualDrive extends TrainClient {
     @Override
     public int getTotalDwellTicks() {
         return 114514;
+    }
+
+    @Override
+    public boolean toggleDoors() {
+        if (speed == 0) {
+            if (doorTarget) {
+                if (doorValue >= 1) {
+                    doorTarget = false;
+                }
+            } else {
+                doorTarget = true;
+            }
+            return true;
+        } else {
+            doorTarget = false;
+            return false;
+        }
     }
 }
