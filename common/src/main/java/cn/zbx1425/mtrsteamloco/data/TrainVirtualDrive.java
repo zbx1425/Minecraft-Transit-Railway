@@ -139,9 +139,8 @@ public class TrainVirtualDrive extends TrainClient {
         atpYellowSpeed = vdMaxSpeed;
         atpRedSpeed = vdMaxSpeed;
         atpTargetSpeed = vdMaxSpeed;
+        float targetPatternSpeed = vdMaxSpeed;
         atpTargetDistance = distances.getLast();
-        double speedLimitLiftDistance = distances.getLast();
-        float patternSpeedAtLiftDistance = vdMaxSpeed;
         double lookAheadDistance = Math.max(300, Math.pow(speed, 2) / (2 * accelerationConstant));
         for (int i = getIndex(railProgress - spacing * trainCars, true);
             i < path.size() && distances.get(i) < railProgress + lookAheadDistance; i++) {
@@ -151,7 +150,8 @@ public class TrainVirtualDrive extends TrainClient {
                 // Persisting speed limit
                 atpYellowSpeed = Math.min(atpYellowSpeed, pathSeg.rail.railType.maxBlocksPerTick);
                 atpRedSpeed = Math.min(atpRedSpeed, pathSeg.rail.railType.maxBlocksPerTick + 5 / 3.6f / 20);
-                speedLimitLiftDistance = distances.get(i) + spacing * trainCars;
+                // Prevent selecting a speed not lower than current limit as a unnecessary target
+                targetPatternSpeed = Math.min(targetPatternSpeed, pathSeg.rail.railType.maxBlocksPerTick);
             }
             if (pathSeg.dwellTime > 0 && i != doorOpenedAtPlatformIndex) {
                 // Stop point pattern
@@ -159,17 +159,17 @@ public class TrainVirtualDrive extends TrainClient {
                     float patternSpeed = (float)Math.sqrt(2 * accelerationConstant * (distances.get(i) - railProgress));
                     if (patternSpeed < atpYellowSpeed) {
                         atpYellowSpeed = patternSpeed;
+                    }
+                    if (patternSpeed < targetPatternSpeed) {
+                        targetPatternSpeed = patternSpeed;
                         atpTargetSpeed = 0;
                         atpTargetDistance = distances.get(i);
                     }
                 } else if (distances.get(i) > railProgress - 10) {
                     atpYellowSpeed = 0;
-                }
-                if (distances.get(i) > speedLimitLiftDistance) {
-                    float patternSpeed = (float)Math.sqrt(2 * accelerationConstant * (distances.get(i) - speedLimitLiftDistance));
-                    patternSpeedAtLiftDistance = Math.min(patternSpeedAtLiftDistance, patternSpeed);
-                } else if (distances.get(i) > speedLimitLiftDistance - 10) {
-                    patternSpeedAtLiftDistance = 0;
+                    targetPatternSpeed = 0;
+                    atpTargetSpeed = 0;
+                    atpTargetDistance = distances.get(i);
                 }
                 if (Math.abs(distances.get(i) - railProgress) < 5 && (doorTarget || doorValue > 0)) {
                     doorOpenedAtPlatformIndex = i;
@@ -186,6 +186,9 @@ public class TrainVirtualDrive extends TrainClient {
                                     + Math.pow(pathSeg.rail.railType.maxBlocksPerTick, 2));
                     if (yellowPatternSpeed < atpYellowSpeed) {
                         atpYellowSpeed = yellowPatternSpeed;
+                    }
+                    if (yellowPatternSpeed < targetPatternSpeed) {
+                        targetPatternSpeed = yellowPatternSpeed;
                         atpTargetSpeed = pathSeg.rail.railType.maxBlocksPerTick;
                         atpTargetDistance = distances.get(i - 1);
                     }
@@ -193,17 +196,8 @@ public class TrainVirtualDrive extends TrainClient {
                             (float)Math.sqrt(2 * accelerationConstant / yellowSpeedBrakeRatio * redSpeedBrakeRatio * (distances.get(i - 1) - railProgress)
                                     + Math.pow(pathSeg.rail.railType.maxBlocksPerTick + 5 / 3.6f / 20, 2)));
                 }
-                if (i > 0 && distances.get(i - 1) > speedLimitLiftDistance) {
-                    float patternSpeed = (float) Math.sqrt(2 * accelerationConstant * (distances.get(i - 1) - speedLimitLiftDistance)
-                            + Math.pow(pathSeg.rail.railType.maxBlocksPerTick, 2));
-                    patternSpeedAtLiftDistance = Math.min(patternSpeedAtLiftDistance, patternSpeed);
-                }
             }
         }
-//        if (patternSpeedAtLiftDistance < atpTargetDistance) {
-//            atpTargetSpeed = patternSpeedAtLiftDistance;
-//            atpTargetDistance = speedLimitLiftDistance;
-//        }
         if (atpTargetDistance == distances.getLast()) {
             atpTargetSpeed = 0;
         }
