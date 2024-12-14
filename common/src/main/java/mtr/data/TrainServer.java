@@ -2,19 +2,13 @@ package mtr.data;
 
 import mtr.TrigCache;
 import mtr.block.*;
-import mtr.mappings.Utilities;
 import mtr.path.PathData;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -118,7 +112,7 @@ public class TrainServer extends Train {
 	}
 
 	@Override
-	protected boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed) {
+	protected boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed, boolean isRendering) {
 
 		final AABB trainAABB = new AABB(positions[0], positions[positions.length - 1]).inflate(TRAIN_UPDATE_DISTANCE);
 		final boolean[] playerNearby = {false};
@@ -197,27 +191,8 @@ public class TrainServer extends Train {
 	}
 
 	@Override
-	protected boolean openDoors(Level world, Block block, BlockPos checkPos, int dwellTicks) {
-		if (block instanceof BlockPSDAPGDoorBase) {
-			for (int i = -1; i <= 1; i++) {
-				final BlockPos doorPos = checkPos.above(i);
-				final BlockState state = world.getBlockState(doorPos);
-				final Block doorBlock = state.getBlock();
-				final BlockEntity entity = world.getBlockEntity(doorPos);
+	protected void openDoors(Level world, Block block, BlockPos checkPos, int dwellTicks) {
 
-				if (doorBlock instanceof BlockPSDAPGDoorBase && entity instanceof BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase && IBlock.getStatePropertySafe(state, BlockPSDAPGDoorBase.UNLOCKED)) {
-					final int doorStateValue = (int) Mth.clamp(doorValue * DOOR_MOVE_TIME, 0, BlockPSDAPGDoorBase.MAX_OPEN_VALUE);
-					((BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase) entity).setOpen(doorStateValue);
-
-					if (doorStateValue > 0 && !world.getBlockTicks().hasScheduledTick(doorPos, doorBlock)) {
-						/* This schedules the block tick to the door (Ensures the door will be closed when the train passes by) */
-						Utilities.scheduleBlockTick(world, doorPos, doorBlock, dwellTicks);
-					}
-				}
-			}
-		}
-
-		return false;
 	}
 
 	@Override

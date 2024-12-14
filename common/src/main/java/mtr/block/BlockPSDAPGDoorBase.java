@@ -1,5 +1,6 @@
 package mtr.block;
 
+import mtr.MTRClient;
 import mtr.data.IGui;
 import mtr.mappings.BlockEntityClientSerializableMapper;
 import mtr.mappings.EntityBlockMapper;
@@ -89,6 +90,7 @@ public abstract class BlockPSDAPGDoorBase extends BlockPSDAPGBase implements Ent
 
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext collisionContext) {
+		if (!(world instanceof Level level && level.isClientSide())) return Shapes.empty();
 		final BlockEntity entity = world.getBlockEntity(pos);
 		return entity instanceof TileEntityPSDAPGDoorBase && ((TileEntityPSDAPGDoorBase) entity).isOpen() ? Shapes.empty() : super.getCollisionShape(state, world, pos, collisionContext);
 	}
@@ -120,51 +122,46 @@ public abstract class BlockPSDAPGDoorBase extends BlockPSDAPGBase implements Ent
 
 	public static abstract class TileEntityPSDAPGDoorBase extends BlockEntityClientSerializableMapper implements IGui {
 
-		private int open;
-		private float openClient;
-
-		private static final String KEY_OPEN = "open";
+		private float open;
+		private float openCooldownTick;
 
 		public TileEntityPSDAPGDoorBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 			super(type, pos, state);
-		}
-
-		@Override
-		public void readCompoundTag(CompoundTag compoundTag) {
-			open = compoundTag.getInt(KEY_OPEN);
-		}
-
-		@Override
-		public void writeCompoundTag(CompoundTag compoundTag) {
-			compoundTag.putInt(KEY_OPEN, open);
 		}
 
 		public AABB getRenderBoundingBox() {
 			return new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 		}
 
-		public void setOpen(int open) {
-			if (open != this.open) {
-				this.open = open;
-				setChanged();
-				syncData();
-			}
+		public void setOpen(float open) {
+			this.open = open;
+			Client.setCooldown(this);
 		}
 
 		public float getOpen(float lastFrameDuration) {
-			final float change = lastFrameDuration * 0.95F;
-			if (Math.abs(open - SMALL_OFFSET_16 * 2 - openClient) < change) {
-				openClient = open - SMALL_OFFSET_16 * 2;
-			} else if (openClient < open) {
-				openClient += change;
-			} else {
-				openClient -= change;
-			}
-			return openClient / 32;
+			clientTick();
+			return open;
 		}
 
 		public boolean isOpen() {
 			return open > 0;
+		}
+
+		public void clientTick() {
+			if (Client.isCooldownExpired(this)) {
+				open = 0;
+			}
+		}
+
+		private static class Client {
+
+			public static void setCooldown(TileEntityPSDAPGDoorBase door) {
+				door.openCooldownTick = MTRClient.getGameTick();
+			}
+
+			public static boolean isCooldownExpired(TileEntityPSDAPGDoorBase door) {
+				return MTRClient.getGameTick() - door.openCooldownTick > 10;
+			}
 		}
 	}
 }

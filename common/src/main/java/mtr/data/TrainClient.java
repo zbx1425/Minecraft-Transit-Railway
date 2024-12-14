@@ -3,6 +3,8 @@ package mtr.data;
 import cn.zbx1425.mtrsteamloco.ClientConfig;
 import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
 import mtr.MTRClient;
+import mtr.block.BlockPSDAPGDoorBase;
+import mtr.block.IBlock;
 import mtr.client.*;
 import mtr.render.RenderDrivingOverlay;
 import mtr.render.TrainRendererBase;
@@ -16,6 +18,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
@@ -152,7 +156,7 @@ public class TrainClient extends Train implements IGui {
 				trainSound.stopAll();
 				return;
 			}
-			if (!handlePositions(world, keyPointsPositions, ticksElapsed)) {
+			if (!handlePositions(world, keyPointsPositions, ticksElapsed, true)) {
 				trainSound.stopAll();
 				return;
 			}
@@ -165,7 +169,7 @@ public class TrainClient extends Train implements IGui {
 
 			for (int i = 0; i < trainCars; i++) {
 				final int ridingCar = i;
-				calculateCar(world, keyPointsPositions, i, totalDwellTicks, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
+				calculateCar(world, keyPointsPositions, i, totalDwellTicks, true, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
 					renderCar(
 							world, ridingCar, ticksElapsed,
 							x, y, z,
@@ -235,7 +239,7 @@ public class TrainClient extends Train implements IGui {
 	}
 
 	@Override
-	protected boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed) {
+	protected boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed, boolean isRendering) {
 		final Minecraft client = Minecraft.getInstance();
 		final LocalPlayer clientPlayer = client.player;
 		if (clientPlayer == null) {
@@ -279,14 +283,14 @@ public class TrainClient extends Train implements IGui {
 				});
 
 				final int currentRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
-				calculateCar(world, positions, currentRidingCar, 0, (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
+				calculateCar(world, positions, currentRidingCar, 0, isRendering, (x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) -> {
 					vehicleRidingClient.moveSelf(id, uuid, realSpacingRender, width, yaw, currentRidingCar, trainCars, doorLeftOpenRender, doorRightOpenRender, !trainProperties.hasGangwayConnection, ticksElapsed);
 
 					final int newRidingCar = Mth.clamp((int) Math.floor(vehicleRidingClient.getPercentageZ(uuid)), 0, trainCars - 1);
 					if (currentRidingCar == newRidingCar) {
 						calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, roll, realSpacingRender, doorLeftOpenRender, doorRightOpenRender);
 					} else {
-						calculateCar(world, positions, newRidingCar, 0, calculateCarCallback);
+						calculateCar(world, positions, newRidingCar, 0, isRendering, calculateCarCallback);
 					}
 				});
 			});
@@ -303,7 +307,7 @@ public class TrainClient extends Train implements IGui {
 	private final PerlinNoise1D irregR = new PerlinNoise1D(1 / 8f, 3, 0.0100);
 
 	@Override
-	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
+	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, boolean isRendering, CalculateCarCallback calculateCarCallback) {
 		final Vec3 pos1 = positions[index * 2];
 		final Vec3 pos2 = positions[index * 2 + 1];
 
@@ -334,8 +338,8 @@ public class TrainClient extends Train implements IGui {
 
 			final double realSpacing = spacing;
 			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y + irregY2 - pos1.y - irregY1) / realSpacing);
-			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
-			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
+			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks, isRendering) && doorValue > 0;
+			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks, isRendering) && doorValue > 0;
 
 			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen);
 		}
@@ -357,8 +361,17 @@ public class TrainClient extends Train implements IGui {
 	}
 
 	@Override
-	protected boolean openDoors(Level world, Block block, BlockPos checkPos, int dwellTicks) {
-		return true;
+	protected void openDoors(Level world, Block block, BlockPos checkPos, int dwellTicks) {
+		for (int i = -1; i <= 1; i++) {
+			final BlockPos doorPos = checkPos.above(i);
+			final BlockState state = world.getBlockState(doorPos);
+			final Block doorBlock = state.getBlock();
+			final BlockEntity entity = world.getBlockEntity(doorPos);
+			if (doorBlock instanceof BlockPSDAPGDoorBase && entity instanceof BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase && IBlock.getStatePropertySafe(state, BlockPSDAPGDoorBase.UNLOCKED)) {
+				final float doorStateValue = Mth.clamp(doorValue * DOOR_MOVE_TIME / BlockPSDAPGDoorBase.MAX_OPEN_VALUE, 0, 1);
+				((BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase) entity).setOpen(doorStateValue);
+			}
+		}
 	}
 
 	@Override

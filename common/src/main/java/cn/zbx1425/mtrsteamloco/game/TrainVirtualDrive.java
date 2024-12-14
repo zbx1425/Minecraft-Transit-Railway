@@ -66,7 +66,6 @@ public class TrainVirtualDrive extends TrainClient {
         nextStoppingIndex = path.size() - 1;
         super.simulateTrain(world, ticksElapsed, speedCallback, announcementCallback, lightRailAnnouncementCallback);
         if (!isOnRoute
-            || Math.abs(vehicleRidingClient.getPercentageX(Minecraft.getInstance().player.getUUID())) > 1.1
             || ClientData.getShiftHoldingTicks() >= RailwayDataCoolDownModule.SHIFT_ACTIVATE_TICKS) {
             stopDriving();
             return;

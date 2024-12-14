@@ -3,7 +3,9 @@ package mtr.data;
 import mtr.Items;
 import mtr.Keys;
 import mtr.block.BlockPSDAPGBase;
+import mtr.block.BlockPSDAPGDoorBase;
 import mtr.block.BlockPlatform;
+import mtr.block.IBlock;
 import mtr.packet.IPacket;
 import mtr.path.PathData;
 import net.minecraft.core.BlockPos;
@@ -12,12 +14,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.msgpack.core.MessagePacker;
 import org.msgpack.value.Value;
@@ -533,7 +535,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 			if (!path.isEmpty()) {
 				keyPointsPositions = getPositions();
-				if (handlePositions(world, keyPointsPositions, ticksElapsed)) {
+				if (handlePositions(world, keyPointsPositions, ticksElapsed, false)) {
 					final double[] prevX = {0};
 					final double[] prevY = {0};
 					final double[] prevZ = {0};
@@ -543,7 +545,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 					for (int i = 0; i < trainCars; i++) {
 						final int ridingCar = i;
-						calculateCar(world, keyPointsPositions, i, totalDwellTicks, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
+						calculateCar(world, keyPointsPositions, i, totalDwellTicks, false, (x, y, z, yaw, pitch, roll, realSpacing, doorLeftOpen, doorRightOpen) -> {
 							simulateCar(
 									world, ridingCar, ticksElapsed,
 									x, y, z,
@@ -567,7 +569,10 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		}
 	}
 
-	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, CalculateCarCallback calculateCarCallback) {
+	/**
+	 * @param isRendering If it's the renderTrain pass on client (Door logic should only be handled there)
+	 */
+	protected void calculateCar(Level world, Vec3[] positions, int index, int dwellTicks, boolean isRendering, CalculateCarCallback calculateCarCallback) {
 		final Vec3 pos1 = positions[index * 2];
 		final Vec3 pos2 = positions[index * 2 + 1];
 
@@ -579,8 +584,8 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 			final double realSpacing = spacing;
 			final float yaw = (float) Mth.atan2(pos2.x - pos1.x, pos2.z - pos1.z);
 			final float pitch = realSpacing == 0 ? 0 : (float) asin((pos2.y - pos1.y) / realSpacing);
-			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
-			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks) && doorValue > 0;
+			final boolean doorLeftOpen = scanDoors(world, x, y, z, (float) Math.PI + yaw, pitch, realSpacing / 2, dwellTicks, isRendering) && doorValue > 0;
+			final boolean doorRightOpen = scanDoors(world, x, y, z, yaw, pitch, realSpacing / 2, dwellTicks, isRendering) && doorValue > 0;
 
 			calculateCarCallback.calculateCarCallback(x, y, z, yaw, pitch, 0, realSpacing, doorLeftOpen, doorRightOpen);
 		}
@@ -636,7 +641,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 			boolean doorLeftOpen, boolean doorRightOpen, double realSpacing
 	);
 
-	protected abstract boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed);
+	protected abstract boolean handlePositions(Level world, Vec3[] positions, float ticksElapsed, boolean shouldOpenDoors);
 
 	protected abstract boolean canDeploy(Depot depot);
 
@@ -644,7 +649,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 	protected abstract boolean skipScanBlocks(Level world, double trainX, double trainY, double trainZ);
 
-	protected abstract boolean openDoors(Level world, Block block, BlockPos checkPos, int dwellTicks);
+	protected abstract void openDoors(Level world, Block block, BlockPos checkPos, int dwellTicks);
 
 	protected abstract double asin(double value);
 
@@ -662,7 +667,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		return path.get(index).rail.getPosition(tempRailProgress - (index == 0 ? 0 : distances.get(index - 1))).add(0, transportMode.railOffset, 0);
 	}
 
-	protected boolean scanDoors(Level world, double trainX, double trainY, double trainZ, float checkYaw, float pitch, double halfSpacing, int dwellTicks) {
+	protected boolean scanDoors(Level world, double trainX, double trainY, double trainZ, float checkYaw, float pitch, double halfSpacing, int dwellTicks, boolean shouldOpenDoors) {
 		if (skipScanBlocks(world, trainX, trainY, trainZ)) {
 			return false;
 		}
@@ -671,19 +676,31 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		final Vec3 offsetVec = new Vec3(1, 0, 0).yRot(checkYaw).xRot(pitch);
 		final Vec3 traverseVec = new Vec3(0, 0, 1).yRot(checkYaw).xRot(pitch);
 
-		for (int checkX = 1; checkX <= 3; checkX++) {
-			for (int checkY = -2; checkY <= 3; checkY++) {
-				for (double checkZ = -halfSpacing; checkZ <= halfSpacing; checkZ++) {
-					final BlockPos checkPos = RailwayData.newBlockPos(trainX + offsetVec.x * checkX + traverseVec.x * checkZ, trainY + checkY, trainZ + offsetVec.z * checkX + traverseVec.z * checkZ);
-					final Block block = world.getBlockState(checkPos).getBlock();
 
-					if (block instanceof BlockPlatform || block instanceof BlockPSDAPGBase) {
-						if (openDoors(world, block, checkPos, dwellTicks)) {
-							return true;
+		for (double checkZ = -halfSpacing; checkZ <= halfSpacing; checkZ++) {
+			for (int checkX = 1; checkX <= 3; checkX++) {
+				for (int checkY = 3; checkY >= -2; checkY--) {
+					final BlockPos checkPos = RailwayData.newBlockPos(trainX + offsetVec.x * checkX + traverseVec.x * checkZ, trainY + checkY, trainZ + offsetVec.z * checkX + traverseVec.z * checkZ);
+					final BlockState state = world.getBlockState(checkPos);
+					if (state.getBlock() instanceof BlockPSDAPGBase) {
+						// PSD/APG glass are not considered platform since you can't exit from there
+						if (state.getBlock() instanceof BlockPSDAPGDoorBase) {
+							if (IBlock.getStatePropertySafe(state, BlockPSDAPGDoorBase.UNLOCKED)) {
+								if (shouldOpenDoors) openDoors(world, state.getBlock(), checkPos, dwellTicks);
+								hasPlatform = true;
+							}
 						}
+						// When the platform has PSD/APG, use them to determine if the doors can open
+						// Thus, skip checking the platform block below them
+						break;
+					}
+					if (state.getBlock() instanceof BlockPlatform) {
+						// The platform has no PSD/APG, and platform blocks are present, doors can open
 						hasPlatform = true;
 					}
 				}
+				// On server we only care about platform presence, no need to check further to open doors
+				if (hasPlatform && !shouldOpenDoors) return true;
 			}
 		}
 
