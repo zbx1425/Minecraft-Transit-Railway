@@ -355,9 +355,9 @@ public abstract class Lift extends NameColorDataBase implements IPacket {
 				final BlockEntity entity1 = world.getBlockEntity(checkPos);
 				final BlockEntity entity2 = world.getBlockEntity(checkPos.above());
 				if (entity1 instanceof BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase && entity2 instanceof BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase && IBlock.getStatePropertySafe(world, checkPos, BlockPSDAPGDoorBase.UNLOCKED) && IBlock.getStatePropertySafe(world, checkPos.above(), BlockPSDAPGDoorBase.UNLOCKED)) {
-					if (!world.isClientSide) {
-						((BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase) entity1).setOpen(Math.min(Math.round(doorValue), DOOR_MAX));
-						((BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase) entity2).setOpen(Math.min(Math.round(doorValue), DOOR_MAX));
+					if (world.isClientSide) {
+						((BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase) entity1).setOpen(Math.min(doorValue / DOOR_MAX, 1));
+						((BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase) entity2).setOpen(Math.min(doorValue / DOOR_MAX, 1));
 					}
 					hasDoor = true;
 				}

@@ -67,14 +67,6 @@ public abstract class BlockPSDAPGDoorBase extends BlockPSDAPGBase implements Ent
 	}
 
 	@Override
-	public void tick(BlockState state, ServerLevel world, BlockPos pos) {
-		final BlockEntity entity = world.getBlockEntity(pos);
-		if (IBlock.getStatePropertySafe(state, UNLOCKED) && entity instanceof TileEntityPSDAPGDoorBase) {
-			((TileEntityPSDAPGDoorBase) entity).setOpen(0);
-		}
-	}
-
-	@Override
 	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult blockHitResult) {
 		return IBlock.checkHoldingBrush(world, player, () -> {
 			final boolean unlocked = IBlock.getStatePropertySafe(state, UNLOCKED);
@@ -139,18 +131,14 @@ public abstract class BlockPSDAPGDoorBase extends BlockPSDAPGBase implements Ent
 		}
 
 		public float getOpen(float lastFrameDuration) {
-			clientTick();
+			if (Client.isCooldownExpired(this)) {
+				open = 0;
+			}
 			return open;
 		}
 
 		public boolean isOpen() {
 			return open > 0;
-		}
-
-		public void clientTick() {
-			if (Client.isCooldownExpired(this)) {
-				open = 0;
-			}
 		}
 
 		private static class Client {
