@@ -135,7 +135,8 @@ public class VirtualDriveOverlay {
         // Stop accuracy
         double platformDistance = train.nextPlatformRailProgress - train.getRailProgress();
         if (platformDistance < train.spacing * train.trainCars + 10) {
-           if (Math.abs(platformDistance) < 1) {
+            blit(guiGraphics, bufferBuilder, 2, 2, 64, 64, 0.5f, 0.5f, 0.125f, 0.125f, 0x88222222);
+            if (Math.abs(platformDistance) < 1) {
                blit(guiGraphics, bufferBuilder, 0, 0, 64, 64, 0.5f, 0.5f, 0.125f, 0.125f, 0xffffffff);
            } else {
                blit(guiGraphics, bufferBuilder, 0, 0, 64, 64, 0.625f, 0.5f, 0.125f, 0.125f, 0xffffffff);
@@ -253,7 +254,8 @@ public class VirtualDriveOverlay {
             String distanceText = (platformDistance > -5 && platformDistance < 5)
                     ? Math.round(platformDistance * 100) + " cm"
                     : Math.round(platformDistance) + " m";
-            guiGraphics.drawString(font, Component.translatable("gui.mtrsteamloco.drive.stop_position", distanceText), x, y, 0xFF1CED85);
+            guiGraphics.drawString(font, Text.translatable("gui.mtrsteamloco.drive.stop_position", distanceText),
+                    x, y, Math.abs(platformDistance) < 1 ? 0xFF1CED85 : 0xFFFFA500);
             y -= lineHeight;
         }
         // ATP status

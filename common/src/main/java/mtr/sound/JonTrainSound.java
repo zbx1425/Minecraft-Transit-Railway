@@ -116,7 +116,7 @@ public class JonTrainSound extends TrainSoundBase {
 			this.speedSoundCount = speedSoundCount;
 			this.doorCloseSoundTime = doorCloseSoundTime;
 			this.useAccelerationSoundsWhenCoasting = useAccelerationSoundsWhenCoasting;
-			constantPlaybackSpeed = false;
+			constantPlaybackSpeed = true;
 		}
 	}
 }

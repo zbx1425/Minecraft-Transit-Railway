@@ -4900,5 +4900,21 @@
 				"attenuation_distance": 32
 			}
 		]
+	},
+    "sp1900_door_open": {
+		"sounds": [
+			{
+				"name": "mtr:sp1900/door_open",
+				"pitch": 0.5
+			}
+		]
+	},
+	"sp1900_door_close": {
+		"sounds": [
+			{
+				"name": "mtr:sp1900/door_close",
+				"pitch": 0.5
+			}
+		]
 	}
 }
