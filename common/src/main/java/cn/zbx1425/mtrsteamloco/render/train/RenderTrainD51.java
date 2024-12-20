@@ -34,6 +34,8 @@ public class RenderTrainD51 extends TrainRendererBase {
 
     private static int renderingCarNum = 0;
 
+    private float demoSpeed = -1;
+
     public static void initGLModel(ResourceManager resourceManager) {
         try {
             MainClient.atlasManager.load(resourceManager, Main.id("models/atlas/d51.json"));
@@ -50,18 +52,25 @@ public class RenderTrainD51 extends TrainRendererBase {
         this.trailingCarRenderer = trailingCarRenderer;
     }
 
-    private RenderTrainD51(TrainClient trainClient, TrainRendererBase trailingCarRenderer) {
+    public RenderTrainD51(TrainRendererBase trailingCarRenderer, float demoSpeed) {
+        this.train = null;
+        this.trailingCarRenderer = trailingCarRenderer;
+        this.demoSpeed = demoSpeed;
+    }
+
+    private RenderTrainD51(TrainClient trainClient, RenderTrainD51 source) {
         this.train = trainClient;
-        if (trailingCarRenderer == null) {
+        if (source.trailingCarRenderer == null) {
             this.trailingCarRenderer = null;
         } else {
-            this.trailingCarRenderer = trailingCarRenderer.createTrainInstance(this.train);
+            this.trailingCarRenderer = source.trailingCarRenderer.createTrainInstance(this.train);
         }
+        this.demoSpeed = source.demoSpeed;
     }
 
     @Override
     public TrainRendererBase createTrainInstance(TrainClient trainClient) {
-        return new RenderTrainD51(trainClient, this.trailingCarRenderer);
+        return new RenderTrainD51(trainClient, this);
     }
 
     @Override
@@ -113,11 +122,14 @@ public class RenderTrainD51 extends TrainRendererBase {
         final int light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, posAverage), world.getBrightness(LightLayer.SKY, posAverage));
 
         updateProp.update(train, carIndex, !train.isReversed());
+        if (demoSpeed >= 0) {
+            updateProp.speed = demoSpeed * 20F;
+        }
 
         Matrix4f pose = new Matrix4f(matrices.last().pose());
         modelD51.updateAndEnqueueAll(MainClient.drawScheduler, updateProp, pose, light);
 
-        if (ClientConfig.enableSmoke && train.getIsOnRoute() && (int)MTRClient.getGameTick() % 4 == 0) {
+        if (ClientConfig.enableSmoke && (train.getIsOnRoute() || demoSpeed >= 0) && (int)MTRClient.getGameTick() % 4 == 0) {
             Vector3f smokeOrigin = new Vector3f(0, 2.7f, 8.4f);
             Vector3f carPos = new Vector3f((float)x, (float)y, (float)z);
 

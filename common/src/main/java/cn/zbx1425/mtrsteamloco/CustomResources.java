@@ -127,6 +127,13 @@ public class CustomResources {
                 new RenderTrainD51(null),
                 new DwellTimeBveTrainSound(new BveTrainSoundConfig(resourceManager, "mtrsteamloco:d51"))
         ));
+        mtr.client.TrainClientRegistry.register("d51_static_demo", new TrainProperties(
+                "train_19_2", Text.literal(Text.translatable("train.mtrsteamloco.d51").getString() + " (DEMO)"),
+                Text.translatable("train.mtrsteamloco.d51.description").getString(), "", 0x808080,
+                0.0F, 0.0F, -1f, 6F, false, false,
+                new RenderTrainD51(null, 30 / 3.6f / 20f),
+                new DwellTimeBveTrainSound(new BveTrainSoundConfig(resourceManager, "mtrsteamloco:d51"))
+        ));
         existingTrains19m.forEach((key, prop) -> TrainClientRegistry.register("d51_" + key, new TrainProperties(
                 "train_19_2", Text.literal("D51 + " + prop.name.getString()),
                 Text.translatable("train.mtrsteamloco.d51.description").getString()
