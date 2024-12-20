@@ -1,7 +1,10 @@
 package mtr;
 
+import cn.zbx1425.mtrsteamloco.Main;
 import cn.zbx1425.mtrsteamloco.MainClient;
 import cn.zbx1425.mtrsteamloco.NTEClientCommand;
+import cn.zbx1425.mtrsteamloco.gui.ScriptDebugOverlay;
+import cn.zbx1425.mtrsteamloco.render.train.SteamSmokeParticle;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.client.CustomResources;
 import mtr.client.ICustomResources;
@@ -11,6 +14,7 @@ import mtr.screen.ResourcePackCreatorScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -27,9 +31,7 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 		MTRClient.init();
 		MTRClient.initItemModelPredicate();
 		MainClient.init();
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			NTEClientCommand.register(dispatcher, ClientCommandManager::literal);
-		});
+
 		WorldRenderEvents.AFTER_ENTITIES.register(context -> {
 			final PoseStack matrices = context.matrixStack();
 			matrices.pushPose();
@@ -42,6 +44,12 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 		HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> RenderDrivingOverlay.render(guiGraphics));
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CustomResourcesWrapper());
 		MTRFabric.PACKET_REGISTRY.commitClient();
+
+		ParticleFactoryRegistry.getInstance().register(Main.PARTICLE_STEAM_SMOKE, SteamSmokeParticle.Provider::new);
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			NTEClientCommand.register(dispatcher, ClientCommandManager::literal);
+		});
+		HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> ScriptDebugOverlay.render(guiGraphics));
 	}
 
 	private static class CustomResourcesWrapper implements SimpleSynchronousResourceReloadListener {

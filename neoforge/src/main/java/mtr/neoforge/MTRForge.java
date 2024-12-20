@@ -12,8 +12,10 @@ import mtr.mappings.RegistryUtilities;
 import mtr.render.RenderDrivingOverlay;
 import mtr.render.RenderLift;
 import mtr.render.RenderTrains;
+import mtr.screen.ConfigScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
@@ -26,9 +28,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -77,6 +82,8 @@ public class MTRForge {
 			NeoForge.EVENT_BUS.register(ClientProxy.ForgeEventBusListener.class);
 			eventBus.register(ClientProxy.ModEventBusListener.class);
 		}
+
+		ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (modContainer, arg) -> new ConfigScreen());
 	}
 
 	private static void registerItem(String path, RegistryObject<Item> item) {

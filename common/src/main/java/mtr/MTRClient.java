@@ -483,6 +483,7 @@ public class MTRClient implements IPacket {
 	}
 
 	public static float getLastFrameDuration() {
+		if (Minecraft.getInstance().isPaused()) return 0;
 		return isReplayMod ? 20F / 60 : Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
 	}
 

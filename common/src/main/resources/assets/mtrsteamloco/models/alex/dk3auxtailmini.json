@@ -1,0 +1,94 @@
+{
+  "miProject": "dk3doorstaff/dk3doorstaff.miproject",
+  "timelineFps": 24,
+  "models": {
+    "conductor": {
+      "position": "0,0,6.5"
+    },
+    "conductor.body": {
+      "model": "body.csv",
+      "offset": "0, 0.75, 0"
+    },
+    "conductor.body.head": {
+      "model": "head.csv",
+      "offset": "0, 0.75, 0"
+    },  
+    "conductor.body.leftarm": {
+      "model": "rightarm.csv",
+      "offset": "0.3125, 0.625, 0"
+    },
+    "conductor.body.rightarm": {
+      "model": "leftarm.csv",
+      "offset": "-0.3125, 0.625, 0"
+    },
+    "conductor.leftleg": {
+      "model": "rightleg.csv",
+      "offset": "0.11875, 0.75, 0"
+    },
+    "conductor.rightleg": {
+      "model": "leftleg.csv",
+      "offset": "-0.11875, 0.75, 0"
+    },
+
+    "doorll": {
+      "model": "../dk3/chemen/zuozuo3mini.nmb"
+    },
+    "doorlr": {
+      "model": "../dk3/chemen/zuoyou3mini.nmb"
+    },
+    "doorrl": {
+      "model": "../dk3/chemen/youzuo3mini.nmb"
+    },
+    "doorrr": {
+      "model": "../dk3/chemen/youyou3mini.nmb"
+    },
+
+    "cabdoorl": {
+      "model": "../dk3/chemen/cabdoorl.nmb",
+      "position": "0,0,6.5"
+    },
+    "cabdoorr": {
+      "model": "../dk3/chemen/cabdoorr.nmb",
+      "position": "0,0,6.5"
+    },
+
+    "cabdoorlnm": {
+      "model": "../dk3/chemen/cabdoorl.nmb",
+      "position": "0,0,6.5"
+    },
+    "cabdoorrnm": {
+      "model": "../dk3/chemen/cabdoorr.nmb",
+      "position": "0,0,6.5"
+    }
+  },
+  "copyKeyframes": [
+    {
+      "src": "1.3, 5",
+      "dest": "29.3",
+      "mirror": "1, 0, 0",
+      "modelReplace": {
+        "doorll": "doorrr",
+        "doorlr": "doorrl",
+        "conductor.body.leftarm": "conductor.body.rightarm",
+        "conductor.body.rightarm": "conductor.body.leftarm",
+        "conductor.leftleg": "conductor.rightleg",
+        "conductor.rightleg": "conductor.leftleg",
+        "cabdoorl": "cabdoorr"
+      }
+    },
+    {
+      "src": "7, 23.6",
+      "dest": "35",
+      "mirror": "1, 0, 0",
+      "modelReplace": {
+        "doorll": "doorrr",
+        "doorlr": "doorrl",
+        "conductor.body.leftarm": "conductor.body.rightarm",
+        "conductor.body.rightarm": "conductor.body.leftarm",
+        "conductor.leftleg": "conductor.rightleg",
+        "conductor.rightleg": "conductor.leftleg",
+        "cabdoorl": "cabdoorr"
+      }
+    }
+  ]
+}

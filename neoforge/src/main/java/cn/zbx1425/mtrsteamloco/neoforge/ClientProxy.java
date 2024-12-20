@@ -6,6 +6,7 @@ import cn.zbx1425.mtrsteamloco.MainClient;
 import cn.zbx1425.mtrsteamloco.NTEClientCommand;
 import cn.zbx1425.mtrsteamloco.gui.ConfigScreen;
 import cn.zbx1425.mtrsteamloco.render.RenderUtil;
+import cn.zbx1425.mtrsteamloco.render.train.SteamSmokeParticle;
 import mtr.mappings.Text;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
@@ -27,6 +28,11 @@ public class ClientProxy {
         @SubscribeEvent
         public static void onClientSetupEvent(FMLClientSetupEvent event) {
             MainClient.init();
+        }
+
+        @SubscribeEvent
+        public static void onRegistryParticleFactory(RegisterParticleProvidersEvent event) {
+            Minecraft.getInstance().particleEngine.register(Main.PARTICLE_STEAM_SMOKE, SteamSmokeParticle.Provider::new);
         }
     }
 
