@@ -81,9 +81,9 @@ public class MTRForge {
 			// NTE
 			NeoForge.EVENT_BUS.register(ClientProxy.ForgeEventBusListener.class);
 			eventBus.register(ClientProxy.ModEventBusListener.class);
-		}
 
-		ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (modContainer, arg) -> new ConfigScreen());
+			ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (modContainer, arg) -> new ConfigScreen());
+		}
 	}
 
 	private static void registerItem(String path, RegistryObject<Item> item) {
