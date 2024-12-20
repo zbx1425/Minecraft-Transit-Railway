@@ -82,7 +82,7 @@ public class MTRForge {
 			NeoForge.EVENT_BUS.register(ClientProxy.ForgeEventBusListener.class);
 			eventBus.register(ClientProxy.ModEventBusListener.class);
 
-			ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory.class, () -> (modContainer, arg) -> new ConfigScreen());
+			ClientProxy.registerConfigScreen();
 		}
 	}
 
