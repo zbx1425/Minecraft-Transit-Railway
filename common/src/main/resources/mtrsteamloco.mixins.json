@@ -7,8 +7,10 @@
     "BlockNodeMixin",
     "ClientCacheAccessor",
     "CustomResourcesMixin",
+    "DynamicImageAccessor",
     "DynamicTrainModelMixin",
     "GameRendererMixin",
+    "GLFWMixin",
     "JonModelTrainRendererMixin",
     "KeyboardHandlerMixin",
     "LevelRendererAccessor",
@@ -24,8 +26,7 @@
     "TrainAccessor",
     "TrainClientAccessor",
     "TrainClientMixin",
-    "TrainClientRegistryMixin",
-    "GLFWMixin"
+    "TrainClientRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
