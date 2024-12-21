@@ -208,7 +208,7 @@ public class TrainServer extends Train {
 			realTicksElapsed = (t - lastSimulateTrainMillis) / 50f;
 		}
 		lastSimulateTrainMillis = t;
-		ticksElapsed = realTicksElapsed;
+		ticksElapsed = realTicksElapsed > 100 ? 0 : realTicksElapsed; // Maybe paused, TODO better impl
 
 		this.trainPositions = trainPositions;
 		this.trainsInPlayerRange = trainsInPlayerRange;

@@ -157,6 +157,9 @@ public class ScriptHolder {
                 }
                 if (finishCallback != null) finishCallback.run();
                 scriptCtx.lastExecuteDuration = System.nanoTime() - startTime;
+                float movingAverageFactor = 0.05f;
+                scriptCtx.lastExecuteDurationMovingAverage = (long)((1 - movingAverageFactor) * scriptCtx.lastExecuteDurationMovingAverage
+                        + movingAverageFactor * scriptCtx.lastExecuteDuration);
             } catch (Exception ex) {
                 Main.LOGGER.error("Error in NTE Resource Pack JavaScript", ex);
                 failTime = System.currentTimeMillis();

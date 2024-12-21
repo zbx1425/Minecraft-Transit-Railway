@@ -16,6 +16,7 @@ public abstract class AbstractScriptContext {
     protected boolean disposed = false;
 
     public long lastExecuteDuration = 0;
+    public long lastExecuteDurationMovingAverage = 0;
     public Map<String, Object> debugInfo = new HashMap<>();
 
     public abstract void renderFunctionFinished();
