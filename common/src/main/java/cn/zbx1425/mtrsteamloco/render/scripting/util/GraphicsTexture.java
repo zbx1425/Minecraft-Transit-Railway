@@ -24,11 +24,6 @@ public class GraphicsTexture implements Closeable {
     private final DynamicTexture dynamicTexture;
     public final ResourceLocation identifier;
 
-    private final NativeImage[] backingNativeImage = new NativeImage[2];
-    private final BufferedImage[] backingBufferedImage = new BufferedImage[2];
-    private final Graphics2D[] backingGraphics = new Graphics2D[2];
-    private int currentWritingBuffer = 0;
-
     public BufferedImage bufferedImage;
     public Graphics2D graphics;
 
@@ -38,24 +33,21 @@ public class GraphicsTexture implements Closeable {
         this.width = width;
         this.height = height;
 
-        for (int i = 0; i < 2; i++) {
-            // Double-buffer
-            backingNativeImage[i] = new NativeImage(width, height, false);
+        NativeImage backingNativeImage = new NativeImage(width, height, false);
 
-            long pixelAddr = ((NativeImageAccessor)(Object)backingNativeImage[i]).getPixels();
-            IntBuffer target = MemoryUtil.memByteBuffer(pixelAddr, width * height * 4).asIntBuffer();
-            DataBuffer dataBuffer = new IntBufDataBuffer(target, width * height);
-            WritableRaster raster = Raster.createPackedRaster(dataBuffer, width, height, width,
-                    new int[] { 0xFF0000, 0xFF00, 0xFF, 0xFF000000 }, new Point(0, 0));
-            backingBufferedImage[i] = new BufferedImage(ColorModel.getRGBdefault(), raster, false, null);
+        long pixelAddr = ((NativeImageAccessor)(Object)backingNativeImage).getPixels();
+        IntBuffer target = MemoryUtil.memByteBuffer(pixelAddr, width * height * 4).asIntBuffer();
+        DataBuffer dataBuffer = new IntBufDataBuffer(target, width * height);
+        WritableRaster raster = Raster.createPackedRaster(dataBuffer, width, height, width,
+                new int[] { 0xFF0000, 0xFF00, 0xFF, 0xFF000000 }, new Point(0, 0));
+        bufferedImage = new BufferedImage(ColorModel.getRGBdefault(), raster, false, null);
 
-            backingGraphics[i] = backingBufferedImage[i].createGraphics();
-            backingGraphics[i].setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            backingGraphics[i].setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-        }
+        graphics = bufferedImage.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
-        dynamicTexture = new DynamicTexture(backingNativeImage[1]);
-        RenderSystem.recordRenderCall(() -> {
+        dynamicTexture = new DynamicTexture(backingNativeImage);
+        Minecraft.getInstance().execute(() -> {
             int prevTextureBinding = GL33.glGetInteger(GL33.GL_TEXTURE_BINDING_2D);
             dynamicTexture.bind();
             GL33.glTexParameteriv(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_SWIZZLE_RGBA,
@@ -66,9 +58,6 @@ public class GraphicsTexture implements Closeable {
         Minecraft.getInstance().execute(() -> {
             Minecraft.getInstance().getTextureManager().register(identifier, dynamicTexture);
         });
-
-        bufferedImage = backingBufferedImage[currentWritingBuffer];
-        graphics = backingGraphics[currentWritingBuffer];
     }
 
     public static BufferedImage createArgbBufferedImage(BufferedImage src) {
@@ -80,20 +69,13 @@ public class GraphicsTexture implements Closeable {
     }
 
     public void upload() {
-        ((DynamicImageAccessor)dynamicTexture).mtrsteamloco$setPixels(backingNativeImage[currentWritingBuffer]);
-        currentWritingBuffer = 1 - currentWritingBuffer;
-        bufferedImage = backingBufferedImage[currentWritingBuffer];
-        graphics = backingGraphics[currentWritingBuffer];
-        RenderSystem.recordRenderCall(dynamicTexture::upload);
+        Minecraft.getInstance().execute(dynamicTexture::upload);
     }
 
     @Override
     public void close() {
         Minecraft.getInstance().execute(() -> {
-            for (int i = 0; i < 2; i++) {
-                backingNativeImage[i].close();
-                backingGraphics[i].dispose();
-            }
+            graphics.dispose();
             Minecraft.getInstance().getTextureManager().release(identifier);
         });
     }
