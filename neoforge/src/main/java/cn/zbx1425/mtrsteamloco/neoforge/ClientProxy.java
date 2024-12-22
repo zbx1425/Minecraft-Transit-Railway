@@ -45,6 +45,12 @@ public class ClientProxy {
         public static void onRegistryParticleFactory(RegisterParticleProvidersEvent event) {
             Minecraft.getInstance().particleEngine.register(Main.PARTICLE_STEAM_SMOKE, SteamSmokeParticle.Provider::new);
         }
+
+        @SubscribeEvent
+        public static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
+            event.registerAbove(VanillaGuiLayers.SCOREBOARD_SIDEBAR, Main.id("script_debug_overlay"),
+                    (guiGraphics, tickDelta) -> ScriptDebugOverlay.render(guiGraphics));
+        }
     }
 
     public static class ForgeEventBusListener {
@@ -63,12 +69,6 @@ public class ClientProxy {
         @SubscribeEvent
         public static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
             NTEClientCommand.register(event.getDispatcher(), Commands::literal);
-        }
-
-        @SubscribeEvent
-        public static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
-            event.registerAbove(VanillaGuiLayers.SCOREBOARD_SIDEBAR, Main.id("script_debug_overlay"),
-                    (guiGraphics, tickDelta) -> ScriptDebugOverlay.render(guiGraphics));
         }
     }
 }
