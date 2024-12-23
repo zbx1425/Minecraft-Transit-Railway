@@ -34,7 +34,12 @@ public class NTEClientCommand {
                             boolean successful = TrainVirtualDrive.startDrivingRidingTrain();
                             if (!successful) throw ERROR_NOT_RIDING.create();
                             return 1;
-                        }))
+                        })
+                        .then(literal.apply("atpcutout").executes(context -> {
+                            if (TrainVirtualDrive.activeTrain == null) throw ERROR_NOT_RIDING.create();
+                            TrainVirtualDrive.activeTrain.atpCutout = !TrainVirtualDrive.activeTrain.atpCutout;
+                            return 1;
+                        })))
                 .then(literal.apply("stat")
                         .executes(context -> {
                             Minecraft.getInstance().tell(() -> {

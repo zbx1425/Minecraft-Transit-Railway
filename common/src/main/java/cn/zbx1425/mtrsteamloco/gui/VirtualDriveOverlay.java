@@ -23,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
+import org.joml.Random;
 
 public class VirtualDriveOverlay {
 
@@ -32,6 +33,10 @@ public class VirtualDriveOverlay {
     private static int lastTargetState;
     private static float atpBuzzerTriggerTime = 0;
     private static final SoundEvent ATP_BUZZER_SOUND = SoundEvent.createVariableRangeEvent(Main.id("drive.atp_buzzer"));
+
+    private static float delayedTrainSpeed, delayedAtpYellowSpeed, delayedAtpRedSpeed;
+    private static float speedUpdateCooldown = 0;
+    private static final Random random = new Random();
 
     public static void render(GuiGraphics guiGraphics, DeltaTracker deltaT) {
         if (TrainVirtualDrive.activeTrain == null) return;
@@ -66,6 +71,14 @@ public class VirtualDriveOverlay {
             train.toggleDoors();
         }
 
+        speedUpdateCooldown -= MTRClient.getLastFrameDuration();
+        if (speedUpdateCooldown <= 0) {
+            delayedTrainSpeed = train.getSpeed();
+            delayedAtpYellowSpeed = train.atpYellowSpeed;
+            delayedAtpRedSpeed = train.atpRedSpeed;
+            speedUpdateCooldown = (random.nextInt(3) + 2);
+        }
+
         // HMI painting
         ResourceLocation hmiTex = Main.id("textures/gui/drive_hmi.png");
         RenderSystem.setShaderTexture(0, hmiTex);
@@ -95,7 +108,7 @@ public class VirtualDriveOverlay {
         // Speed needle
         guiGraphics.pose().pushPose();
         guiGraphics.pose().rotateAround(
-                Axis.ZP.rotationDegrees(-140 + Mth.clamp(RailwayData.round(train.getSpeed() * 3.6f * 20, 1), 0, GAUGE_MAX_SPEED) / GAUGE_MAX_SPEED * 280),
+                Axis.ZP.rotationDegrees(-140 + Mth.clamp(Math.round(delayedTrainSpeed * 3.6f * 20 * 4) / 4f, 0, GAUGE_MAX_SPEED) / GAUGE_MAX_SPEED * 280),
                 PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0
         );
         int needleXOff = PADDING + GAUGE_SIZE / 4 + (GAUGE_SIZE * 3 / 8);
@@ -104,28 +117,30 @@ public class VirtualDriveOverlay {
                 GAUGE_SIZE / 4, GAUGE_SIZE,
                 0f, 0.5f, 0.125f, 0.5f, 0xffffffff);
         guiGraphics.pose().popPose();
-        // Yellow ATP Speed needle
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().rotateAround(
-                Axis.ZP.rotationDegrees(-140 + Mth.clamp(RailwayData.round(train.atpYellowSpeed * 3.6f * 20, 1), 0, GAUGE_MAX_SPEED) / GAUGE_MAX_SPEED * 280),
-                PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0
-        );
-        blit(guiGraphics, bufferBuilder,
-                needleXOff, guiGraphics.guiHeight() - GAUGE_SIZE - PADDING,
-                GAUGE_SIZE / 4, GAUGE_SIZE,
-                0.375f, 0.5f, 0.125f, 0.5f, 0xffffffff);
-        guiGraphics.pose().popPose();
-        // Red ATP Speed needle
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().rotateAround(
-                Axis.ZP.rotationDegrees(-140 + Mth.clamp(RailwayData.round(train.atpRedSpeed * 3.6f * 20, 1), 0, GAUGE_MAX_SPEED) / GAUGE_MAX_SPEED * 280),
-                PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0
-        );
-        blit(guiGraphics, bufferBuilder,
-                needleXOff, guiGraphics.guiHeight() - GAUGE_SIZE - PADDING,
-                GAUGE_SIZE / 4, GAUGE_SIZE,
-                0.25f, 0.5f, 0.125f, 0.5f, 0xffffffff);
-        guiGraphics.pose().popPose();
+        if (!train.atpCutout) {
+            // Yellow ATP Speed needle
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().rotateAround(
+                    Axis.ZP.rotationDegrees(-140 + Mth.clamp(train.atpYellowSpeed * 3.6f * 20, 0, GAUGE_MAX_SPEED) / GAUGE_MAX_SPEED * 280),
+                    PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0
+            );
+            blit(guiGraphics, bufferBuilder,
+                    needleXOff, guiGraphics.guiHeight() - GAUGE_SIZE - PADDING,
+                    GAUGE_SIZE / 4, GAUGE_SIZE,
+                    0.375f, 0.5f, 0.125f, 0.5f, 0xffffffff);
+            guiGraphics.pose().popPose();
+            // Red ATP Speed needle
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().rotateAround(
+                    Axis.ZP.rotationDegrees(-140 + Mth.clamp(train.atpRedSpeed * 3.6f * 20, 0, GAUGE_MAX_SPEED) / GAUGE_MAX_SPEED * 280),
+                    PADDING + GAUGE_SIZE / 4f + GAUGE_SIZE / 2f, guiGraphics.guiHeight() - GAUGE_SIZE / 2f - PADDING, 0
+            );
+            blit(guiGraphics, bufferBuilder,
+                    needleXOff, guiGraphics.guiHeight() - GAUGE_SIZE - PADDING,
+                    GAUGE_SIZE / 4, GAUGE_SIZE,
+                    0.25f, 0.5f, 0.125f, 0.5f, 0xffffffff);
+            guiGraphics.pose().popPose();
+        }
 
         // Info icons
         guiGraphics.pose().pushPose();
@@ -172,7 +187,7 @@ public class VirtualDriveOverlay {
         }
         guiGraphics.pose().popPose();
 
-        if (train.atpTargetSpeed >= 0) {
+        if (train.atpTargetSpeed >= 0 && !train.atpCutout) {
             // Target speed text
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(PADDING + (32 / 256f) * GAUGE_SIZE,
@@ -209,7 +224,7 @@ public class VirtualDriveOverlay {
         }
 
         // Target status
-        {
+        if (!train.atpCutout) {
             float x1 = PADDING;
             float x2 = x1 + (40 / 256f) * GAUGE_SIZE;
             float y1 = guiGraphics.guiHeight() - GAUGE_SIZE - PADDING - (10 / 256f) * GAUGE_SIZE;

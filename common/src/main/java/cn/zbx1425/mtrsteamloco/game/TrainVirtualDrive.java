@@ -47,10 +47,12 @@ public class TrainVirtualDrive extends TrainClient {
     public float atpTargetSpeed;
     public double atpTargetDistance;
     public boolean atpEmergencyBrake;
+    public boolean atpCutout = false;
+
     private int doorOpenedAtPlatformIndex = 0;
 
     public LongArrayList railAheadLookup = new LongArrayList();
-    private DelayedValue actualNotch = new DelayedValue(0.5);
+    private final DelayedValue actualNotch = new DelayedValue(0.5);
 
     public int powerNotches = 5;
     public int brakeNotches = 7;
@@ -208,7 +210,7 @@ public class TrainVirtualDrive extends TrainClient {
             atpRedSpeed = 0;
             atpTargetSpeed = -1;
         }
-        if (speed > atpRedSpeed) {
+        if (speed > atpRedSpeed && !atpCutout) {
             atpEmergencyBrake = true;
         }
     }
@@ -218,6 +220,7 @@ public class TrainVirtualDrive extends TrainClient {
     /** @return Whether the player is riding a train and the virtual driving is started
      */
     public static boolean startDrivingRidingTrain() {
+        if (activeTrain != null) return false;
         Player player = Minecraft.getInstance().player;
         if (player == null) return false;
         for (TrainClient train : ClientData.TRAINS) {
