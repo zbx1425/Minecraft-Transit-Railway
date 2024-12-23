@@ -20,7 +20,7 @@ public final class ShadersModHandler {
 
         try {
             Class<?> ignored = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            internalHandler = new Oculus();
+            internalHandler = new Iris();
         } catch (Exception ignored) { }
     }
 
@@ -36,17 +36,24 @@ public final class ShadersModHandler {
         return !(internalHandler instanceof Optifine) || canUseCustomShader();
     }
 
+    public static boolean isRenderingShadowPass() {
+        return internalHandler.isRenderingShadowPass();
+    }
+
     private interface InternalHandler {
         default boolean isShaderPackInUse() {
             return false;
         }
+        default boolean isRenderingShadowPass() { return false; };
     }
 
-    private static class Oculus implements InternalHandler {
+    private static class Iris implements InternalHandler {
         private final BooleanSupplier shadersEnabledSupplier;
+        private final BooleanSupplier isRenderingShadowPassSupplier;
 
-        Oculus() {
+        Iris() {
             shadersEnabledSupplier = createShadersEnabledSupplier();
+            isRenderingShadowPassSupplier = createIsRenderingShadowPassSupplier();
         }
 
         @Override
@@ -70,13 +77,37 @@ public final class ShadersModHandler {
                 return () -> false;
             }
         }
+
+        @Override
+        public boolean isRenderingShadowPass() {
+            return isRenderingShadowPassSupplier.getAsBoolean();
+        }
+
+        private static BooleanSupplier createIsRenderingShadowPassSupplier() {
+            try {
+                Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                Object irisApiInstance = irisApiClass.getMethod("getInstance").invoke(null);
+                Method fnIsRenderingShadowPass = irisApiClass.getMethod("isRenderingShadowPass");
+                return () -> {
+                    try {
+                        return (Boolean)fnIsRenderingShadowPass.invoke(irisApiInstance);
+                    } catch (Exception ignored) {
+                        return false;
+                    }
+                };
+            } catch (Exception ignored) {
+                return () -> false;
+            }
+        }
     }
 
     private static class Optifine implements InternalHandler {
         private final BooleanSupplier shadersEnabledSupplier;
+        private final BooleanSupplier isRenderingShadowPassSupplier;
 
         Optifine() {
             shadersEnabledSupplier = createShadersEnabledSupplier();
+            isRenderingShadowPassSupplier = createIsRenderingShadowPassSupplier();
         }
 
         @Override
@@ -92,6 +123,28 @@ public final class ShadersModHandler {
                 return () -> {
                     try {
                         return (int)field.get(null) != 0;
+                    } catch (IllegalAccessException ignored) {
+                        return false;
+                    }
+                };
+            } catch (Exception ignored) {
+                return () -> false;
+            }
+        }
+
+        @Override
+        public boolean isRenderingShadowPass() {
+            return isRenderingShadowPassSupplier.getAsBoolean();
+        }
+
+        private static BooleanSupplier createIsRenderingShadowPassSupplier() {
+            try {
+                Class<?> ofShaders = Class.forName("net.optifine.shaders.Shaders");
+                Field field = ofShaders.getDeclaredField("isShadowPass");
+                field.setAccessible(true);
+                return () -> {
+                    try {
+                        return field.getBoolean(null);
                     } catch (IllegalAccessException ignored) {
                         return false;
                     }

@@ -4,6 +4,7 @@ import cn.zbx1425.mtrsteamloco.MainClient;
 import cn.zbx1425.mtrsteamloco.block.BlockEyeCandy;
 import cn.zbx1425.mtrsteamloco.data.EyeCandyProperties;
 import cn.zbx1425.mtrsteamloco.data.EyeCandyRegistry;
+import cn.zbx1425.mtrsteamloco.render.ShadersModHandler;
 import cn.zbx1425.mtrsteamloco.render.rail.RailRenderDispatcher;
 import cn.zbx1425.mtrsteamloco.render.scripting.ScriptContextManager;
 import cn.zbx1425.mtrsteamloco.render.scripting.eyecandy.EyeCandyScriptContext;
@@ -11,6 +12,7 @@ import cn.zbx1425.mtrsteamloco.render.scripting.train.ScriptedTrainRenderer;
 import cn.zbx1425.sowcer.math.Matrix4f;
 import cn.zbx1425.sowcer.math.PoseStackUtil;
 import cn.zbx1425.sowcerext.model.ModelCluster;
+import cn.zbx1425.sowcerext.model.integration.BufferSourceProxy;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.RegistryObject;
 import mtr.block.IBlock;
@@ -94,6 +96,13 @@ public class BlockEntityEyeCandyRenderer extends BlockEntityRendererMapper<Block
                 blockEntity.scriptContext.scriptResult.commit(MainClient.drawScheduler, candyPose, lightToUse);
             }
             prop.script.tryCallRenderFunctionAsync(blockEntity.scriptContext);
+        }
+
+        // TODO: Mixin into Iris to carry out the batching properly?
+        if (ShadersModHandler.isRenderingShadowPass()) {
+            BufferSourceProxy vertexConsumersProxy = new BufferSourceProxy(vertexConsumers);
+            MainClient.drawScheduler.commit(vertexConsumersProxy, MainClient.drawContext);
+            vertexConsumersProxy.commit();
         }
     }
 
