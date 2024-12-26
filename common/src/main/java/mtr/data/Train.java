@@ -210,13 +210,13 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 
 		path = new ArrayList<>();
 		distances = new ArrayList<>();
-		final int pathSize = packet.readInt();
+		final int pathSize = packet.readVarInt();
 		for (int i = 0; i < pathSize; i++) {
 			path.add(new PathData(packet));
 			distances.add(packet.readDouble());
 		}
-		repeatIndex1 = packet.readInt();
-		repeatIndex2 = packet.readInt();
+		repeatIndex1 = packet.readVarInt();
+		repeatIndex2 = packet.readVarInt();
 
 		sidingId = packet.readLong();
 		railLength = RailwayData.round(packet.readFloat(), 3);
@@ -225,8 +225,8 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		accelerationConstant = tempAccelerationConstant <= 0 ? ACCELERATION_DEFAULT : tempAccelerationConstant;
 		railProgress = packet.readDouble();
 		elapsedDwellTicks = packet.readFloat();
-		nextStoppingIndex = packet.readInt();
-		nextPlatformIndex = packet.readInt();
+		nextStoppingIndex = packet.readVarInt();
+		nextPlatformIndex = packet.readVarInt();
 		reversed = packet.readBoolean();
 		trainId = packet.readUtf(PACKET_STRING_READ_LENGTH);
 		baseTrainType = packet.readUtf(PACKET_STRING_READ_LENGTH);
@@ -236,13 +236,13 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		trainCars = Math.min(transportMode.maxLength, (int) Math.floor(railLength / spacing));
 		isManualAllowed = packet.readBoolean();
 		isCurrentlyManual = packet.readBoolean();
-		maxManualSpeed = packet.readInt();
-		manualToAutomaticTime = packet.readInt();
+		maxManualSpeed = packet.readVarInt();
+		manualToAutomaticTime = packet.readVarInt();
 		isOnRoute = packet.readBoolean();
-		manualNotch = packet.readInt();
+		manualNotch = packet.readVarInt();
 		doorTarget = packet.readBoolean();
 
-		final int ridingEntitiesCount = packet.readInt();
+		final int ridingEntitiesCount = packet.readVarInt();
 		for (int i = 0; i < ridingEntitiesCount; i++) {
 			ridingEntities.add(packet.readUUID());
 		}
@@ -283,13 +283,13 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		super.writePacket(packet);
 
 		final int pathSize = Math.min(path.size(), distances.size());
-		packet.writeInt(pathSize);
+		packet.writeVarInt(pathSize);
 		for (int i = 0; i < pathSize; i++) {
 			path.get(i).writePacket(packet);
 			packet.writeDouble(distances.get(i));
 		}
-		packet.writeInt(repeatIndex1);
-		packet.writeInt(repeatIndex2);
+		packet.writeVarInt(repeatIndex1);
+		packet.writeVarInt(repeatIndex2);
 
 		packet.writeLong(sidingId);
 		packet.writeFloat(railLength);
@@ -297,19 +297,19 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		packet.writeFloat(accelerationConstant);
 		packet.writeDouble(railProgress);
 		packet.writeFloat(elapsedDwellTicks);
-		packet.writeInt(nextStoppingIndex);
-		packet.writeInt(nextPlatformIndex);
+		packet.writeVarInt(nextStoppingIndex);
+		packet.writeVarInt(nextPlatformIndex);
 		packet.writeBoolean(reversed);
 		packet.writeUtf(trainId);
 		packet.writeUtf(baseTrainType);
 		packet.writeBoolean(isManualAllowed);
 		packet.writeBoolean(isCurrentlyManual);
-		packet.writeInt(maxManualSpeed);
-		packet.writeInt(manualToAutomaticTime);
+		packet.writeVarInt(maxManualSpeed);
+		packet.writeVarInt(manualToAutomaticTime);
 		packet.writeBoolean(isOnRoute);
-		packet.writeInt(manualNotch);
+		packet.writeVarInt(manualNotch);
 		packet.writeBoolean(doorTarget);
-		packet.writeInt(ridingEntities.size());
+		packet.writeVarInt(ridingEntities.size());
 		ridingEntities.forEach(packet::writeUUID);
 	}
 

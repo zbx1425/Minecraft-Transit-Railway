@@ -273,18 +273,18 @@ public class Rail extends SerializedDataBase {
 	}
 
 	public Rail(FriendlyByteBuf packet) {
-		h1 = packet.readDouble();
-		k1 = packet.readDouble();
-		h2 = packet.readDouble();
-		k2 = packet.readDouble();
-		r1 = packet.readDouble();
-		r2 = packet.readDouble();
-		tStart1 = packet.readDouble();
-		tEnd1 = packet.readDouble();
-		tStart2 = packet.readDouble();
-		tEnd2 = packet.readDouble();
-		yStart = packet.readInt();
-		yEnd = packet.readInt();
+		h1 = packet.readFloat();
+		k1 = packet.readFloat();
+		h2 = packet.readFloat();
+		k2 = packet.readFloat();
+		r1 = packet.readFloat();
+		r2 = packet.readFloat();
+		tStart1 = packet.readFloat();
+		tEnd1 = packet.readFloat();
+		tStart2 = packet.readFloat();
+		tEnd2 = packet.readFloat();
+		yStart = packet.readVarInt();
+		yEnd = packet.readVarInt();
 		reverseT1 = packet.readBoolean();
 		isStraight1 = packet.readBoolean();
 		reverseT2 = packet.readBoolean();
@@ -325,18 +325,18 @@ public class Rail extends SerializedDataBase {
 
 	@Override
 	public void writePacket(FriendlyByteBuf packet) {
-		packet.writeDouble(h1);
-		packet.writeDouble(k1);
-		packet.writeDouble(h2);
-		packet.writeDouble(k2);
-		packet.writeDouble(r1);
-		packet.writeDouble(r2);
-		packet.writeDouble(tStart1);
-		packet.writeDouble(tEnd1);
-		packet.writeDouble(tStart2);
-		packet.writeDouble(tEnd2);
-		packet.writeInt(yStart);
-		packet.writeInt(yEnd);
+		packet.writeFloat((float) h1);
+		packet.writeFloat((float) k1);
+		packet.writeFloat((float) h2);
+		packet.writeFloat((float) k2);
+		packet.writeFloat((float) r1);
+		packet.writeFloat((float) r2);
+		packet.writeFloat((float) tStart1);
+		packet.writeFloat((float) tEnd1);
+		packet.writeFloat((float) tStart2);
+		packet.writeFloat((float) tEnd2);
+		packet.writeVarInt(yStart);
+		packet.writeVarInt(yEnd);
 		packet.writeBoolean(reverseT1);
 		packet.writeBoolean(isStraight1);
 		packet.writeBoolean(reverseT2);

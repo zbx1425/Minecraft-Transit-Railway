@@ -63,8 +63,8 @@ public class PathData extends SerializedDataBase {
 	public PathData(FriendlyByteBuf packet) {
 		rail = new Rail(packet);
 		savedRailBaseId = packet.readLong();
-		dwellTime = packet.readInt();
-		stopIndex = packet.readInt();
+		dwellTime = packet.readVarInt();
+		stopIndex = packet.readVarInt();
 		startingPos = BlockPos.of(packet.readLong());
 		endingPos = BlockPos.of(packet.readLong());
 	}
@@ -91,8 +91,8 @@ public class PathData extends SerializedDataBase {
 	public void writePacket(FriendlyByteBuf packet) {
 		rail.writePacket(packet);
 		packet.writeLong(savedRailBaseId);
-		packet.writeInt(dwellTime);
-		packet.writeInt(stopIndex);
+		packet.writeVarInt(dwellTime);
+		packet.writeVarInt(stopIndex);
 		packet.writeLong(startingPos.asLong());
 		packet.writeLong(endingPos.asLong());
 	}

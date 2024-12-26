@@ -64,7 +64,7 @@ public abstract class SavedRailBase extends NameColorDataBase {
 		positions = new HashSet<>(2);
 		positions.add(packet.readBlockPos());
 		positions.add(packet.readBlockPos());
-		dwellTime = packet.readInt();
+		dwellTime = packet.readVarInt();
 		dwellTime = transportMode.continuousMovement ? 1 : dwellTime;
 	}
 
@@ -87,7 +87,7 @@ public abstract class SavedRailBase extends NameColorDataBase {
 		super.writePacket(packet);
 		packet.writeBlockPos(getPosition(0));
 		packet.writeBlockPos(getPosition(1));
-		packet.writeInt(dwellTime);
+		packet.writeVarInt(dwellTime);
 	}
 
 	@Override
