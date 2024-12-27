@@ -439,6 +439,9 @@ public class TrainClient extends Train implements IGui {
 		if (isManualAllowed && Train.isHoldingKey(player) && isPlayerRiding(player)) {
 			RenderDrivingOverlay.setData(manualNotch, this);
 		}
+
+		this.speedCallback = null;
+		this.announcementCallback = null;
 	}
 
 	@Override
