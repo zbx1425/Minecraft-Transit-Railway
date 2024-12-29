@@ -59,6 +59,9 @@ public class TrainVirtualDrive extends TrainClient {
     public float yellowSpeedBrakeRatio = 0.7f;
     public float redSpeedBrakeRatio = 0.9f;
 
+    public float motorPowerPerCar = 240000; // 240kW when averaged per car
+    public float weightPerCar = 27000; // 27t when averaged per car
+
     public double PROG_TOLERANCE = 5;
 
     @Override
@@ -95,10 +98,10 @@ public class TrainVirtualDrive extends TrainClient {
             }
         }
 
-        float accelDueToFriction = (-0.2f / 400 / 3.6f) * ticksElapsed;
+        float accelDueToFriction = (-0.2f / 400 / 3.6f);
         float sinPitch = (float)(keyPointsPositions[0].y - keyPointsPositions[keyPointsPositions.length - 1].y)
                 / (spacing * trainCars - ((spacing - 1) / 2f - getBogiePosition()) * 2f) * (reversed ? 1 : -1);
-        float accelDueToPitch = (sinPitch * 9.8f / 400) * ticksElapsed;
+        float accelDueToPitch = (sinPitch * 9.8f / 400);
         float passiveAccel = accelDueToFriction + accelDueToPitch;
         float commandNotch;
         if (atpEmergencyBrake) {
@@ -109,13 +112,23 @@ public class TrainVirtualDrive extends TrainClient {
         }
         float actualNotch = this.actualNotch.setAndGet(commandNotch, ticksElapsed);
         if (actualNotch < -1) {
-            speed = Mth.clamp(speed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed - 1.1f * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
         } else if (actualNotch < 0) {
-            speed = Mth.clamp(speed + actualNotch * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed + actualNotch * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
         } else if (actualNotch > 0) {
-            speed = Mth.clamp(speed + actualNotch * accelerationConstant * ticksElapsed + passiveAccel, 0, vdMaxSpeed);
+            float accelRequested = actualNotch * (accelerationConstant * 400);
+            float maxAccelMotorCapable = motorPowerPerCar / (weightPerCar * (speed * 20));
+            if (accelRequested > maxAccelMotorCapable) {
+                // Power percent mode (TODO: Is this how it's supposed to work?)
+                float motorOutputAccel = maxAccelMotorCapable * actualNotch;
+                speed = Mth.clamp(speed + (motorOutputAccel / 400) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
+            } else {
+                // Acceleration percent mode, also compensate slope (TODO: Is this how it's supposed to work?)
+                float motorOutputAccel = Math.min(accelRequested + Math.max(-passiveAccel * 400, 0), maxAccelMotorCapable);
+                speed = Mth.clamp(speed + (motorOutputAccel / 400) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
+            }
         } else {
-            speed = Mth.clamp(speed + passiveAccel, 0, vdMaxSpeed);
+            speed = Mth.clamp(speed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
         }
         if (doorValue > 0 || doorTarget) {
             speed = 0;

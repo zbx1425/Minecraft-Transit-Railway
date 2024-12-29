@@ -162,8 +162,10 @@ public class ScriptHolder {
                         + movingAverageFactor * scriptCtx.lastExecuteDuration);
             } catch (Exception ex) {
                 Main.LOGGER.error("Error in NTE Resource Pack JavaScript", ex);
-                failTime = System.currentTimeMillis();
-                failException = ex;
+                synchronized (this) {
+                    failTime = System.currentTimeMillis();
+                    failException = ex;
+                }
             } finally {
                 Context.exit();
             }

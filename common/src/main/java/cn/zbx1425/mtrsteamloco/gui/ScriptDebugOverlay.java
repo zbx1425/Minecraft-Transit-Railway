@@ -47,16 +47,18 @@ public class ScriptDebugOverlay {
         int lineHeight = Mth.ceil(font.lineHeight * 1.2f);
         for (Map.Entry<ScriptHolder, List<AbstractScriptContext>> entry : contexts.entrySet()) {
             ScriptHolder holder = entry.getKey();
-            if (holder.failTime > 0) {
-                drawText(vdStuff, font, holder.name + " FAILED", 0, y, 0xFFFF0000);
-                y += lineHeight;
-                for (String msgLine : Splitter.fixedLength(60).split(holder.failException.getMessage())) {
-                    drawText(vdStuff, font, msgLine, 5, y, 0xFFFF8888);
+            synchronized (holder) {
+                if (holder.failTime > 0) {
+                    drawText(vdStuff, font, holder.name + " FAILED", 0, y, 0xFFFF0000);
+                    y += lineHeight;
+                    for (String msgLine : Splitter.fixedLength(60).split(holder.failException.getMessage())) {
+                        drawText(vdStuff, font, msgLine, 5, y, 0xFFFF8888);
+                        y += lineHeight;
+                    }
+                } else {
+                    drawText(vdStuff, font, holder.name, 0, y, 0xFFAAAAFF);
                     y += lineHeight;
                 }
-            } else {
-                drawText(vdStuff, font, holder.name, 0, y, 0xFFAAAAFF);
-                y += lineHeight;
             }
             for (AbstractScriptContext context : entry.getValue()) {
                 drawText(vdStuff, font,

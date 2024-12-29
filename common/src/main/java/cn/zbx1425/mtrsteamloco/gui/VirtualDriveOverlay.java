@@ -67,8 +67,12 @@ public class VirtualDriveOverlay {
             lastKey = null;
             keyCooldown = 0;
         }
+
+        double platformDistance = train.nextPlatformRailProgress - train.getRailProgress();
         if (KeyMappings.TRAIN_TOGGLE_DOORS.consumeClick()) {
-            train.toggleDoors();
+            if (train.getDoorValue() > 0 || Math.abs(platformDistance) < 1) {
+                train.toggleDoors();
+            }
         }
 
         speedUpdateCooldown -= MTRClient.getLastFrameDuration();
@@ -148,7 +152,6 @@ public class VirtualDriveOverlay {
         float infoIconScale = (GAUGE_SIZE / 4f) / 64;
         guiGraphics.pose().scale(infoIconScale, infoIconScale, 1);
         // Stop accuracy
-        double platformDistance = train.nextPlatformRailProgress - train.getRailProgress();
         if (platformDistance < train.spacing * train.trainCars + 10) {
             blit(guiGraphics, bufferBuilder, 2, 2, 64, 64, 0.5f, 0.5f, 0.125f, 0.125f, 0x88222222);
             if (Math.abs(platformDistance) < 1) {
