@@ -76,19 +76,25 @@ public class TrainVirtualDrive extends TrainClient {
             return;
         }
 
-        if (speed <= 0) {
-            // Repeat
+        // Repeat
+        if (isRepeat()) {
             int headIndex = getIndex(railProgress + PROG_TOLERANCE, false);
-            if (isRepeat() && headIndex >= repeatIndex2 && distances.size() > repeatIndex1) {
+            if (headIndex >= repeatIndex2 && distances.size() > repeatIndex1) {
                 if (path.get(repeatIndex2).isOppositeRail(path.get(repeatIndex1))) {
-                    railProgress = distances.get(repeatIndex1 - 1) + trainCars * spacing;
-                    reversed = !reversed;
-                    Minecraft.getInstance().player.displayClientMessage(Text.translatable("gui.mtrsteamloco.drive.change_end"), false);
+                    if (speed <= 0) {
+                        railProgress = distances.get(repeatIndex1 - 1) + trainCars * spacing;
+                        nextPlatformIndex = 0;
+                        reversed = !reversed;
+                        Minecraft.getInstance().player.displayClientMessage(Text.translatable("gui.mtrsteamloco.drive.change_end"), false);
+                    }
                 } else {
-                    railProgress = distances.get(repeatIndex1);
+                    railProgress = distances.get(repeatIndex1) + (railProgress - distances.get(repeatIndex2));
+                    nextPlatformIndex = 0;
                 }
             }
-            // Turn back
+        }
+        // Turn back
+        if (speed <= 0) {
             int tailIndex = getIndex(railProgress - spacing * trainCars + PROG_TOLERANCE, false);
             if (path.size() > tailIndex + 1 && Math.abs(railProgress - distances.get(tailIndex)) < PROG_TOLERANCE
                 && path.get(tailIndex).isOppositeRail(path.get(tailIndex + 1))) {
