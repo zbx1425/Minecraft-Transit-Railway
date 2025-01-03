@@ -60,6 +60,7 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 
 		playerInVirtualDrive.forEach(player -> {
 			playerRidingCoolDown.put(player, 2);
+			Registry.setInTeleportationState(player, true);
 		});
 
 		final Set<Player> playersToRemove = new HashSet<>();
