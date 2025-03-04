@@ -22,10 +22,10 @@ public class Config {
 	private static boolean hideTranslucentParts;
 	private static boolean shiftToToggleSitting;
 	private static int languageOptions;
-	private static boolean useDynamicFPS = true;
+	private static boolean useDynamicFPS = false;
 	private static int trackTextureOffset;
 	private static int dynamicTextureResolution = 2;
-	private static int trainRenderDistanceRatio = 12;
+	private static int trainRenderDistanceRatio = 15;
 
 	public static final List<Patreon> PATREON_LIST = new ArrayList<>();
 	public static final int TRACK_OFFSET_COUNT = 32;

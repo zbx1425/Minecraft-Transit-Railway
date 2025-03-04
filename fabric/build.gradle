@@ -40,6 +40,10 @@ processResources {
 	}
 }
 
+static boolean matchInnerClass(String path, String... names) {
+	names.any { name -> path.startsWith(name) }
+}
+
 shadowJar {
 	configurations = [project.configurations.shadowCommon]
 	archiveClassifier = "dev-shadow"

@@ -3,10 +3,6 @@ on: [ pull_request, push ]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        java: [ 17 ]
-        os: [ ubuntu-latest ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

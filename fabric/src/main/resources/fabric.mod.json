@@ -2,14 +2,15 @@
 	"schemaVersion": 1,
 	"id": "mtr",
 	"version": "${version}",
-	"name": "Minecraft Transit Railway",
+	"name": "NeoMTR",
 	"description": "A Minecraft mod that adds automated train systems into the game.",
 	"authors": [
-		"Jonathan Ho"
+		"Jonathan Ho",
+		"Zbx1425"
 	],
 	"contact": {
-		"homepage": "https://www.curseforge.com/minecraft/mc-mods/minecraft-transit-railway",
-		"sources": "https://github.com/jonafanho/Minecraft-Transit-Railway"
+		"homepage": "https://modrinth.com/mod/neomtr",
+		"sources": "https://github.com/zbx1425/Minecraft-Transit-Railway"
 	},
 	"license": "MIT",
 	"icon": "icon.png",
