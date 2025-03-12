@@ -361,14 +361,21 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 		return getIndex(getRailProgress(car, trainSpacing), roundDown);
 	}
 
-	public final int getIndex(double tempRailProgress, boolean roundDown) {
-		for (int i = 0; i < path.size(); i++) {
-			final double tempDistance = distances.get(i);
-			if (tempRailProgress < tempDistance || roundDown && tempRailProgress == tempDistance) {
-				return i;
-			}
-		}
-		return path.size() - 1;
+	public final int getIndex(double targetDistance, boolean roundDown) {
+		int left = 0;
+    int right = distances.size() - 1;
+    int result = -1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        double midVal = distances.get(mid);
+        if (roundDown ? (midVal >= targetDistance) : (midVal > targetDistance)) {
+            result = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return (result == -1) ? distances.size() - 1 : result;
 	}
 
 	public final float getRailSpeed(int railIndex) {
@@ -489,30 +496,66 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 							}
 						}
 
-						final double stoppingDistance = distances.get(nextStoppingIndex) - railProgress;
-						if (!transportMode.continuousMovement && stoppingDistance < 0.5 * speed * speed / accelerationConstant) {
-							speed = stoppingDistance <= 0 ? Train.ACCELERATION_DEFAULT : (float) Math.max(speed - (0.5 * speed * speed / stoppingDistance) * ticksElapsed, Train.ACCELERATION_DEFAULT);
-							manualNotch = -3;
-						} else {
-							if (isCurrentlyManual) {
-								if (manualNotch >= -2 && manualNotch <= 2) {
-									final RailType railType = convertMaxManualSpeed(maxManualSpeed);
-									speed = Mth.clamp(speed + manualNotch * newAcceleration / 2, 0, railType == null ? RailType.IRON.maxBlocksPerTick : railType.maxBlocksPerTick);
-								}
+						if (transportMode.continuousMovement || isCurrentlyManual) {
+							final double stoppingDistance = distances.get(nextStoppingIndex) - railProgress;
+							if (!transportMode.continuousMovement && stoppingDistance < 0.5 * speed * speed / accelerationConstant) {
+								speed = stoppingDistance <= 0 ? Train.ACCELERATION_DEFAULT : (float) Math.max(speed - (0.5 * speed * speed / stoppingDistance) * ticksElapsed, Train.ACCELERATION_DEFAULT);
+								manualNotch = -3;
 							} else {
-								final float railSpeed = getRailSpeed(getIndex(0, spacing, false));
-								if (speed < railSpeed) {
-									speed = Math.min(speed + newAcceleration, railSpeed);
-									manualNotch = 2;
-								} else if (speed > railSpeed) {
-									speed = Math.max(speed - newAcceleration, railSpeed);
-									manualNotch = -2;
+								if (isCurrentlyManual) {
+									if (manualNotch >= -2 && manualNotch <= 2) {
+										final RailType railType = convertMaxManualSpeed(maxManualSpeed);
+										speed = Mth.clamp(speed + manualNotch * newAcceleration / 2, 0, railType == null ? RailType.IRON.maxBlocksPerTick : railType.maxBlocksPerTick);
+									}
 								} else {
-									manualNotch = 0;
+									final float railSpeed = getRailSpeed(getIndex(0, spacing, false));
+									if (speed < railSpeed) {
+										speed = Math.min(speed + newAcceleration, railSpeed);
+										manualNotch = 2;
+									} else if (speed > railSpeed) {
+										speed = Math.max(speed - newAcceleration, railSpeed);
+										manualNotch = -2;
+									} else {
+										manualNotch = 0;
+									}
 								}
 							}
+						} else {
+							double lookAheadDistance = Math.max(300, Math.pow(speed, 2) / (2 * accelerationConstant));
+							float atpYellowSpeed = Float.POSITIVE_INFINITY;
+							for (int i = getIndex(railProgress - spacing * trainCars, true);
+									i < path.size() && distances.get(i) < railProgress + lookAheadDistance; i++) {
+									PathData pathSeg = path.get(i);
+									if (i > 0 && distances.get(i - 1) < railProgress && distances.get(i) > railProgress - spacing * trainCars) {
+											// Persisting speed limit
+											atpYellowSpeed = Math.min(atpYellowSpeed, pathSeg.rail.railType.maxBlocksPerTick);
+									}
+									// Stop point pattern based on stoppingDistance
+									final double stoppingDistance = distances.get(nextStoppingIndex) - railProgress;
+									atpYellowSpeed = Math.min(atpYellowSpeed, (float)Math.sqrt(2 * accelerationConstant * stoppingDistance));
+									if (pathSeg.dwellTime > 0) {
+										// This is already handled by stoppingDistance
+									} else {
+											if (i > 0 && distances.get(i - 1) > railProgress) {
+													// Decelerate to start of speed limit
+													float yellowPatternSpeed = (float) Math.sqrt(2 * accelerationConstant * (distances.get(i - 1) - railProgress)
+																					+ Math.pow(pathSeg.rail.railType.maxBlocksPerTick, 2));
+													if (yellowPatternSpeed < atpYellowSpeed) {
+															atpYellowSpeed = yellowPatternSpeed;
+													}
+											}
+									}
+							}
+							if (speed < atpYellowSpeed) {
+								speed = Math.min(speed + newAcceleration, atpYellowSpeed);
+								manualNotch = 2;
+							} else if (speed > atpYellowSpeed) {
+								speed = atpYellowSpeed;
+								manualNotch = -2;
+							} else {
+								manualNotch = 0;
+							}
 						}
-
 						tempDoorOpen = transportMode.continuousMovement && openDoors();
 					}
 
