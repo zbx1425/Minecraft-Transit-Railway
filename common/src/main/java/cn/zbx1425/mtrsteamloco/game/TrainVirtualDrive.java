@@ -122,17 +122,16 @@ public class TrainVirtualDrive extends TrainClient {
         } else if (actualNotch < 0) {
             speed = Mth.clamp(speed + actualNotch * (accelerationConstant / yellowSpeedBrakeRatio) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
         } else if (actualNotch > 0) {
-            float accelRequested = actualNotch * (accelerationConstant * 400);
-            float maxAccelMotorCapable = motorPowerPerCar / (weightPerCar * (speed * 20));
-            if (accelRequested > maxAccelMotorCapable) {
-                // Power percent mode (TODO: Is this how it's supposed to work?)
-                float motorOutputAccel = maxAccelMotorCapable * actualNotch;
-                speed = Mth.clamp(speed + (motorOutputAccel / 400) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
+            float maxPowerAccel = motorPowerPerCar / (weightPerCar * (speed * 20));
+            float motorOutputAccel;
+            if (accelerationConstant * 400 > maxPowerAccel) {
+                // Constant power
+                motorOutputAccel = maxPowerAccel * actualNotch;
             } else {
-                // Acceleration percent mode, also compensate slope (TODO: Is this how it's supposed to work?)
-                float motorOutputAccel = Math.min(accelRequested + Math.max(-passiveAccel * 400, 0), maxAccelMotorCapable);
-                speed = Mth.clamp(speed + (motorOutputAccel / 400) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
+                // Constant force
+                motorOutputAccel = (accelerationConstant * 400) * actualNotch;
             }
+            speed = Mth.clamp(speed + (motorOutputAccel / 400) * ticksElapsed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
         } else {
             speed = Mth.clamp(speed + passiveAccel * ticksElapsed, 0, vdMaxSpeed);
         }
