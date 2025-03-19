@@ -5,6 +5,8 @@ import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
+import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import mtr.neoforge.mappings.ForgeUtilities;
 import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.NetworkUtilities;
@@ -29,6 +31,10 @@ public class RegistryImpl {
 
 	public static boolean isFabric() {
 		return false;
+	}
+
+	public static boolean isClientEnvironment() {
+		return Platform.getEnvironment() == Env.CLIENT;
 	}
 
 	public static <T extends BlockEntityMapper> BlockEntityType<T> getBlockEntityType(Utilities.TileEntitySupplier<T> supplier, Block block) {

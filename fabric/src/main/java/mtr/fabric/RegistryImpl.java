@@ -6,11 +6,13 @@ import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.NetworkUtilities;
 import mtr.mappings.Utilities;
 import mtr.mixin.PlayerTeleportationStateAccessor;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -32,6 +34,10 @@ public class RegistryImpl {
 
 	public static boolean isFabric() {
 		return true;
+	}
+
+	public static boolean isClientEnvironment() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
 	}
 
 	public static <T extends BlockEntityMapper> BlockEntityType<T> getBlockEntityType(Utilities.TileEntitySupplier<T> supplier, Block block) {

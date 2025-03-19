@@ -28,6 +28,11 @@ public class Registry {
 	}
 
 	@ExpectPlatform
+	public static boolean isClientEnvironment() {
+		throw new AssertionError();
+	}
+
+	@ExpectPlatform
 	public static <T extends BlockEntityMapper> BlockEntityType<T> getBlockEntityType(Utilities.TileEntitySupplier<T> supplier, Block block) {
 		throw new AssertionError();
 	}

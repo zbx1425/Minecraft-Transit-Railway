@@ -1,5 +1,6 @@
 package mtr.item;
 
+import mtr.Registry;
 import mtr.block.BlockNode;
 import mtr.data.RailAngle;
 import mtr.data.RailwayData;
@@ -76,7 +77,7 @@ public abstract class ItemNodeModifierSelectableBlockBase extends ItemNodeModifi
 		}
 		tooltip.add(Text.translatable("tooltip.mtr.rail_action_width", width).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 
-		if (canSaveBlock) {
+		if (Registry.isClientEnvironment() && canSaveBlock) {
 			final BlockState state = getSavedState(stack);
 			final String[] textSplit = Text.translatable(state.isAir() ? "tooltip.mtr.shift_right_click_to_select_material" : "tooltip.mtr.shift_right_click_to_clear", Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage(), Text.translatable(mtr.Blocks.RAIL_NODE.get().getDescriptionId())).getString().split("\\|");
 			for (String text : textSplit) {
