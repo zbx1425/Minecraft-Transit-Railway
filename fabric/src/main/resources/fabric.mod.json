@@ -33,5 +33,6 @@
 	"depends": {
 		"fabric": "*",
 		"minecraft": "*"
-	}
+	},
+	"accessWidener" : "mtrsteamloco.accesswidener"
 }
