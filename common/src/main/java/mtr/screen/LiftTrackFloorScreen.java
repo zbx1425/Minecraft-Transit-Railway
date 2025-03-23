@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.block.BlockLiftTrackFloor;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
@@ -107,7 +108,7 @@ public class LiftTrackFloorScreen extends ScreenMapper implements IGui, IPacket 
 			guiGraphics.drawString(font, TEXT_FLOOR_DESCRIPTION, startX, startY + SQUARE_SIZE + TEXT_FIELD_PADDING * 3 / 2 + TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

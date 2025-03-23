@@ -3,6 +3,7 @@ package mtr.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import mtr.Keys;
+import mtr.MTR;
 import mtr.RegistryClient;
 import mtr.block.BlockTrainAnnouncer;
 import mtr.block.BlockTrainScheduleSensor;
@@ -254,7 +255,7 @@ public class PacketTrainDataGuiClient extends PacketTrainDataBase {
 			try {
 				minecraftClient.execute(() -> ClientData.receivePacket(newPacket));
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 	}

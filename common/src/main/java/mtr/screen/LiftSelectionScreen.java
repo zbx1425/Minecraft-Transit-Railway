@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.client.ClientData;
 import mtr.data.DataConverter;
 import mtr.data.IGui;
@@ -69,7 +70,7 @@ public class LiftSelectionScreen extends ScreenMapper implements IGui {
 			selectionList.render(guiGraphics, font);
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
 import mtr.data.Platform;
@@ -102,7 +103,7 @@ public abstract class SavedRailScreenBase<T extends SavedRailBase> extends Scree
 			}
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

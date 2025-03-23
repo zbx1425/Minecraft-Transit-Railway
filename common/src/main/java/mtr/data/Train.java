@@ -2,6 +2,7 @@ package mtr.data;
 
 import mtr.Items;
 import mtr.Keys;
+import mtr.MTR;
 import mtr.block.BlockPSDAPGBase;
 import mtr.block.BlockPSDAPGDoorBase;
 import mtr.block.BlockPlatform;
@@ -158,7 +159,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 //				ContainerHelper.loadAllItems(compoundTag.getCompound(KEY_CARGO), stacks);
 				inventory1 = new SimpleContainer(stacks.toArray(new ItemStack[0]));
 			} catch (IOException e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 	}
@@ -608,7 +609,7 @@ public abstract class Train extends NameColorDataBase implements IPacket {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

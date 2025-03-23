@@ -10,7 +10,7 @@ import mtr.data.RailType;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -52,7 +52,7 @@ public class Patreon implements Keys, IGui, Comparable<Patreon> {
 			jsonObjectData.getAsJsonArray("data").forEach(jsonElementData -> {
 				final JsonObject jsonObjectAttributes = jsonElementData.getAsJsonObject().getAsJsonObject("attributes");
 				final JsonArray jsonObjectTiers = jsonElementData.getAsJsonObject().getAsJsonObject("relationships").getAsJsonObject("currently_entitled_tiers").getAsJsonArray("data");
-				if (!jsonObjectAttributes.get("patron_status").isJsonNull() && jsonObjectAttributes.get("patron_status").getAsString().equals("active_patron") && jsonObjectTiers.size() > 0) {
+				if (!jsonObjectAttributes.get("patron_status").isJsonNull() && jsonObjectAttributes.get("patron_status").getAsString().equals("active_patron") && !jsonObjectTiers.isEmpty()) {
 					patreonList.add(new Patreon(jsonObjectAttributes, idMap.get(jsonObjectTiers.get(0).getAsJsonObject().get("id").getAsString())));
 				}
 			});
@@ -63,7 +63,7 @@ public class Patreon implements Keys, IGui, Comparable<Patreon> {
 
 	public static void openConnectionSafe(String url, Consumer<InputStream> callback, String... requestProperties) {
 		try {
-			final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			final HttpURLConnection connection = (HttpURLConnection) new URI(url).toURL().openConnection();
 			connection.setUseCaches(false);
 
 			for (int i = 0; i < requestProperties.length / 2; i++) {
@@ -72,20 +72,18 @@ public class Patreon implements Keys, IGui, Comparable<Patreon> {
 
 			try (final InputStream inputStream = connection.getInputStream()) {
 				callback.accept(inputStream);
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("Failed to fetch patreon member list!", e);
 		}
 	}
 
 	public static void openConnectionSafeJson(String url, Consumer<JsonElement> callback, String... requestProperties) {
 		openConnectionSafe(url, inputStream -> {
 			try (final InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-				callback.accept(new JsonParser().parse(inputStreamReader));
+				callback.accept(JsonParser.parseReader(inputStreamReader));
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("Failed to fetch patreon member list!", e);
 			}
 		}, requestProperties);
 	}

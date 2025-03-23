@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.vertex.PoseStack;
+import mtr.MTR;
 import mtr.client.DynamicTrainModel;
 import mtr.client.DynamicTrainModelLegacy;
 import mtr.client.IResourcePackCreatorProperties;
@@ -368,7 +369,7 @@ public class DynamicTrainModelLoader {
             available = UtilitiesClient.hasResource(id);
             (available ? RenderTrains.AVAILABLE_TEXTURES : RenderTrains.UNAVAILABLE_TEXTURES).add(textureString);
             if (!available) {
-                System.out.println("Texture " + textureString + " not found, using default");
+                MTR.LOGGER.warn("[NeoMTR] Texture {} not found, using default", textureString);
             }
         } else {
             available = RenderTrains.AVAILABLE_TEXTURES.contains(textureString);

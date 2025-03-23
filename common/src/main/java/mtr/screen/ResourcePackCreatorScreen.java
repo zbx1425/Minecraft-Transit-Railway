@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.Icons;
+import mtr.MTR;
 import mtr.client.CustomResources;
 import mtr.client.DoorAnimationType;
 import mtr.client.IDrawing;
@@ -399,7 +400,7 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 				guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.used_model_parts"), width - PANEL_WIDTH / 2, SQUARE_SIZE * 7 / 2 + TEXT_PADDING, ARGB_WHITE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 		guiCounter = 2;
 	}

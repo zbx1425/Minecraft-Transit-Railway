@@ -3,6 +3,7 @@ package mtr.data;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import mtr.MTR;
 import net.minecraft.core.BlockPos;
 
 import java.util.HashMap;
@@ -112,7 +113,7 @@ public class DataCache {
 			blockPosToStation.clear();
 			syncAdditional();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 
 		lastRefreshedTime = System.currentTimeMillis();

@@ -1,6 +1,7 @@
 package mtr.data;
 
 import com.google.gson.JsonParser;
+import mtr.MTR;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CollectionTag;
 import net.minecraft.nbt.CompoundTag;
@@ -53,7 +54,7 @@ public class RailwayDataLoggingModule extends RailwayDataModuleBase {
 				}
 				queuedEvents.clear();
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 	}
@@ -101,8 +102,8 @@ public class RailwayDataLoggingModule extends RailwayDataModuleBase {
 					formatString(IGui.formatStationName(name)),
 					formatString(String.join("\n", positionsList)),
 					formatString((oldDataDiff.isEmpty() ? LoggingEditType.CREATE : newDataDiff.isEmpty() ? LoggingEditType.DELETE : LoggingEditType.EDIT).toString()),
-					formatString(RailwayData.prettyPrint(new JsonParser().parse(String.format("{%s}", String.join(",", oldDataDiff))))),
-					formatString(RailwayData.prettyPrint(new JsonParser().parse(String.format("{%s}", String.join(",", newDataDiff)))))
+					formatString(RailwayData.prettyPrint(JsonParser.parseString(String.format("{%s}", String.join(",", oldDataDiff))))),
+					formatString(RailwayData.prettyPrint(JsonParser.parseString(String.format("{%s}", String.join(",", newDataDiff)))))
 			));
 		}
 	}
@@ -130,10 +131,10 @@ public class RailwayDataLoggingModule extends RailwayDataModuleBase {
 
 				return dataList;
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 
 		return new ArrayList<>();

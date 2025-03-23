@@ -1,6 +1,7 @@
 package mtr.screen;
 
 import mtr.Keys;
+import mtr.MTR;
 import mtr.Patreon;
 import mtr.client.ClientData;
 import mtr.client.Config;
@@ -224,7 +225,7 @@ public class ConfigScreen extends ScreenMapper implements IGui {
 
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

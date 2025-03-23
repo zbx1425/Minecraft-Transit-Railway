@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.*;
@@ -175,7 +176,7 @@ public class PIDSConfigScreen extends ScreenMapper implements IGui, IPacket {
 		try {
 			displayPage = Math.max(0, Integer.parseInt(displayPageInput.getValue()) - 1);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 		PacketTrainDataGuiClient.sendPIDSConfigC2S(pos1, pos2, messages, hideArrival, filterPlatformIds, displayPage);
 		super.onClose();
@@ -196,7 +197,7 @@ public class PIDSConfigScreen extends ScreenMapper implements IGui, IPacket {
 			}
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

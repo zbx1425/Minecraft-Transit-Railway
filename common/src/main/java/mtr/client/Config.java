@@ -2,12 +2,14 @@ package mtr.client;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import mtr.MTR;
 import mtr.Patreon;
 import mtr.data.RailwayData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -151,9 +153,10 @@ public class Config {
 	}
 
 	public static void refreshProperties() {
-		System.out.println("Refreshed MTR mod config");
+		MTR.LOGGER.info("[NeoMTR] Reading config file...");
+
 		try {
-			final JsonObject jsonConfig = new JsonParser().parse(String.join("", Files.readAllLines(CONFIG_FILE_PATH))).getAsJsonObject();
+			final JsonObject jsonConfig = JsonParser.parseString(String.join("", Files.readAllLines(CONFIG_FILE_PATH))).getAsJsonObject();
 			try {
 				useMTRFont = jsonConfig.get(USE_MTR_FONT_KEY).getAsBoolean();
 			} catch (Exception ignored) {
@@ -194,14 +197,16 @@ public class Config {
 				trainRenderDistanceRatio = Mth.clamp(jsonConfig.get(TRAIN_RENDER_DISTANCE_RATIO).getAsInt(), 0, TRAIN_RENDER_DISTANCE_RATIO_COUNT - 1);
 			} catch (Exception ignored) {
 			}
-		} catch (Exception e) {
+		} catch (NoSuchFileException e) {
+			// Generate config if non-existent
 			writeToFile();
-			e.printStackTrace();
+		} catch (Exception e) {
+			MTR.LOGGER.error("[NeoMTR] Failed to read config file!", e);
+			writeToFile();
 		}
 	}
 
 	private static void writeToFile() {
-		System.out.println("Wrote MTR mod config to file");
 		final JsonObject jsonConfig = new JsonObject();
 		jsonConfig.addProperty(USE_MTR_FONT_KEY, useMTRFont);
 		jsonConfig.addProperty(SHOW_ANNOUNCEMENT_MESSAGES, showAnnouncementMessages);
@@ -216,8 +221,9 @@ public class Config {
 
 		try {
 			Files.write(CONFIG_FILE_PATH, Collections.singleton(RailwayData.prettyPrint(jsonConfig)));
+			MTR.LOGGER.info("[NeoMTR] Config file saved to disk");
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("[NeoMTR] Failed to save config file!", e);
 		}
 	}
 }

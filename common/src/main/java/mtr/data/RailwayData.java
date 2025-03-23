@@ -176,7 +176,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		} else {
 			try {
@@ -216,7 +216,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 					signalBlocks.signalBlocks.add(new SignalBlocks.SignalBlock(tagNewSignalBlocks.getCompound(key)));
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 
@@ -230,23 +230,20 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 
 		try {
 			UpdateDynmap.updateDynmap(world, this);
-		} catch (NoClassDefFoundError | IllegalStateException ignored) {
-			System.out.println("Dynamp is not loaded");
-		} catch (Exception ignored) {
+			MTR.LOGGER.info("[NeoMTR] Dynmap is detected");
+		} catch (NoClassDefFoundError | Exception ignored) {
 		}
-		try {
+        try {
 			UpdateBlueMap.updateBlueMap(world, this);
-		} catch (NoClassDefFoundError | IllegalStateException ignored) {
-			System.out.println("BlueMap is not loaded");
-		} catch (Exception ignored) {
+			MTR.LOGGER.info("[NeoMTR] BlueMap is detected");
+		} catch (NoClassDefFoundError | Exception ignored) {
 		}
-		try {
+        try {
 			UpdateSquaremap.updateSquaremap(world, this);
-		} catch (NoClassDefFoundError | IllegalStateException ignored) {
-			System.out.println("Squaremap is not loaded");
-		} catch (Exception ignored) {
+			MTR.LOGGER.info("[NeoMTR] Squaremap is detected");
+		} catch (NoClassDefFoundError | Exception ignored) {
 		}
-	}
+    }
 
 	@Override
 	public void save(File file, HolderLookup.Provider registries) {
@@ -549,7 +546,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 		try {
 			return platforms.stream().filter(platform -> platform.containsPos(pos)).findFirst().orElse(null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 			return null;
 		}
 	}
@@ -571,7 +568,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -588,7 +585,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 				validateRails(world, rails);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -617,7 +614,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 				validateRails(world, rails);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -633,7 +630,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 				return stations.stream().filter(station -> station.inArea(pos.getX(), pos.getZ())).findFirst().orElse(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 			return null;
 		}
 	}
@@ -660,7 +657,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 				return platformId;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 			return 0;
 		}
 	}
@@ -803,7 +800,7 @@ public class RailwayData extends PersistentStateMapper implements IPacket {
 	}
 
 	private static void runCommand(MinecraftServer server, CommandSourceStack commandSourceStack, String command) {
-		System.out.println("Running command " + command);
+		MTR.LOGGER.info("[NeoMTR] Running command {}", command);
 		Utilities.sendCommand(server, commandSourceStack, command);
 	}
 

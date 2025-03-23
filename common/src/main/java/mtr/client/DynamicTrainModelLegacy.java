@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import mtr.MTR;
 import mtr.mappings.ModelDataWrapper;
 import mtr.mappings.ModelMapper;
 import mtr.model.ModelDoorOverlay;
@@ -78,7 +79,7 @@ public class DynamicTrainModelLegacy extends ModelSimpleTrainBase<DynamicTrainMo
 				part.setModelPart();
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 
 		this.properties = properties;
@@ -262,7 +263,7 @@ public class DynamicTrainModelLegacy extends ModelSimpleTrainBase<DynamicTrainMo
 			jsonObject.remove("parts_door_opened");
 			jsonObject.remove("parts_door_closed");
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

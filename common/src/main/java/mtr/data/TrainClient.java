@@ -2,6 +2,7 @@ package mtr.data;
 
 import cn.zbx1425.mtrsteamloco.ClientConfig;
 import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
+import mtr.MTR;
 import mtr.MTRClient;
 import mtr.block.BlockPSDAPGDoorBase;
 import mtr.block.IBlock;
@@ -230,7 +231,7 @@ public class TrainClient extends Train implements IGui {
 			final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
 			if (ticksElapsed > 0) trainSound.playNearestCar(world, soundPos, nearestCar);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

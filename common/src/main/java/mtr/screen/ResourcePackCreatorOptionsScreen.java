@@ -1,6 +1,7 @@
 package mtr.screen;
 
 import com.google.gson.JsonObject;
+import mtr.MTR;
 import mtr.client.CustomResources;
 import mtr.client.ICustomResources;
 import mtr.client.IDrawing;
@@ -152,7 +153,7 @@ public class ResourcePackCreatorOptionsScreen extends ScreenMapper implements IR
 			guiGraphics.drawString(font, GANGWAY_CONNECTION_ID_TEXT, SQUARE_SIZE, yStart + SQUARE_SIZE * 11 / 2 + TEXT_FIELD_PADDING * 5 / 2 + TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.drawString(font, TRAIN_BARRIER_ID_TEXT, SQUARE_SIZE, yStart + SQUARE_SIZE * 13 / 2 + TEXT_FIELD_PADDING * 7 / 2 + TEXT_PADDING, ARGB_WHITE);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -205,7 +206,7 @@ public class ResourcePackCreatorOptionsScreen extends ScreenMapper implements IR
 					try {
 						callback.accept(paths.get(0));
 					} catch (Exception e) {
-						e.printStackTrace();
+						MTR.LOGGER.error("", e);
 					}
 				}
 			}));

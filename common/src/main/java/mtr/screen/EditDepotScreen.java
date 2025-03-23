@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.*;
@@ -242,7 +243,7 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 				guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.vehicles_per_hour"), sliderX + sliderWidthWithText / 2, SQUARE_SIZE + TEXT_PADDING, ARGB_LIGHT_GRAY);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -264,8 +265,8 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 		try {
 			data.cruisingAltitude = Integer.parseInt(textFieldCruisingAltitude.getValue());
 		} catch (Exception e) {
-			e.printStackTrace();
 			data.cruisingAltitude = Depot.DEFAULT_CRUISING_ALTITUDE;
+			MTR.LOGGER.error("", e);
 		}
 		data.setData(packet -> PacketTrainDataGuiClient.sendUpdate(PACKET_UPDATE_DEPOT, packet));
 	}

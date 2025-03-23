@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import mtr.MTR;
 import mtr.data.*;
 import mtr.mappings.ModelDataWrapper;
 import mtr.mappings.ModelMapper;
@@ -107,7 +108,7 @@ public class DynamicTrainModel extends ModelTrainBase implements IResourcePackCr
 				part.setModelPart();
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 
 		IResourcePackCreatorProperties.checkSchema(properties);

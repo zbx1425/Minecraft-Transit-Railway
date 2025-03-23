@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.DataConverter;
@@ -144,7 +145,7 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -206,7 +207,7 @@ public class EditStationScreen extends EditNameColorScreenBase<Station> {
 				final String exitParent = parentLetter + Integer.parseInt(parentNumber);
 				data.setExitParent(editingExit, exitParent, packet -> PacketTrainDataGuiClient.sendUpdate(PACKET_UPDATE_STATION, packet));
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 		changeEditingExit(null, -1);

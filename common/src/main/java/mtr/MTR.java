@@ -1,16 +1,13 @@
 package mtr;
 
-import mtr.client.ClientData;
 import mtr.data.Depot;
 import mtr.data.RailwayData;
 import mtr.data.Route;
 import mtr.data.Station;
 import mtr.mappings.BlockEntityMapper;
 import mtr.packet.IPacket;
-import mtr.packet.PacketTrainDataGuiClient;
 import mtr.packet.PacketTrainDataGuiServer;
 import mtr.servlet.Webserver;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +16,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +29,7 @@ public class MTR implements IPacket {
 	private static int gameTick = 0;
 
 	public static final String MOD_ID = "mtr";
+	public static final Logger LOGGER = LoggerFactory.getLogger("NeoMTR");
 
 	public static ResourceLocation id(String path) {
 		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);

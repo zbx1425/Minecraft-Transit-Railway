@@ -77,7 +77,7 @@ public class ResourcePackCreatorProperties implements IResourcePackCreatorProper
 			textureFileName = path.getFileName().toString();
 			textureFilePath = path;
 		} catch (IOException e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -375,7 +375,7 @@ public class ResourcePackCreatorProperties implements IResourcePackCreatorProper
 
 			Util.getPlatform().openFile(resourcePackDirectory);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("Failed to export resource pack!", e);
 		}
 	}
 
@@ -415,9 +415,9 @@ public class ResourcePackCreatorProperties implements IResourcePackCreatorProper
 
 	private static void readJson(Path path, BiConsumer<String, JsonObject> jsonCallback) {
 		try {
-			jsonCallback.accept(path.getFileName().toString(), new JsonParser().parse(String.join("", Files.readAllLines(path))).getAsJsonObject());
+			jsonCallback.accept(path.getFileName().toString(), JsonParser.parseString(String.join("", Files.readAllLines(path))).getAsJsonObject());
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

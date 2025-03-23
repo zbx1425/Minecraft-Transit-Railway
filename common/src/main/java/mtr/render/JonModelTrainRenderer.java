@@ -2,6 +2,7 @@ package mtr.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import mtr.MTR;
 import mtr.MTRClient;
 import mtr.client.TrainClientRegistry;
 import mtr.client.TrainProperties;
@@ -209,7 +210,7 @@ public class JonModelTrainRenderer extends TrainRendererBase implements IGui {
 			available = UtilitiesClient.hasResource(id);
 			(available ? RenderTrains.AVAILABLE_TEXTURES : RenderTrains.UNAVAILABLE_TEXTURES).add(textureString);
 			if (!available) {
-				System.out.println("Texture " + textureString + " not found, using default");
+				MTR.LOGGER.warn("[NeoMTR] Texture {} not found, using default", textureString);
 			}
 		} else {
 			available = RenderTrains.AVAILABLE_TEXTURES.contains(textureString);
