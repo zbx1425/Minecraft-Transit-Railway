@@ -1,5 +1,7 @@
 package mtr.data;
 
+import mtr.MTR;
+
 import java.util.Locale;
 
 public enum TrainType {
@@ -156,7 +158,7 @@ public enum TrainType {
 					length = Integer.parseInt(remainingSplit[0]);
 					width = Integer.parseInt(remainingSplit[1]);
 				} catch (Exception e) {
-					e.printStackTrace();
+					MTR.LOGGER.error("", e);
 				}
 
 				trainTypeCallback.trainTypeCallback(transportMode, Math.max(length, 1), Math.max(width, 1));

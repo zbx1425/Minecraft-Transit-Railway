@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.block.BlockRailwaySign;
 import mtr.block.BlockRouteSignBase;
 import mtr.client.ClientData;
@@ -85,7 +86,7 @@ public class RailwaySignScreen extends ScreenMapper implements IGui {
 				ClientData.DATA_CACHE.getConnectingStationsIncludingThisOne(station).forEach(connectingStation -> stationsForList.add(new DataConverter(connectingStation.id, connectingStation.name, connectingStation.color)));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 
 		if (world != null) {
@@ -207,7 +208,7 @@ public class RailwaySignScreen extends ScreenMapper implements IGui {
 				guiGraphics.drawCenteredString(font, String.format("%s/%s", page + 1, totalPages), (width - PANEL_WIDTH - SQUARE_SIZE * 4) / 2 + PANEL_WIDTH + SQUARE_SIZE * 2, height - SQUARE_SIZE * 2 + TEXT_PADDING, ARGB_WHITE);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

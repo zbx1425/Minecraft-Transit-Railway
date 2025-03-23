@@ -24,6 +24,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.AttributedString;
 import java.util.List;
 import java.util.*;
@@ -116,7 +117,7 @@ public class ClientCache extends DataCache implements IGui {
 	}
 
 	public void refreshDynamicResources() {
-		System.out.println("Refreshing dynamic resources");
+		MTR.LOGGER.info("[NeoMTR] Refreshing dynamic resources");
 		resourcesToRefresh.addAll(dynamicResources.keySet());
 	}
 
@@ -416,7 +417,7 @@ public class ClientCache extends DataCache implements IGui {
 				font = Font.createFont(Font.TRUETYPE_FONT, Utilities.getInputStream(resourceManager.getResource(MTR.id("font/noto-sans-semibold.ttf"))));
 				fontCjk = Font.createFont(Font.TRUETYPE_FONT, Utilities.getInputStream(resourceManager.getResource(MTR.id("font/noto-serif-cjk-tc-semibold.ttf"))));
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 
@@ -448,9 +449,9 @@ public class ClientCache extends DataCache implements IGui {
 				final DynamicTexture dynamicTexture = new DynamicTexture(nativeImage);
 				String newKey = key;
 				try {
-					newKey = URLEncoder.encode(key, "UTF-8");
+					newKey = URLEncoder.encode(key, StandardCharsets.UTF_8);
 				} catch (Exception e) {
-					e.printStackTrace();
+					MTR.LOGGER.error("", e);
 				}
 				final ResourceLocation resourceLocation = MTR.id("dynamic_texture_" + newKey.toLowerCase(Locale.ENGLISH).replaceAll("[^0-9a-z_]", "_"));
 				minecraftClient.getTextureManager().register(resourceLocation, dynamicTexture);

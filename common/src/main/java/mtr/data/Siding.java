@@ -1,6 +1,7 @@
 package mtr.data;
 
 import io.netty.buffer.Unpooled;
+import mtr.MTR;
 import mtr.packet.IPacket;
 import mtr.path.PathData;
 import mtr.path.PathFinder;
@@ -339,7 +340,7 @@ public class Siding extends SavedRailBase implements IPacket, IReducedSaveData {
 				repeatIndex1 = tempRepeatIndex1;
 				repeatIndex2 = tempRepeatIndex2;
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		});
 

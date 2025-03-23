@@ -310,9 +310,15 @@ public class MTRClient implements IPacket {
 				isPehkui = false;
 			}
 
-			System.out.println(isReplayMod ? "Running in Replay Mod mode" : "Not running in Replay Mod mode");
-			System.out.println(isVivecraft ? "Vivecraft detected" : "Vivecraft not detected");
-			System.out.println(isPehkui ? "Pehkui detected" : "Pehkui not detected");
+			if(isReplayMod) {
+				MTR.LOGGER.info("[NeoMTR] Running in Replay Mod mode");
+			}
+			if(isVivecraft) {
+				MTR.LOGGER.info("[NeoMTR] Vivecraft detected");
+			}
+			if(isPehkui) {
+				MTR.LOGGER.info("[NeoMTR] Pehkui detected");
+			}
 
 			if (!Keys.LIFTS_ONLY) {
 				final Minecraft minecraft = Minecraft.getInstance();
@@ -473,7 +479,7 @@ public class MTRClient implements IPacket {
 			startSampleMillis = millis;
 			startSampleGameTick = gameTickTest;
 			if (skipTicks != lastSkipTicks) {
-				System.out.println("Tick skip updated to " + skipTicks);
+				// MTR.LOGGER.info("[NeoMTR] Tick skip updated to {}", skipTicks);
 			}
 			lastSkipTicks = skipTicks;
 		}

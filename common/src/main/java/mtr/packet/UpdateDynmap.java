@@ -1,5 +1,6 @@
 package mtr.packet;
 
+import mtr.MTR;
 import mtr.data.AreaBase;
 import mtr.data.IGui;
 import mtr.data.RailwayData;
@@ -29,13 +30,12 @@ public class UpdateDynmap implements IGui, IUpdateWebMap {
 						IUpdateWebMap.readResource(STATION_ICON_PATH, inputStream -> markerAPI.createMarkerIcon(STATION_ICON_KEY, STATION_ICON_KEY, inputStream));
 						IUpdateWebMap.readResource(DEPOT_ICON_PATH, inputStream -> markerAPI.createMarkerIcon(DEPOT_ICON_KEY, DEPOT_ICON_KEY, inputStream));
 					} catch (Exception e) {
-						e.printStackTrace();
+						MTR.LOGGER.error("", e);
 					}
 				}
 			});
-		} catch (
-				Exception e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class UpdateDynmap implements IGui, IUpdateWebMap {
 			updateDynmap(world, railwayData.stations, MARKER_SET_STATIONS_ID, MARKER_SET_STATIONS_TITLE, MARKER_SET_STATION_AREAS_ID, MARKER_SET_STATION_AREAS_TITLE, STATION_ICON_KEY);
 			updateDynmap(world, railwayData.depots, MARKER_SET_DEPOTS_ID, MARKER_SET_DEPOTS_TITLE, MARKER_SET_DEPOT_AREAS_ID, MARKER_SET_DEPOT_AREAS_TITLE, DEPOT_ICON_KEY);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 

@@ -3,6 +3,7 @@ package mtr.client;
 import cn.zbx1425.mtrsteamloco.game.TrainVirtualDrive;
 import cn.zbx1425.mtrsteamloco.game.VirtualDriveClientData;
 import mtr.KeyMappings;
+import mtr.MTR;
 import mtr.MTRClient;
 import mtr.data.*;
 import mtr.mappings.Text;
@@ -342,7 +343,7 @@ public final class ClientData {
 		try {
 			return TRAINS.stream().filter(item -> item.id == id).findFirst().orElse(null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 			return null;
 		}
 	}

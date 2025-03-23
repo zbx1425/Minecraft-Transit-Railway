@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.block.BlockArrivalProjectorBase;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
@@ -80,7 +81,7 @@ public class ArrivalProjectorConfigScreen extends ScreenMapper implements IGui, 
 			guiGraphics.drawString(font, Text.translatable("gui.mtr.display_page"), SQUARE_SIZE, SQUARE_SIZE * 4 + TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -93,7 +94,7 @@ public class ArrivalProjectorConfigScreen extends ScreenMapper implements IGui, 
 		try {
 			displayPage = Math.max(0, Integer.parseInt(displayPageInput.getValue()) - 1);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 		PacketTrainDataGuiClient.sendArrivalProjectorConfigC2S(pos, filterPlatformIds, displayPage);
 		super.onClose();

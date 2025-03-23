@@ -1,6 +1,7 @@
 package mtr.screen;
 
 import com.mojang.blaze3d.vertex.*;
+import mtr.MTR;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
 import mtr.mappings.ButtonMapper;
@@ -174,7 +175,7 @@ public class WidgetColorSelector extends ButtonMapper implements IGui {
 				BufferUploader.drawWithShader(buffer.buildOrThrow());
 				UtilitiesClient.finishDrawingRectangle();
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 

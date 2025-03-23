@@ -1,5 +1,6 @@
 package mtr.screen;
 
+import mtr.MTR;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.*;
@@ -156,7 +157,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 			dashboardList.render(guiGraphics, font);
 			guiGraphics.pose().popPose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -216,7 +217,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 					break;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -344,7 +345,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 					break;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -430,7 +431,7 @@ public class DashboardScreen extends ScreenMapper implements IGui, IPacket {
 			try {
 				ClientData.ROUTES.add(editingRoute);
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 			}
 		}
 		editingRoute.name = IGui.textOrUntitled(textFieldName.getValue());

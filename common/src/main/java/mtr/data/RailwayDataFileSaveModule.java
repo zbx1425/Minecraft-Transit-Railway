@@ -1,5 +1,6 @@
 package mtr.data;
 
+import mtr.MTR;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -74,7 +75,7 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 			Files.createDirectories(railsPath);
 			Files.createDirectories(signalBlocksPath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("Failed to create MTR data directory!", e);
 		}
 	}
 
@@ -89,7 +90,7 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 		readMessagePackFromFile(railsPath, RailEntry::new, railEntry -> rails.put(railEntry.pos, railEntry.connections), true);
 		readMessagePackFromFile(signalBlocksPath, SignalBlocks.SignalBlock::new, signalBlocks.signalBlocks::add, true);
 
-		System.out.println("Minecraft Transit Railway data successfully loaded for " + world.dimension().location());
+		MTR.LOGGER.info("Minecraft Transit Railway data successfully loaded for {}", world.dimension().location());
 		canAutoSave = true;
 		dataLoaded = true;
 	}
@@ -169,7 +170,7 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 				try {
 					Files.deleteIfExists(path);
 				} catch (IOException e) {
-					e.printStackTrace();
+					MTR.LOGGER.error("", e);
 				}
 				existingFiles.remove(path);
 				filesDeleted++;
@@ -187,15 +188,15 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 				}));
 
 				if (!useReducedHash || filesWritten > 0 || filesDeleted > 0) {
-					System.out.println("Minecraft Transit Railway save complete for " + world.dimension().location() + " in " + (System.currentTimeMillis() - autoSaveStartMillis) / 1000 + " second(s)");
+					MTR.LOGGER.info("Minecraft Transit Railway save complete for {} in {} second(s)", world.dimension().location(), (System.currentTimeMillis() - autoSaveStartMillis) / 1000);
 					if (filesWritten > 0) {
-						System.out.println("- Changed: " + filesWritten);
+						MTR.LOGGER.info("- Changed: {}", filesWritten);
 					}
 					if (filesDeleted > 0) {
-						System.out.println("- Deleted: " + filesDeleted);
+						MTR.LOGGER.info("- Deleted: {}", filesDeleted);
 					}
 					if (!routeIdsToRemove.isEmpty()) {
-						System.out.println("- Delays Cleared: " + routeIdsToRemove.size());
+						MTR.LOGGER.info("- Delays Cleared: {}", routeIdsToRemove.size());
 					}
 				}
 
@@ -236,21 +237,21 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 
 									existingFiles.put(idFile, getHash(data, true));
 								} catch (Exception e) {
-									e.printStackTrace();
+									MTR.LOGGER.error("", e);
 								}
 							} catch (IOException e) {
-								e.printStackTrace();
+								MTR.LOGGER.error("", e);
 							}
 						} catch (IOException e) {
-							e.printStackTrace();
+							MTR.LOGGER.error("", e);
 						}
 					});
 				} catch (IOException e) {
-					e.printStackTrace();
+					MTR.LOGGER.error("", e);
 				}
 			});
 		} catch (IOException e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 	}
 
@@ -273,7 +274,7 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 
 			return dataPath;
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 		return null;
 	}
@@ -313,7 +314,7 @@ public class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 
 			return hash;
 		} catch (Exception e) {
-			e.printStackTrace();
+			MTR.LOGGER.error("", e);
 		}
 		return 0;
 	}

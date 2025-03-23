@@ -1,6 +1,7 @@
 package mtr.data;
 
 import io.netty.buffer.Unpooled;
+import mtr.MTR;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -200,7 +201,7 @@ public class SignalBlocks {
 			try {
 				savedColor = DyeColor.values()[messagePackHelper.getInt(KEY_COLOR)];
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 				savedColor = DyeColor.RED;
 			}
 			color = savedColor;
@@ -215,7 +216,7 @@ public class SignalBlocks {
 			try {
 				savedColor = DyeColor.values()[compoundTag.getInt(KEY_COLOR)];
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 				savedColor = DyeColor.RED;
 			}
 			color = savedColor;
@@ -229,7 +230,7 @@ public class SignalBlocks {
 			try {
 				savedColor = DyeColor.values()[packet.readInt()];
 			} catch (Exception e) {
-				e.printStackTrace();
+				MTR.LOGGER.error("", e);
 				savedColor = DyeColor.RED;
 			}
 			color = savedColor;
