@@ -10,7 +10,6 @@ import mtr.mappings.BlockEntityMapper;
 import mtr.neoforge.mappings.ForgeUtilities;
 import mtr.mappings.RegistryUtilities;
 import mtr.render.RenderDrivingOverlay;
-import mtr.render.RenderLift;
 import mtr.render.RenderTrains;
 import mtr.screen.ConfigScreen;
 import net.minecraft.client.Minecraft;
