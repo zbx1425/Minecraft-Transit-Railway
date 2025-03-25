@@ -32,6 +32,8 @@ public class UpdateSquaremap implements IGui, IUpdateWebMap {
 					e.printStackTrace();
 				}
 			});
+		} catch (IllegalStateException ignored) {
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
