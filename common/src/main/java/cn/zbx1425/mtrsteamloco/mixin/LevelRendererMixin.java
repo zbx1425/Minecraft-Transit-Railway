@@ -21,29 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = LevelRenderer.class, priority = 100)
 public class LevelRendererMixin {
 
-    @Shadow @Final private RenderBuffers renderBuffers;
-
-    @Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=destroyProgress", ordinal = 0))
-#if MC_VERSION >= "11903"
-    private void afterBlockEntities(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
-#else
-    private void afterBlockEntities(PoseStack matrices, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, com.mojang.math.Matrix4f matrix4f, CallbackInfo ci) {
-#endif
-        Minecraft.getInstance().level.getProfiler().popPush("NTEBlockEntities");
-        BufferSourceProxy vertexConsumersProxy = new BufferSourceProxy(renderBuffers.bufferSource());
-        MainClient.drawScheduler.commit(vertexConsumersProxy, MainClient.drawContext);
-        vertexConsumersProxy.commit();
-    }
-
-    @Inject(method = "renderLevel", at = @At("TAIL"))
-#if MC_VERSION >= "11903"
-    private void renderLevelLast(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
-#else
-    private void renderLevelLast(PoseStack matrices, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, com.mojang.math.Matrix4f matrix4f, CallbackInfo ci) {
-#endif
-        MainClient.drawContext.resetFrameProfiler();
-    }
-
     // Sodium applies @Overwrite to them so have to inject them all, rather than just setSectionDirty(IIIZ)
     // TODO Will it include unnecessary updates?
 

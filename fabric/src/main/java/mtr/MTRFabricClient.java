@@ -5,6 +5,7 @@ import cn.zbx1425.mtrsteamloco.MainClient;
 import cn.zbx1425.mtrsteamloco.NTEClientCommand;
 import cn.zbx1425.mtrsteamloco.gui.ScriptDebugOverlay;
 import cn.zbx1425.mtrsteamloco.render.train.SteamSmokeParticle;
+import cn.zbx1425.sowcerext.model.integration.BufferSourceProxy;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.client.CustomResources;
 import mtr.client.ICustomResources;
@@ -19,6 +20,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -40,7 +42,17 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 			RenderTrains.render(0, matrices, context.consumers());
 			matrices.popPose();
 		});
-		WorldRenderEvents.LAST.register(event -> ResourcePackCreatorScreen.render(event.matrixStack()));
+		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((worldRenderContext, hitResult) -> {
+			Minecraft.getInstance().level.getProfiler().popPush("NTEBlockEntities");
+			BufferSourceProxy vertexConsumersProxy = new BufferSourceProxy(Minecraft.getInstance().renderBuffers().bufferSource());
+			MainClient.drawScheduler.commit(vertexConsumersProxy, MainClient.drawContext);
+			vertexConsumersProxy.commit();
+            return true;
+        });
+		WorldRenderEvents.LAST.register(event -> {
+			ResourcePackCreatorScreen.render(event.matrixStack());
+			MainClient.drawContext.resetFrameProfiler();
+		});
 		HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> RenderDrivingOverlay.render(guiGraphics));
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CustomResourcesWrapper());
 		MTRFabric.PACKET_REGISTRY.commitClient();

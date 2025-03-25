@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.ScoreAccess;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
@@ -70,7 +71,12 @@ public class TicketSystem {
 	}
 
 	public static ScoreAccess getPlayerScore(Level world, Player player, String objectiveName) {
-		return world.getScoreboard().getOrCreatePlayerScore(player, world.getScoreboard().getObjective(objectiveName));
+		Objective objective = world.getScoreboard().getObjective(objectiveName);
+		if (objective == null) {
+			addObjectivesIfMissing(world);
+			objective = world.getScoreboard().getObjective(objectiveName);
+		}
+		return world.getScoreboard().getOrCreatePlayerScore(player, objective);
 	}
 
 	private static boolean onEnter(Station station, Player player, ScoreAccess balanceScore, ScoreAccess entryZoneScore, boolean remindIfNoRecord) {

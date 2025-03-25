@@ -97,13 +97,6 @@ public class BlockEntityEyeCandyRenderer extends BlockEntityRendererMapper<Block
             }
             prop.script.tryCallRenderFunctionAsync(blockEntity.scriptContext);
         }
-
-        // TODO: Mixin into Iris to carry out the batching properly?
-        if (ShadersModHandler.isRenderingShadowPass()) {
-            BufferSourceProxy vertexConsumersProxy = new BufferSourceProxy(vertexConsumers);
-            MainClient.drawScheduler.commit(vertexConsumersProxy, MainClient.drawContext);
-            vertexConsumersProxy.commit();
-        }
     }
 
     @Override
