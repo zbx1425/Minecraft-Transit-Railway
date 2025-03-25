@@ -4,7 +4,6 @@ import io.netty.buffer.Unpooled;
 import mtr.MTRClient;
 import mtr.RegistryClient;
 import mtr.client.ClientData;
-import mtr.entity.EntitySeat;
 import mtr.mappings.Utilities;
 import mtr.packet.PacketTrainDataGuiClient;
 import mtr.render.TrainRendererBase;
@@ -94,39 +93,13 @@ public class VehicleRidingClient {
 			final double moveX = x + playerOffset.x;
 			final double moveY = y + playerOffset.y;
 			final double moveZ = z + playerOffset.z;
-			final boolean movePlayer;
+			// HACK Vivecraft support removed
 
-			if (MTRClient.isVivecraft()) {
-				final Entity vehicle = clientPlayer.getVehicle();
-				if (vehicle instanceof EntitySeat) {
-					((EntitySeat) vehicle).setPosByTrain(moveX, moveY, moveZ);
-					movePlayer = false;
-				} else {
-					movePlayer = true;
-				}
-
-				final double tempPercentageX = riderRatioPos.get(uuid).x;
-				final boolean doorOpen = doorLeftOpen && tempPercentageX < 0 || doorRightOpen && tempPercentageX > 1;
-				final boolean movedFar = Math.abs(lastSentX - moveX) > 2 || Math.abs(lastSentY - moveY) > 2 || Math.abs(lastSentZ - moveZ) > 2;
-
-				if (doorOpen || MTRClient.getGameTick() - lastSentTicks > 60 && movedFar) {
-					PacketTrainDataGuiClient.sendUpdateEntitySeatPassengerPosition(moveX, moveY, moveZ);
-					lastSentX = moveX;
-					lastSentY = moveY;
-					lastSentZ = moveZ;
-					lastSentTicks = MTRClient.getGameTick();
-				}
-			} else {
-				movePlayer = true;
-			}
-
-			if (movePlayer) {
-				clientPlayer.fallDistance = 0;
-				clientPlayer.setDeltaMovement(0, 0, 0);
-				clientPlayer.setSpeed(0);
-				if (MTRClient.getGameTick() > 40) {
-					clientPlayer.absMoveTo(moveX, moveY, moveZ);
-				}
+			clientPlayer.fallDistance = 0;
+			clientPlayer.setDeltaMovement(0, 0, 0);
+			clientPlayer.setSpeed(0);
+			if (MTRClient.getGameTick() > 40) {
+				clientPlayer.absMoveTo(moveX, moveY, moveZ);
 			}
 
 			clientPlayerCallback.run();

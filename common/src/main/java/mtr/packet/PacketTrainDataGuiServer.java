@@ -473,7 +473,7 @@ public class PacketTrainDataGuiServer extends PacketTrainDataBase {
 			final double x = packet.readDouble();
 			final double y = packet.readDouble();
 			final double z = packet.readDouble();
-			minecraftServer.execute(() -> railwayData.railwayDataCoolDownModule.moveSeat(player, x, y, z));
+//			minecraftServer.execute(() -> railwayData.railwayDataCoolDownModule.moveSeat(player, x, y, z));
 		}
 	}
 

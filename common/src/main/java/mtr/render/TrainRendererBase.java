@@ -7,7 +7,6 @@ import mtr.client.TrainClientRegistry;
 import mtr.client.TrainProperties;
 import mtr.data.RailwayData;
 import mtr.data.TrainClient;
-import mtr.entity.EntitySeat;
 import mtr.mappings.Utilities;
 import mtr.mappings.UtilitiesClient;
 import net.minecraft.client.Camera;
@@ -65,7 +64,7 @@ public abstract class TrainRendererBase {
 		matrices.popPose();
 	}
 
-	public static void setupStaticInfo(PoseStack matrices, MultiBufferSource vertexConsumers, EntitySeat entity, float tickDelta) {
+	public static void setupStaticInfo(PoseStack matrices, MultiBufferSource vertexConsumers, float tickDelta) {
 		final Minecraft client = Minecraft.getInstance();
 		camera = client.gameRenderer.getMainCamera();
 		entityRenderDispatcher = client.getEntityRenderDispatcher();

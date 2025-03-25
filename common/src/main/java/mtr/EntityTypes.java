@@ -1,7 +1,6 @@
 package mtr;
 
 import mtr.entity.EntityLift;
-import mtr.entity.EntitySeat;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
@@ -9,8 +8,6 @@ import net.minecraft.world.level.Level;
 import java.util.function.BiFunction;
 
 public interface EntityTypes {
-
-	RegistryObject<EntityType<EntitySeat>> SEAT = new RegistryObject<>(() -> EntityType.Builder.<EntitySeat>of(EntitySeat::new, MobCategory.MISC).sized(EntitySeat.SIZE, EntitySeat.SIZE).clientTrackingRange(8).build("seat"));
 
 	@Deprecated
 	enum LiftType {

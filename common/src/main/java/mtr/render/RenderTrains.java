@@ -10,7 +10,6 @@ import mtr.block.BlockSignalLightBase;
 import mtr.block.BlockSignalSemaphoreBase;
 import mtr.client.*;
 import mtr.data.*;
-import mtr.entity.EntitySeat;
 import mtr.item.ItemNodeModifierBase;
 import mtr.mappings.EntityRendererMapper;
 import mtr.mappings.Text;
@@ -41,7 +40,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IGui {
+public class RenderTrains implements IGui {
 
 	public static int maxTrainRenderDistance;
 	public static ResourcePackCreatorProperties creatorProperties = new ResourcePackCreatorProperties();
@@ -84,20 +83,6 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 			RENDERS.add(i, rendersList);
 			CURRENT_RENDERS.add(i, currentRendersList);
 		}
-	}
-
-	public RenderTrains(Object parameter) {
-		super(parameter);
-	}
-
-	@Override
-	public void render(EntitySeat entity, float entityYaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int entityLight) {
-		render(entity, tickDelta, matrices, vertexConsumers);
-	}
-
-	@Override
-	public ResourceLocation getTextureLocation(EntitySeat entity) {
-		return null;
 	}
 
 	public static void simulate() {
@@ -196,29 +181,14 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 		ClientData.LIFTS.forEach(lift -> lift.tickClient(world, newLastFrameDuration));
 	}
 
-	public static void render(EntitySeat entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
+	public static void render(float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
 		final Minecraft client = Minecraft.getInstance();
-		final boolean backupRendering = entity == null;
-
-		if (!backupRendering && MTRClient.isPehkui()) {
-			return;
-		}
-
-		final boolean alreadyRendered = renderedUuid != null && (backupRendering || entity.getUUID() != renderedUuid);
-
-		if (backupRendering) {
-			renderedUuid = null;
-		}
 
 		final LocalPlayer player = client.player;
 		final Level world = client.level;
 
-		if (alreadyRendered || player == null || world == null) {
+		if (player == null || world == null) {
 			return;
-		}
-
-		if (!backupRendering) {
-			renderedUuid = entity.getUUID();
 		}
 
 		final int renderDistanceChunks = UtilitiesClient.getRenderDistance();
@@ -234,15 +204,15 @@ public class RenderTrains extends EntityRendererMapper<EntitySeat> implements IG
 		maxTrainRenderDistance = renderDistanceChunks * (Config.trainRenderDistanceRatio() + 1);
 //		}
 
-		if (!backupRendering) {
-			matrices.popPose();
-			matrices.pushPose();
-			final Vec3 cameraPosition = client.gameRenderer.getMainCamera().getPosition();
-			matrices.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-		}
+//		if (!backupRendering) {
+//			matrices.popPose();
+//			matrices.pushPose();
+//			final Vec3 cameraPosition = client.gameRenderer.getMainCamera().getPosition();
+//			matrices.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+//		}
 		matrices.pushPose();
 
-		TrainRendererBase.setupStaticInfo(matrices, vertexConsumers, entity, tickDelta);
+		TrainRendererBase.setupStaticInfo(matrices, vertexConsumers, tickDelta);
 		TrainRendererBase.setBatch(false);
 		ClientData.TRAINS.forEach(train -> train.renderTrain(world, newLastFrameDuration));
 		if (!Config.hideTranslucentParts()) {

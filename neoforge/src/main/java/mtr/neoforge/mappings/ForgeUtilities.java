@@ -128,7 +128,7 @@ public class ForgeUtilities {
 				matrices.pushPose();
 				final Vec3 cameraPos = event.getCamera().getPosition();
 				matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-				RenderTrains.render(null, 0, matrices, Minecraft.getInstance().renderBuffers().bufferSource());
+				RenderTrains.render(0, matrices, Minecraft.getInstance().renderBuffers().bufferSource());
 				matrices.popPose();
 			} else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
 				PoseStack matrices = event.getPoseStack();

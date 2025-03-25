@@ -37,7 +37,7 @@ public class MTRFabricClient implements ClientModInitializer, ICustomResources {
 			matrices.pushPose();
 			final Vec3 cameraPos = context.camera().getPosition();
 			matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-			RenderTrains.render(null, 0, matrices, context.consumers());
+			RenderTrains.render(0, matrices, context.consumers());
 			matrices.popPose();
 		});
 		WorldRenderEvents.LAST.register(event -> ResourcePackCreatorScreen.render(event.matrixStack()));

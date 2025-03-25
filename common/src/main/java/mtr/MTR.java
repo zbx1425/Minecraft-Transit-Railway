@@ -73,8 +73,6 @@ public class MTR implements IPacket {
 		registerBlockEntityType.accept("lift_door_1", BlockEntityTypes.LIFT_DOOR_EVEN_1_TILE_ENTITY);
 		registerBlockEntityType.accept("lift_door_odd_1", BlockEntityTypes.LIFT_DOOR_ODD_1_TILE_ENTITY);
 
-		registerEntityType.accept("seat", EntityTypes.SEAT);
-
 		if (!Keys.LIFTS_ONLY) {
 			registerItem.accept("apg_door", Items.APG_DOOR);
 			registerItem.accept("apg_glass", Items.APG_GLASS);

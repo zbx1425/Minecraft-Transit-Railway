@@ -1,7 +1,6 @@
 package mtr.data;
 
 import mtr.Registry;
-import mtr.entity.EntitySeat;
 import mtr.mappings.Utilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,8 +16,6 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 
 	private final Map<Player, Integer> playerRidingCoolDown = new HashMap<>();
 	private final Map<Player, Long> playerRidingRoute = new HashMap<>();
-	private final Map<Player, EntitySeat> playerSeats = new HashMap<>();
-	private final Map<Player, Integer> playerSeatCoolDowns = new HashMap<>();
 	private final Map<Player, Integer> playerShiftCoolDowns = new HashMap<>();
 
 	public final Set<Player> playerInVirtualDrive = new HashSet<>();
@@ -31,21 +28,6 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 
 	public void tick() {
 		world.players().forEach(player -> {
-			final Integer seatCoolDownOld = playerSeatCoolDowns.get(player);
-			final EntitySeat seatOld = playerSeats.get(player);
-			final EntitySeat seat;
-			if (seatCoolDownOld == null || seatCoolDownOld <= 0 || Utilities.entityRemoved(seatOld)) {
-				seat = new EntitySeat(world, player.getX(), player.getY(), player.getZ());
-				world.addFreshEntity(seat);
-				seat.initialize(player);
-				playerSeats.put(player, seat);
-				playerSeatCoolDowns.put(player, 3);
-			} else {
-				seat = playerSeats.get(player);
-				playerSeatCoolDowns.put(player, playerSeatCoolDowns.get(player) - 1);
-			}
-			seat.updateSeatByRailwayData(player);
-
 			final int oldShiftCoolDown = playerShiftCoolDowns.getOrDefault(player, 0);
 			final int shiftCoolDown;
 			if (player.isShiftKeyDown()) {
@@ -84,8 +66,6 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 	}
 
 	public void onPlayerDisconnect(Player player) {
-		playerSeats.remove(player);
-		playerSeatCoolDowns.remove(player);
 		playerShiftCoolDowns.remove(player);
 		playerInVirtualDrive.remove(player);
 	}
@@ -104,10 +84,6 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 			((ServerPlayer) player).gameMode.getGameModeForPlayer().updatePlayerAbilities(Utilities.getAbilities(player));
 		}
 		Registry.setInTeleportationState(player, isRiding);
-	}
-
-	public void updatePlayerSeatCoolDown(Player player) {
-		playerSeatCoolDowns.put(player, 3);
 	}
 
 	public boolean canRide(Player player) {
@@ -133,14 +109,6 @@ public class RailwayDataCoolDownModule extends RailwayDataModuleBase {
 			return railwayData.dataCache.routeIdMap.get(playerRidingRoute.get(player));
 		} else {
 			return null;
-		}
-	}
-
-	public void moveSeat(Player player, double x, double y, double z) {
-		final EntitySeat entitySeat = playerSeats.get(player);
-		if (entitySeat != null) {
-			player.startRiding(entitySeat);
-			entitySeat.setPos(x, y, z);
 		}
 	}
 
