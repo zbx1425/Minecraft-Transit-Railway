@@ -42,8 +42,8 @@ public class ModelDoorOverlay extends EntityModel<Entity> {
 
 	public ModelDoorOverlay(int doorMax, float angle, int pivotY, String overlayLeftTextureName, String overlayRightTextureName, boolean renderLeft, boolean renderRight) {
 		float angleRadians = (float) Math.toRadians(angle);
-		doorOverlayTextureLeft = ResourceLocation.parse("mtr:textures/block/sign/" + overlayLeftTextureName);
-		doorOverlayTextureRight = ResourceLocation.parse("mtr:textures/block/sign/" + overlayRightTextureName);
+		doorOverlayTextureLeft = ResourceLocation.parse("mtr:textures/entity/door_overlay/" + overlayLeftTextureName);
+		doorOverlayTextureRight = ResourceLocation.parse("mtr:textures/entity/door_overlay/" + overlayRightTextureName);
 		this.renderLeft = renderLeft;
 		this.renderRight = renderRight;
 
