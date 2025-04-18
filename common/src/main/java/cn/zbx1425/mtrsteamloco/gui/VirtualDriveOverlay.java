@@ -31,7 +31,7 @@ public class VirtualDriveOverlay {
     private static KeyMapping lastKey = null;
 
     private static int lastTargetState;
-    private static float atpBuzzerTriggerTime = 0;
+    private static double atpBuzzerTriggerTime = 0;
     private static final SoundEvent ATP_BUZZER_SOUND = SoundEvent.createVariableRangeEvent(Main.id("drive.atp_buzzer"));
 
     private static float delayedTrainSpeed, delayedAtpYellowSpeed, delayedAtpRedSpeed;
@@ -303,7 +303,7 @@ public class VirtualDriveOverlay {
 
     private static final float KEY_DELAY_BEFORE_REPEAT = 6f;
     private static final float KEY_REPEAT_INTERVAL = 3f;
-    private static float lastProcessedTick;
+    private static double lastProcessedTick;
     private static boolean anyKeyDown;
 
     private static boolean isKeyDownWithRepeat(KeyMapping key, DeltaTracker deltaT) {

@@ -47,7 +47,7 @@ public class DwellTimeBveTrainSound extends TrainSoundBase {
 
     private float elapsedDwellTicks = 0;
     private float totalDwellTicks = 0;
-    private float lastRenderedTick = 0;
+    private double lastRenderedTick = 0;
 
     @Override
     public void playAllCarsDoorOpening(Level world, BlockPos pos, int carIndex) {

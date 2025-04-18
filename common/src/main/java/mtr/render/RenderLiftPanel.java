@@ -125,14 +125,14 @@ public class RenderLiftPanel<T extends BlockLiftPanelBase.TileEntityLiftPanel1Ba
 		final boolean noFloorDisplay = floorDisplay.isEmpty();
 		final int lineCount = (noFloorNumber ? 0 : floorNumber.split("\\|").length) + (noFloorDisplay ? 0 : floorDisplay.split("\\|").length);
 		final float lineHeight = 1F / lineCount;
-		final float gameTick = MTRClient.getGameTick();
+		final double gameTick = MTRClient.getGameTick();
 		final boolean goingUp = liftDirection == Lift.LiftDirection.UP;
 		final float arrowSize = PANEL_WIDTH / 6;
 		final float y = -arrowSize - 0.125F;
 
 		// Arrow
 		if (liftDirection != Lift.LiftDirection.NONE) {
-			final float uv = (gameTick * ARROW_SPEED) % 1;
+			final float uv = (float)((gameTick * ARROW_SPEED) % 1);
 			final int color = goingUp ? 0xFF00FF00 : 0xFFFF0000;
 			IDrawing.drawTexture(matrices, vertexConsumers.getBuffer(MoreRenderLayers.getLight(ARROW_TEXTURE, false)), -PANEL_WIDTH / 2 - arrowSize, y, arrowSize, arrowSize, 0, (goingUp ? 0 : 1) + uv, 1, (goingUp ? 1 : 0) + uv, Direction.UP, color, MAX_LIGHT_GLOWING);
 			IDrawing.drawTexture(matrices, vertexConsumers.getBuffer(MoreRenderLayers.getLight(ARROW_TEXTURE, false)), PANEL_WIDTH / 2, y, arrowSize, arrowSize, 0, (goingUp ? 0 : 1) + uv, 1, (goingUp ? 1 : 0) + uv, Direction.UP, color, MAX_LIGHT_GLOWING);

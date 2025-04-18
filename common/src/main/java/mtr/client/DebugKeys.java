@@ -11,7 +11,7 @@ public class DebugKeys {
 
 	private int index;
 	private boolean isPressing;
-	private float lastPressedTicks;
+	private double lastPressedTicks;
 	private final int categories;
 	private final float scale;
 	private final int[] field1;
@@ -37,7 +37,7 @@ public class DebugKeys {
 		final boolean tempPressingCategoryPositive = KeyMappings.DEBUG_ROTATE_CATEGORY_POSITIVE.isDown();
 
 		final boolean tempIsPressing = tempPressing1Negative || tempPressing2Negative || tempPressing3Negative || tempPressing1Positive || tempPressing2Positive || tempPressing3Positive || tempPressingCategoryNegative || tempPressingCategoryPositive;
-		final float gameTick = MTRClient.getGameTick();
+		final double gameTick = MTRClient.getGameTick();
 
 		final boolean shouldIncrement;
 		final boolean fastPress;

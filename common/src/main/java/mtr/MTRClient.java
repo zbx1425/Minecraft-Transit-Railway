@@ -25,19 +25,11 @@ public class MTRClient implements IPacket {
 	private static boolean isReplayMod;
 	private static boolean isVivecraft;
 	private static boolean isPehkui;
-	private static float gameTick = 0;
-	private static float lastPlayedTrainSoundsTick = 0;
-
-	private static int tick;
-	private static long startSampleMillis;
-	private static float startSampleGameTick;
-	private static float gameTickTest;
-	private static int skipTicks;
-	private static int lastSkipTicks;
+	private static double gameTick = 0;
+	private static double lastPlayedTrainSoundsTick = 0;
 
 	public static final int TICKS_PER_SPEED_SOUND = 4;
 	public static final LoopingSoundInstance TACTILE_MAP_SOUND_INSTANCE = new LoopingSoundInstance("tactile_map_music");
-	private static final int SAMPLE_MILLIS = 1000;
 
 	public static void init() {
 		if (!Keys.LIFTS_ONLY) {
@@ -458,31 +450,12 @@ public class MTRClient implements IPacket {
 		return isPehkui;
 	}
 
-	public static float getGameTick() {
+	public static double getGameTick() {
 		return gameTick;
 	}
 
 	public static void incrementGameTick() {
-		final float lastFrameDuration = getLastFrameDuration();
-		gameTickTest += lastFrameDuration;
-		if (isReplayMod || tick == 0) {
-			gameTick += lastFrameDuration;
-		}
-		tick++;
-		if (tick >= skipTicks) {
-			tick = 0;
-		}
-
-		final long millis = System.currentTimeMillis();
-		if (millis - startSampleMillis >= SAMPLE_MILLIS) {
-			skipTicks = Math.round((gameTickTest - startSampleGameTick) * 50 / (millis - startSampleMillis));
-			startSampleMillis = millis;
-			startSampleGameTick = gameTickTest;
-			if (skipTicks != lastSkipTicks) {
-				// MTR.LOGGER.info("[NeoMTR] Tick skip updated to {}", skipTicks);
-			}
-			lastSkipTicks = skipTicks;
-		}
+		gameTick += getLastFrameDuration();
 		ClientData.tick();
 	}
 

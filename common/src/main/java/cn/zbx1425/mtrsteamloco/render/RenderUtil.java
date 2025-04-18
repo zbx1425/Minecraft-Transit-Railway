@@ -20,7 +20,7 @@ public class RenderUtil {
 
     public static double runningSeconds;
     public static double frameSeconds;
-    private static float lastRenderedTick = 0;
+    private static double lastRenderedTick = 0;
 
     public static void updateElapsedTicks() {
         final float lastFrameDuration = MTRClient.getLastFrameDuration();

@@ -10,7 +10,7 @@ import net.minecraft.core.Direction;
 
 public class ScrollingText implements IGui {
 
-	private float ticksOffset;
+	private double ticksOffset;
 	private ClientCache.DynamicResource dynamicResource;
 	private VertexConsumer vertexConsumer;
 
@@ -44,7 +44,7 @@ public class ScrollingText implements IGui {
 			final int widthSteps = (int) Math.floor(availableWidth / scale / pixelScale);
 			final int imageSteps = dynamicResource.width / pixelScale;
 			final int totalSteps = widthSteps + imageSteps;
-			final int step = Math.round((MTRClient.getGameTick() - ticksOffset) * scrollSpeed) % totalSteps;
+			final int step = (int) (Math.round((MTRClient.getGameTick() - ticksOffset) * scrollSpeed) % totalSteps);
 			final float width = Math.min(Math.min(availableWidth, dynamicResource.width * scale), Math.min(step * pixelScale * scale, (totalSteps - step) * pixelScale * scale));
 			IDrawing.drawTexture(matrices, vertexConsumer, Math.max(widthSteps - step, 0) * scale * pixelScale, 0, width, availableHeight, Math.max((float) (step - widthSteps) / imageSteps, 0), 0, Math.min((float) step / imageSteps, 1), 1, Direction.UP, ARGB_WHITE, MAX_LIGHT_GLOWING);
 		}

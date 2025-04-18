@@ -81,7 +81,7 @@ public class RenderTrainDK3 extends TrainRendererBase {
 
     private float elapsedDwellTicks = 0;
     private float totalDwellTicks = 0;
-    private float lastRenderedTick = 0;
+    private double lastRenderedTick = 0;
 
     @Override
     public void renderCar(int carIndex, double x, double y, double z, float yaw, float pitch, float roll, boolean doorLeftOpen, boolean doorRightOpen) {

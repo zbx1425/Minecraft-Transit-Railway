@@ -45,7 +45,7 @@ public class RenderTrains implements IGui {
 	public static int maxTrainRenderDistance;
 	public static ResourcePackCreatorProperties creatorProperties = new ResourcePackCreatorProperties();
 
-	private static float lastSimulatedTick;
+	private static double lastSimulatedTick;
 	private static float newLastFrameDuration;
 
 	private static int prevPlatformCount;

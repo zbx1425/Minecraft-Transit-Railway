@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 
 public class MiScheduleHelper {
 
-    private float lastRenderedTick = 0;
+    private double lastRenderedTick = 0;
 
     public float currentFrameTime = 0;
     private float targetFrameTime = 0;
