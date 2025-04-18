@@ -138,12 +138,9 @@ public class ResourcePackCreatorOptionsScreen extends ScreenMapper implements IR
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+		super.renderBackground(guiGraphics, mouseX, mouseY, delta);
 		try {
-			super.render(guiGraphics, mouseX, mouseY, delta);
-			guiGraphics.pose().pushPose();
-			guiGraphics.pose().translate(0, 0, -100);
-			guiGraphics.pose().popPose();
 			final int yStart = (height - SQUARE_SIZE * 10 - TEXT_FIELD_PADDING * 4) / 2;
 			guiGraphics.drawString(font, FILE_MODEL_TEXT, SQUARE_SIZE, yStart + TEXT_PADDING, ARGB_WHITE);
 			guiGraphics.drawString(font, FILE_PROPERTIES_TEXT, SQUARE_SIZE, yStart + SQUARE_SIZE + TEXT_PADDING, ARGB_WHITE);
@@ -155,6 +152,7 @@ public class ResourcePackCreatorOptionsScreen extends ScreenMapper implements IR
 		} catch (Exception e) {
 			MTR.LOGGER.error("", e);
 		}
+		guiGraphics.pose().translate(0, 0, 100);
 	}
 
 	@Override

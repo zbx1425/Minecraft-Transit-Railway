@@ -369,12 +369,9 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+		super.renderBackground(guiGraphics, mouseX, mouseY, delta);
 		try {
-			super.render(guiGraphics, mouseX, mouseY, delta);
-			guiGraphics.pose().pushPose();
-			guiGraphics.pose().translate(0, 0, -100);
-
 			if (guiCounter == 0 && minecraft != null) {
 				hideGui = minecraft.options.hideGui;
 				guiGraphics.fill(0, 0, width, height, ARGB_BLACK);
@@ -384,9 +381,6 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 			guiGraphics.fill(width - PANEL_WIDTH, 0, width, height, ARGB_BACKGROUND);
 			availableModelPartsList.render(guiGraphics, font);
 			usedModelPartsList.render(guiGraphics, font);
-
-			guiGraphics.pose().popPose();
-
 			if (isEditing()) {
 				guiGraphics.drawCenteredString(font, Text.translatable("gui.mtr.editing_part", RenderTrains.creatorProperties.getPropertiesPartsArray().get(editingPartIndex).getAsJsonObject().get(KEY_PROPERTIES_NAME).getAsString()), PANEL_WIDTH / 2, TEXT_PADDING, ARGB_WHITE);
 				if (colorSelectorDisplay.visible) {
@@ -402,6 +396,7 @@ public class ResourcePackCreatorScreen extends ScreenMapper implements IResource
 		} catch (Exception e) {
 			MTR.LOGGER.error("", e);
 		}
+		guiGraphics.pose().translate(0, 0, 100);
 		guiCounter = 2;
 	}
 

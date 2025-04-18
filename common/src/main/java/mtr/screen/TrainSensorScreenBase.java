@@ -112,11 +112,9 @@ public abstract class TrainSensorScreenBase extends ScreenMapper implements IGui
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+		super.renderBackground(guiGraphics, mouseX, mouseY, delta);
 		try {
-			super.render(guiGraphics, mouseX, mouseY, delta);
-			guiGraphics.pose().pushPose();
-			guiGraphics.pose().translate(0, 0, -100);
 			for (int i = 0; i < textFieldCount; i++) {
 				guiGraphics.drawString(font, textFieldLabels[i], SQUARE_SIZE + (width / 2 - SQUARE_SIZE) * i, SQUARE_SIZE, ARGB_WHITE);
 			}
@@ -131,10 +129,10 @@ public abstract class TrainSensorScreenBase extends ScreenMapper implements IGui
 				i += TEXT_HEIGHT;
 			}
 			renderAdditional(guiGraphics);
-			guiGraphics.pose().popPose();
 		} catch (Exception e) {
 			MTR.LOGGER.error("", e);
 		}
+		guiGraphics.pose().translate(0, 0, 100);
 	}
 
 	@Override

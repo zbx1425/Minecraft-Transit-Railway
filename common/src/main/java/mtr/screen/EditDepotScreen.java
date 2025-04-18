@@ -191,11 +191,9 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+		super.renderBackground(guiGraphics, mouseX, mouseY, delta);
 		try {
-			super.render(guiGraphics, mouseX, mouseY, delta);
-			guiGraphics.pose().pushPose();
-			guiGraphics.pose().translate(0, 0, -100);
 			guiGraphics.vLine(rightPanelsX - 1, -1, height, ARGB_WHITE_TRANSLUCENT);
 			renderTextFields(guiGraphics);
 
@@ -211,8 +209,6 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 				UtilitiesClient.setWidgetY(sliders[i], SQUARE_SIZE * 2 + lineHeight * i);
 				sliders[i].setHeight(lineHeight);
 			}
-
-			guiGraphics.pose().popPose();
 
 			final int yStartRightPane = PANELS_START + SQUARE_SIZE * (checkboxRepeatIndefinitely.visible ? 3 : 2) + (showCruisingAltitude ? SQUARE_SIZE + TEXT_FIELD_PADDING : 0) + TEXT_PADDING;
 			if (showCruisingAltitude) {
@@ -245,7 +241,9 @@ public class EditDepotScreen extends EditNameColorScreenBase<Depot> {
 		} catch (Exception e) {
 			MTR.LOGGER.error("", e);
 		}
+		guiGraphics.pose().translate(0, 0, 100);
 	}
+
 
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
