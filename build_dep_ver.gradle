@@ -1,4 +1,4 @@
-String default_minecraft_version = "1.19.2"
+String default_minecraft_version = "1.21.1"
 Properties localProperties = new Properties()
 String minecraft_version
 if (project.rootProject.file('build.properties').exists()) {
