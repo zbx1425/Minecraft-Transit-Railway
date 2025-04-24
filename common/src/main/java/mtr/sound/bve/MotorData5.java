@@ -62,6 +62,7 @@ public class MotorData5 extends MotorDataBase { // 5 for BVE5 and BVE6
 					continue;
 				}
 				String[] tokens = lineTrim.split(","); // Trailing entries automatically removed
+				if (tokens.length == 0) continue;
 
 				while (data.size() < tokens.length - 1) {
 					data.add(new TreeMap<>());
