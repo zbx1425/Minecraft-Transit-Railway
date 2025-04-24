@@ -136,6 +136,10 @@ public class BveTrainSound extends TrainSoundBase {
 			}
 		}
 
+		if (motorCurrentOutput != 0) {
+			motorCurrentOutput = Math.signum(motorCurrentOutput) * (0.3f + Math.abs(motorCurrentOutput) * (1 - 0.3f));
+		}
+
 		// Simulation of main reservoir air compressor
 		if (mrPress <= config.soundCfg.mrPressMin) {
 			isCompressorActive = true;
