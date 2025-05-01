@@ -5,12 +5,15 @@ import cn.zbx1425.mtrsteamloco.block.BlockEyeCandy;
 import cn.zbx1425.mtrsteamloco.data.EyeCandyProperties;
 import cn.zbx1425.mtrsteamloco.data.EyeCandyRegistry;
 import cn.zbx1425.mtrsteamloco.network.PacketUpdateBlockEntity;
+
+import com.google.common.primitives.Floats;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import mtr.client.IDrawing;
 import mtr.mappings.Text;
 import mtr.mappings.UtilitiesClient;
 import mtr.screen.WidgetBetterCheckbox;
+import mtr.screen.WidgetBetterTextField;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 #if MC_VERSION >= "12000"
@@ -28,6 +31,8 @@ public class EyeCandyScreen extends SelectListScreen {
 
     private boolean isSelectingModel = false;
 
+    private WidgetBetterTextField textFieldScale;
+
     private static final String INSTRUCTION_LINK = "https://www.zbx1425.cn/nautilus/mtr-nte/#/eyecandy";
     private final WidgetLabel lblInstruction = new WidgetLabel(0, 0, 0, Text.translatable("gui.mtrsteamloco.eye_candy.tip_resource_pack"), () -> {
         this.minecraft.setScreen(new ConfirmLinkScreen(bl -> {
@@ -42,13 +47,13 @@ public class EyeCandyScreen extends SelectListScreen {
 
     public EyeCandyScreen(BlockPos blockPos) {
         super(Text.literal("Select EyeCandy"));
+        textFieldScale = new WidgetBetterTextField("gui.mtr.scale");
         this.editingBlockPos = blockPos;
     }
 
     @Override
     protected void init() {
         super.init();
-
         loadPage();
     }
 
@@ -105,6 +110,15 @@ public class EyeCandyScreen extends SelectListScreen {
                 sender -> { isSelectingModel = true; loadPage(); }
         )), SQUARE_SIZE, SQUARE_SIZE, COLUMN_WIDTH * 3);
 
+        textFieldScale.setValue(String.format(Locale.ROOT, "%.2f", blockEntity.scale));
+        textFieldScale.setResponder(input -> {
+            if (Floats.tryParse(input) instanceof Float parsed) {
+                updateBlockEntity(be -> be.scale = parsed);
+            }
+        });
+
+        IDrawing.setPositionAndWidth(textFieldScale, SQUARE_SIZE + COLUMN_WIDTH * 3 + SQUARE_SIZE / 2, SQUARE_SIZE, SQUARE_SIZE * 2);
+
         IDrawing.setPositionAndWidth(addRenderableWidget(new WidgetSlider(
                 20 * 2, (int)Math.round(blockEntity.translateX * 100 / 5f) + 20,
                 value -> { updateBlockEntity(be -> be.translateX = (value - 20) * 5f / 100f); return "TX " + ((value - 20) * 5) + "cm"; }
@@ -131,14 +145,11 @@ public class EyeCandyScreen extends SelectListScreen {
                 value -> { updateBlockEntity(be -> be.rotateZ = (float)Math.toRadians((value - 18) * 5f)); return "RZ " + ((value - 18) * 5) + "°"; }
         )), SQUARE_SIZE + (width - SQUARE_SIZE * 2) / 3 * 2, SQUARE_SIZE * 4, (width - SQUARE_SIZE * 2) / 3);
 
-        addRenderableWidget(new WidgetBetterCheckbox(SQUARE_SIZE, SQUARE_SIZE * 6, COLUMN_WIDTH * 2, SQUARE_SIZE,
-                Text.translatable("gui.mtrsteamloco.eye_candy.full_light"),
-                checked -> updateBlockEntity((be) -> be.fullLight = checked)
-        )).setChecked(blockEntity.fullLight);
-
         IDrawing.setPositionAndWidth(addRenderableWidget(UtilitiesClient.newButton(
                 Text.literal("X"), sender -> this.onClose()
         )), width - SQUARE_SIZE * 2, height - SQUARE_SIZE * 2, SQUARE_SIZE);
+
+        addDrawableChild(textFieldScale);
     }
 
     private void updateBlockEntity(Consumer<BlockEyeCandy.BlockEntityEyeCandy> modifier) {

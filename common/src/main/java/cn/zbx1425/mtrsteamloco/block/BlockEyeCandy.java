@@ -81,6 +81,7 @@ public class BlockEyeCandy extends BlockDirectionalMapper implements EntityBlock
 
         public float translateX = 0, translateY = 0, translateZ = 0;
         public float rotateX = 0, rotateY = 0, rotateZ = 0;
+        public float scale = 1.0f;
 
         public boolean fullLight = false;
 
@@ -102,6 +103,7 @@ public class BlockEyeCandy extends BlockDirectionalMapper implements EntityBlock
             rotateX = compoundTag.contains("rotateX") ? compoundTag.getFloat("rotateX") : 0;
             rotateY = compoundTag.contains("rotateY") ? compoundTag.getFloat("rotateY") : 0;
             rotateZ = compoundTag.contains("rotateZ") ? compoundTag.getFloat("rotateZ") : 0;
+            scale = compoundTag.contains("scale") ? compoundTag.getFloat("scale") : 1.0f;
         }
 
         @Override
@@ -115,6 +117,7 @@ public class BlockEyeCandy extends BlockDirectionalMapper implements EntityBlock
             compoundTag.putFloat("rotateX", rotateX);
             compoundTag.putFloat("rotateY", rotateY);
             compoundTag.putFloat("rotateZ", rotateZ);
+            compoundTag.putFloat("scale", scale);
         }
 
         public BlockPos getWorldPos() {
