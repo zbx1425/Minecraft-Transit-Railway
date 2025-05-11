@@ -1,0 +1,20 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"BIB",
+		"BIB",
+		"BIB"
+	],
+	"key": {
+		"B": {
+			"tag": "minecraft:fences"
+		},
+		"I": {
+			"tag": "c:iron_ingots"
+		}
+	},
+	"result": {
+		"count": 8,
+		"id": "mtr:signal_pole"
+	}
+}
