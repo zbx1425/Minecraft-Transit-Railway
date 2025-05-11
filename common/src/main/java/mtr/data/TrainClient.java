@@ -153,14 +153,6 @@ public class TrainClient extends Train implements IGui {
 
 		try {
 			final int totalDwellTicks = getTotalDwellTicks();
-			if (path.isEmpty()) {
-				trainSound.stopAll();
-				return;
-			}
-			if (!handlePositions(world, keyPointsPositions, ticksElapsed, true)) {
-				trainSound.stopAll();
-				return;
-			}
 			final double[] prevX = {0};
 			final double[] prevY = {0};
 			final double[] prevZ = {0};
@@ -187,49 +179,6 @@ public class TrainClient extends Train implements IGui {
 					prevRoll[0] = roll;
 				});
 			}
-
-			final Entity camera = Minecraft.getInstance().cameraEntity;
-			final Vec3 cameraPos = camera == null ? Vec3.ZERO : camera.position();
-			Vec3 nearestPoint = keyPointsPositions[0];
-			double nearestDistance = Double.POSITIVE_INFINITY;
-			int nearestCar = 0;
-			for (int i = 0; i < trainCars; i++) {
-				Vec3 v = keyPointsPositions[i * 2 + 1].subtract(keyPointsPositions[i * 2]);
-				Vec3 w = cameraPos.subtract(keyPointsPositions[i * 2]);
-
-				double c1 = w.dot(v);
-				if ( c1 <= 0 ) {
-					final double checkDistance = keyPointsPositions[i * 2].distanceToSqr(cameraPos);
-					if (checkDistance < nearestDistance) {
-						nearestCar = i;
-						nearestDistance = checkDistance;
-						nearestPoint = keyPointsPositions[i * 2];
-					}
-					continue;
-				}
-
-				double c2 = v.dot(v);
-				if ( c2 <= c1 ) {
-					final double checkDistance = keyPointsPositions[i * 2 + 1].distanceToSqr(cameraPos);
-					if (checkDistance < nearestDistance) {
-						nearestCar = i;
-						nearestDistance = checkDistance;
-						nearestPoint = keyPointsPositions[i * 2 + 1];
-					}
-					continue;
-				}
-
-				double b = c1 / c2;
-				Vec3 Pb = keyPointsPositions[i * 2].add(v.scale(b));
-				final double checkDistance = Pb.distanceToSqr(cameraPos);
-				if (checkDistance < nearestDistance) {
-					nearestCar = i;
-					nearestDistance = checkDistance;
-					nearestPoint = Pb;
-				}
-			}
-			final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
-			if (ticksElapsed > 0) trainSound.playNearestCar(world, soundPos, nearestCar);
 		} catch (Exception e) {
 			MTR.LOGGER.error("", e);
 		}
@@ -443,6 +392,61 @@ public class TrainClient extends Train implements IGui {
 
 		this.speedCallback = null;
 		this.announcementCallback = null;
+
+
+
+		// Update sound
+		if (path.isEmpty()) {
+			trainSound.stopAll();
+			return;
+		}
+		if (!handlePositions(world, keyPointsPositions, ticksElapsed, true)) {
+			trainSound.stopAll();
+			return;
+		}
+
+		final Entity camera = Minecraft.getInstance().cameraEntity;
+		final Vec3 cameraPos = camera == null ? Vec3.ZERO : camera.position();
+		Vec3 nearestPoint = keyPointsPositions[0];
+		double nearestDistance = Double.POSITIVE_INFINITY;
+		int nearestCar = 0;
+		for (int i = 0; i < trainCars; i++) {
+			Vec3 v = keyPointsPositions[i * 2 + 1].subtract(keyPointsPositions[i * 2]);
+			Vec3 w = cameraPos.subtract(keyPointsPositions[i * 2]);
+
+			double c1 = w.dot(v);
+			if ( c1 <= 0 ) {
+				final double checkDistance = keyPointsPositions[i * 2].distanceToSqr(cameraPos);
+				if (checkDistance < nearestDistance) {
+					nearestCar = i;
+					nearestDistance = checkDistance;
+					nearestPoint = keyPointsPositions[i * 2];
+				}
+				continue;
+			}
+
+			double c2 = v.dot(v);
+			if ( c2 <= c1 ) {
+				final double checkDistance = keyPointsPositions[i * 2 + 1].distanceToSqr(cameraPos);
+				if (checkDistance < nearestDistance) {
+					nearestCar = i;
+					nearestDistance = checkDistance;
+					nearestPoint = keyPointsPositions[i * 2 + 1];
+				}
+				continue;
+			}
+
+			double b = c1 / c2;
+			Vec3 Pb = keyPointsPositions[i * 2].add(v.scale(b));
+			final double checkDistance = Pb.distanceToSqr(cameraPos);
+			if (checkDistance < nearestDistance) {
+				nearestCar = i;
+				nearestDistance = checkDistance;
+				nearestPoint = Pb;
+			}
+		}
+		final BlockPos soundPos = RailwayData.newBlockPos(nearestPoint.x, nearestPoint.y, nearestPoint.z);
+		if (ticksElapsed > 0) trainSound.playNearestCar(world, soundPos, nearestCar);
 	}
 
 	@Override
