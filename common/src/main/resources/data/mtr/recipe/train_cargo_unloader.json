@@ -1,0 +1,30 @@
+{
+	"type": "minecraft:crafting_shapeless",
+	"ingredients": [
+		{
+			"item": "minecraft:hopper"
+		},
+		{
+			"item": "minecraft:chest"
+		},
+		{
+			"tag": "c:redstone_dusts"
+		},
+		{
+			"item": "minecraft:smooth_stone"
+		},
+		{
+			"item": "minecraft:smooth_stone"
+		},
+		{
+			"item": "minecraft:smooth_stone"
+		},
+		{
+			"tag": "c:nodes"
+		}
+	],
+	"result": {
+		"count": 3,
+		"id": "mtr:train_cargo_unloader"
+	}
+}
