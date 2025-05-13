@@ -88,6 +88,7 @@ public class BlockEntityEyeCandyRenderer extends BlockEntityRendererMapper<Block
         candyPose.rotateX(blockEntity.rotateX);
         candyPose.rotateY(blockEntity.rotateY);
         candyPose.rotateZ(blockEntity.rotateZ);
+        candyPose.scale(blockEntity.scale, blockEntity.scale, blockEntity.scale);
         if (prop.model != null) {
             MainClient.drawScheduler.enqueue(prop.model, candyPose, lightToUse);
         }
